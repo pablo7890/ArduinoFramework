@@ -1,0 +1,92 @@
+<title>Pio Gazeta</title>
+<meta name="description" content="Nowy wygląd aktualności i kalendarza wydarzeń parafii św. Ojca Pio w Gdańsku – podgląd na prawdziwych treściach.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&display=swap">
+<style>
+{{CSS}}
+</style>
+
+<div class="pv">
+	<header class="pv-bar">
+		<div class="pv-bar__in">
+			<p class="pv-brand"><b>Pio Gazeta</b><span>projekt dla parafiapio.pl</span></p>
+			<nav class="pv-tabs" role="tablist" aria-label="Widoki">
+				<a href="#home" role="tab" id="tab-home" aria-controls="home" aria-selected="true">Strona główna</a>
+				<a href="#wydarzenie" role="tab" id="tab-wydarzenie" aria-controls="wydarzenie" aria-selected="false">Wydarzenie</a>
+				<a href="#kalendarz" role="tab" id="tab-kalendarz" aria-controls="kalendarz" aria-selected="false">Kalendarz</a>
+			</nav>
+		</div>
+	</header>
+
+	<main class="pv-main">
+		<section class="pv-view" id="home" role="tabpanel" aria-labelledby="tab-home">
+			<ul class="pv-hints" aria-label="Co warto sprawdzić">
+				<li><b>Najedź</b> na zdjęcie z licznikiem zdjęć – przewinie się podgląd galerii.</li>
+				<li><b>Kliknij</b> kategorię nad wpisami – układ przełoży się płynnie.</li>
+				<li><b>Kliknij</b> kropkę lub pasek na osi wydarzeń – przeniesie do wydarzenia.</li>
+			</ul>
+			<div class="pv-stack">
+				{{HOME}}
+			</div>
+		</section>
+
+		<section class="pv-view" id="wydarzenie" role="tabpanel" aria-labelledby="tab-wydarzenie" hidden>
+			{{SINGLE}}
+		</section>
+
+		<section class="pv-view pio-tec" id="kalendarz" role="tabpanel" aria-labelledby="tab-kalendarz" hidden>
+			{{ARCHIVE}}
+		</section>
+	</main>
+
+	<footer class="pv-foot">
+		<p>Podgląd zbudowany z szablonów wtyczki na treściach z parafiapio.pl ({{NPOSTS}} wpisów, {{NEVENTS}} wydarzeń), stan na {{TODAY}}. Kategorie wpisów w podglądzie to propozycja – dziś prawie wszystkie wpisy mają kategorię „Aktualności”.</p>
+	</footer>
+</div>
+
+<script>
+(function () {
+	var IMG = {{IMAGES}};
+	Array.prototype.forEach.call(document.querySelectorAll('img[data-k]'), function (img) {
+		img.src = IMG[img.getAttribute('data-k')] || '';
+	});
+	Array.prototype.forEach.call(document.querySelectorAll('[data-gallery]'), function (el) {
+		try {
+			var list = JSON.parse(el.getAttribute('data-gallery')).map(function (k) { return IMG[k] || k; });
+			el.setAttribute('data-gallery', JSON.stringify(list));
+		} catch (e) {}
+	});
+
+	var views = ['home', 'wydarzenie', 'kalendarz'];
+	function show(id, scroll) {
+		if (views.indexOf(id) < 0) { id = 'home'; }
+		views.forEach(function (v) {
+			document.getElementById(v).hidden = v !== id;
+			document.getElementById('tab-' + v).setAttribute('aria-selected', v === id ? 'true' : 'false');
+		});
+		if (scroll) { window.scrollTo(0, 0); }
+	}
+	document.addEventListener('click', function (e) {
+		var a = e.target.closest && e.target.closest('a[href]');
+		if (!a) { return; }
+		var href = a.getAttribute('href');
+		if (href === '#home' || href === '#wydarzenie' || href === '#kalendarz') {
+			e.preventDefault();
+			history.replaceState(null, '', href);
+			show(href.slice(1), true);
+			return;
+		}
+		// The one event rendered as a single view opens in-page.
+		if (a.href.indexOf('/wydarzenie/ix-kongres-grupy-modlitwy-ojca-pio') > -1) {
+			e.preventDefault();
+			history.replaceState(null, '', '#wydarzenie');
+			show('wydarzenie', true);
+		}
+	});
+	show((location.hash || '#home').slice(1), false);
+})();
+</script>
+<script>
+{{JS}}
+</script>
