@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       Parafia: PioDesign
- * Description:       Nowa strona główna parafii: redakcyjny układ aktualności, oś wydarzeń The Events Calendar, widok pojedynczego wydarzenia i listy wydarzeń. Shortcode'y: [pio_aktualnosci], [pio_wydarzenia].
- * Version:           1.0
+ * Description:       Nowoczesny wygląd parafii na Avadzie: aktualności i ich archiwum, oś wydarzeń The Events Calendar, sakramenty, cytaty, liturgia dnia i informacje parafialne. Ustawienia → PioDesign.
+ * Version:           1.1
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            cruzLabs
@@ -13,15 +13,17 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PIODESIGN_VERSION', '1.0' );
+define( 'PIODESIGN_VERSION', '1.1' );
 define( 'PIODESIGN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PIODESIGN_URL', plugin_dir_url( __FILE__ ) );
 
 require_once PIODESIGN_DIR . 'includes/core.php';
+require_once PIODESIGN_DIR . 'includes/sections-core.php';
 require_once PIODESIGN_DIR . 'includes/wp-data.php';
 require_once PIODESIGN_DIR . 'includes/tec.php';
 require_once PIODESIGN_DIR . 'includes/settings.php';
 require_once PIODESIGN_DIR . 'includes/archive.php';
+require_once PIODESIGN_DIR . 'includes/sections.php';
 
 /* ---------------------------------------------------------------------------
  * Assets
@@ -30,15 +32,12 @@ require_once PIODESIGN_DIR . 'includes/archive.php';
 add_action(
 	'wp_enqueue_scripts',
 	static function () {
+		// Typefaces come from Avada's Global Options; the plugin loads none.
 		$deps = [];
-		// Fonts ship with the plugin (no requests to Google). Turn off when
-		// the theme already provides Bricolage Grotesque and Newsreader.
-		if ( apply_filters( 'piodesign_load_fonts', true ) ) {
-			wp_register_style( 'piodesign-fonts', PIODESIGN_URL . 'assets/piodesign-fonts.css', [], PIODESIGN_VERSION );
-			$deps[] = 'piodesign-fonts';
-		}
-		wp_register_style( 'piodesign', PIODESIGN_URL . 'assets/piodesign.css', $deps, PIODESIGN_VERSION );
-		wp_register_script( 'piodesign', PIODESIGN_URL . 'assets/piodesign.js', [], PIODESIGN_VERSION, [ 'in_footer' => true, 'strategy' => 'defer' ] );
+		// File times in the version string bust browser and CDN caches on every update.
+		$ver = static fn( $f ) => PIODESIGN_VERSION . '.' . (int) @filemtime( PIODESIGN_DIR . $f );
+		wp_register_style( 'piodesign', PIODESIGN_URL . 'assets/piodesign.css', $deps, $ver( 'assets/piodesign.css' ) );
+		wp_register_script( 'piodesign', PIODESIGN_URL . 'assets/piodesign.js', [], $ver( 'assets/piodesign.js' ), [ 'in_footer' => true, 'strategy' => 'defer' ] );
 
 		if ( piodesign_should_enqueue() ) {
 			wp_enqueue_style( 'piodesign' );
@@ -47,25 +46,20 @@ add_action(
 	}
 );
 
-add_action(
-	'wp_head',
-	static function () {
-		if ( ! apply_filters( 'piodesign_load_fonts', true ) || ! ( piodesign_should_enqueue() || piodesign_option( 'site_fonts' ) ) ) {
-			return;
-		}
-		foreach ( [ 'bricolage-grotesque-latin', 'newsreader-latin' ] as $font ) {
-			printf( '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url( PIODESIGN_URL . 'assets/fonts/' . $font . '.woff2' ) );
-		}
-	},
-	2
-);
-
 function piodesign_should_enqueue() {
 	if ( is_front_page() || piodesign_is_news_archive() || ( function_exists( 'tribe_is_event_query' ) && tribe_is_event_query() ) ) {
 		return true;
 	}
 	$post = get_post();
-	return $post && ( has_shortcode( $post->post_content, 'pio_aktualnosci' ) || has_shortcode( $post->post_content, 'pio_wydarzenia' ) );
+	if ( ! $post ) {
+		return false;
+	}
+	foreach ( [ 'pio_aktualnosci', 'pio_wydarzenia', 'pio_sakramenty', 'pio_cytaty', 'pio_informacje', 'pio_liturgia', 'pio_archiwum' ] as $tag ) {
+		if ( has_shortcode( $post->post_content, $tag ) ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function piodesign_enqueue_late() {
@@ -93,12 +87,13 @@ function piodesign_cached( $name, array $atts, callable $build ) {
 }
 
 $piodesign_bump = static function ( $post_id ) {
-	if ( in_array( get_post_type( $post_id ), [ 'post', 'tribe_events', 'tribe_venue', 'tribe_organizer', 'attachment', 'foogallery' ], true ) ) {
+	if ( in_array( get_post_type( $post_id ), [ 'post', 'page', 'tribe_events', 'tribe_venue', 'tribe_organizer', 'attachment', 'foogallery' ], true ) ) {
 		update_option( 'piodesign_cache_v', (int) get_option( 'piodesign_cache_v', 1 ) + 1, false );
 	}
 };
 add_action( 'save_post', $piodesign_bump );
 add_action( 'deleted_post', $piodesign_bump );
+add_action( 'update_option_piodesign_settings', static fn() => update_option( 'piodesign_cache_v', (int) get_option( 'piodesign_cache_v', 1 ) + 1, false ) );
 
 /* ---------------------------------------------------------------------------
  * Shortcodes
@@ -126,9 +121,8 @@ add_shortcode(
 			$atts,
 			static function () use ( $atts ) {
 				$now         = piodesign_now();
-				$posts_page  = (int) get_option( 'page_for_posts' );
 				$archive_url = $atts['archive_url']
-					?: ( $atts['category'] ? get_category_link( get_category_by_slug( $atts['category'] ) ) : ( $posts_page ? get_permalink( $posts_page ) : home_url( '/aktualnosci/' ) ) );
+					?: ( $atts['category'] ? get_category_link( get_category_by_slug( $atts['category'] ) ) : piodesign_archive_url() );
 
 				return piodesign_render(
 					'news',

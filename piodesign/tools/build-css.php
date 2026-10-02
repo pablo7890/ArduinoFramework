@@ -85,7 +85,7 @@ function piodesign_process( $css ) {
 		$prelude = substr( $css, $i, $brace - $i );
 		$inner   = substr( $css, $brace + 1, $j - $brace - 1 );
 		$head    = ltrim( $prelude );
-		if ( 0 === strpos( $head, '@media' ) || 0 === strpos( $head, '@supports' ) ) {
+		if ( 0 === strpos( $head, '@media' ) || 0 === strpos( $head, '@supports' ) || 0 === strpos( $head, '@container' ) ) {
 			$out .= $prelude . '{' . piodesign_process( $inner ) . '}';
 		} elseif ( '@' === substr( $head, 0, 1 ) ) {
 			$out .= $prelude . '{' . $inner . '}'; // @keyframes, @font-face: untouched.

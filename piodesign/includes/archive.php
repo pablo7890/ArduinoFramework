@@ -1,7 +1,9 @@
 <?php
 /**
- * News archive: posts page, categories, tags, month archives and searches
- * limited to posts use templates/news-archive.php inside the Avada shell.
+ * News archive: the "Aktualności" page (Settings → PioDesign, or the page
+ * with the slug "aktualnosci"), the posts page, categories, tags, month
+ * archives and searches limited to posts use templates/news-archive.php
+ * inside the Avada shell. [pio_archiwum] renders the same archive anywhere.
  *
  * @package PioDesign
  */
@@ -15,7 +17,16 @@ function piodesign_is_news_archive() {
 	if ( is_search() ) {
 		return 'post' === get_query_var( 'post_type' );
 	}
+	$page = piodesign_archive_page_id();
+	if ( $page && is_page( $page ) ) {
+		return true;
+	}
 	return ( is_home() && ! is_front_page() ) || is_category() || is_tag() || ( is_date() && ! is_day() );
+}
+
+/** Current page number on archives and on a static page (/aktualnosci/page/2/). */
+function piodesign_paged() {
+	return max( 1, (int) get_query_var( 'paged' ), (int) get_query_var( 'page' ) );
 }
 
 add_action(
@@ -54,36 +65,54 @@ add_filter(
 /**
  * HTML of the archive for the current main query.
  */
-function piodesign_news_archive_html() {
+function piodesign_news_archive_html( array $args = [] ) {
 	global $wp_query;
 
-	$posts_page = (int) get_option( 'page_for_posts' );
-	$all_url    = $posts_page ? get_permalink( $posts_page ) : home_url( '/' );
-	$kicker     = 'Z życia parafii';
-	$title      = 'Aktualności';
-	$desc       = '';
+	$on_page = is_page() || ! empty( $args['standalone'] );
+	if ( $on_page ) {
+		// A static page: run our own posts query for the current page number.
+		$query = new WP_Query(
+			apply_filters(
+				'piodesign_archive_query',
+				[
+					'post_type'      => 'post',
+					'post_status'    => 'publish',
+					'posts_per_page' => (int) piodesign_option( 'archive_per_page' ),
+					'paged'          => piodesign_paged(),
+					'category_name'  => $args['category'] ?? '',
+				]
+			)
+		);
+	} else {
+		$query = $wp_query;
+	}
 
-	if ( is_category() ) {
+	$all_url = piodesign_archive_url();
+	$kicker  = $args['kicker'] ?? 'Z życia parafii';
+	$title   = $args['title'] ?? 'Aktualności';
+	$desc    = '';
+
+	if ( is_category() && ! $on_page ) {
 		$kicker = 'Kategoria';
 		$title  = single_cat_title( '', false );
 		$desc   = term_description();
-	} elseif ( is_tag() ) {
+	} elseif ( is_tag() && ! $on_page ) {
 		$kicker = 'Temat';
 		$title  = single_tag_title( '', false );
 		$desc   = term_description();
-	} elseif ( is_month() ) {
+	} elseif ( is_month() && ! $on_page ) {
 		$kicker = 'Archiwum';
 		$title  = piodesign_months( 'nom' )[ (int) get_query_var( 'monthnum' ) ] . ' ' . get_query_var( 'year' );
-	} elseif ( is_year() ) {
+	} elseif ( is_year() && ! $on_page ) {
 		$kicker = 'Archiwum';
 		$title  = 'Rok ' . get_query_var( 'year' );
-	} elseif ( is_search() ) {
+	} elseif ( is_search() && ! $on_page ) {
 		$kicker = 'Wyniki wyszukiwania';
 		$title  = '„' . get_search_query( false ) . '”';
 	}
 
 	$generic = apply_filters( 'piodesign_generic_categories', [ 'aktualnosci', 'bez-kategorii', 'uncategorized' ] );
-	$current = is_category() ? (int) get_queried_object_id() : 0;
+	$current = ( is_category() && ! $on_page ) ? (int) get_queried_object_id() : 0;
 	$cats    = [];
 	foreach ( get_categories( [ 'orderby' => 'count', 'order' => 'DESC', 'hide_empty' => true, 'number' => 12 ] ) as $t ) {
 		if ( in_array( $t->slug, $generic, true ) || (int) get_option( 'default_category' ) === $t->term_id ) {
@@ -98,22 +127,22 @@ function piodesign_news_archive_html() {
 		];
 	}
 
-	$page  = max( 1, (int) get_query_var( 'paged' ) );
-	$pages = (int) $wp_query->max_num_pages;
+	$page  = piodesign_paged();
+	$pages = (int) $query->max_num_pages;
 
 	return piodesign_render(
 		'news-archive',
 		[
-			'posts'       => piodesign_wp_posts( $wp_query->posts ),
+			'posts'       => piodesign_wp_posts( $query->posts ),
 			'title'       => html_entity_decode( (string) $title, ENT_QUOTES, 'UTF-8' ),
 			'kicker'      => $kicker,
 			'description' => $desc ? wp_kses_post( $desc ) : '',
 			'cats'        => $cats,
 			'all_url'     => $all_url,
-			'all_active'  => is_home(),
+			'all_active'  => ! is_category(),
 			'page'        => $page,
 			'pages'       => $pages,
-			'total'       => (int) $wp_query->found_posts,
+			'total'       => (int) $query->found_posts,
 			'pager'       => piodesign_pager( $page, $pages, static fn( $n ) => get_pagenum_link( $n ) ),
 			'search'      => [
 				'action' => home_url( '/' ),
@@ -122,3 +151,20 @@ function piodesign_news_archive_html() {
 		]
 	);
 }
+
+add_shortcode(
+	'pio_archiwum',
+	static function ( $atts ) {
+		$atts = shortcode_atts(
+			[
+				'title'    => 'Aktualności',
+				'kicker'   => 'Z życia parafii',
+				'category' => '',
+			],
+			$atts,
+			'pio_archiwum'
+		);
+		piodesign_enqueue_late();
+		return piodesign_news_archive_html( $atts + [ 'standalone' => true ] );
+	}
+);

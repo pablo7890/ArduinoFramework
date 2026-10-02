@@ -17,4 +17,5 @@ python3 preview/fetch.py     # pobiera aktualne wpisy i wydarzenia do preview/da
 php preview/build.php        # tworzy preview/dist/index.html
 ```
 
-Wymaga PHP 7.4+ z GD (WebP) i programu `curl`.
+Wymaga PHP 7.4+ z GD (WebP) i programu `curl`. Czcionki w `preview/fonts/`
+udają kroje ustawione w Avadzie (Global Options).

@@ -1,11 +1,11 @@
 # Parafia: PioDesign
 
-Wersja 1.0 · autor: cruzLabs
+Wersja 1.1 · autor: cruzLabs
 
-Nowy wygląd aktualności i kalendarza dla parafiapio.pl.
-
-Wtyczka WordPress, która daje stronie głównej parafii nowy układ aktualności
-i wydarzeń oraz nowy wygląd widoków The Events Calendar (TEC, wersja darmowa).
+Wtyczka WordPress dla parafiapio.pl (Avada + The Events Calendar, wersja
+darmowa): nowy układ strony głównej, archiwum aktualności, widoki wydarzeń,
+sakramenty, cytaty św. Ojca Pio, liturgia dnia i sekcja informacji przed
+stopką. Kroje pisma pochodzą z Avady.
 
 Co jest w środku:
 
@@ -15,8 +15,11 @@ Co jest w środku:
 | **Nadchodzące wydarzenia** (oś 5 tygodni + 8–10 wydarzeń) | shortcode `[pio_wydarzenia]` |
 | **Pojedyncze wydarzenie** (bilet z odliczaniem, dodaj do kalendarza) | automatycznie, podmienia szablon TEC |
 | **Lista wydarzeń** (archiwum TEC, widok „Lista”) | automatycznie, podmienia wiersze listy TEC |
-| **Archiwum aktualności** (strona wpisów, kategorie, tagi, miesiące, wyszukiwanie we wpisach) | automatycznie, do wyłączenia w *Ustawienia → PioDesign* |
-| **Czcionki na całej stronie** | opcja w *Ustawienia → PioDesign* |
+| **Archiwum aktualności** (strona „Aktualności”, kategorie, tagi, miesiące, wyszukiwanie we wpisach) | automatycznie, albo shortcode `[pio_archiwum]` |
+| **Sakramenty** (animowane slajdy) | shortcode `[pio_sakramenty]` |
+| **Cytaty św. Ojca Pio** (animowane slajdy) | shortcode `[pio_cytaty]` |
+| **Liturgia dnia** (z wtyczki „Parafia: Kalendarz liturgiczny”) | shortcode `[pio_liturgia]` |
+| **Informacje przed stopką** (Msze, kancelaria, kontakt, konto, mapa, strony zaprzyjaźnione) | shortcode `[pio_informacje]` |
 
 ## Pomysły, których nie ma na co drugiej stronie
 
@@ -62,20 +65,27 @@ odliczanie. Wszystko wyłącza się przy systemowym „ogranicz ruch”.
 1. Spakuj folder `piodesign` do ZIP i wgraj w *Wtyczki → Dodaj nową →
    Wyślij wtyczkę na serwer* (albo skopiuj folder do `wp-content/plugins/`).
 2. Włącz wtyczkę **Parafia: PioDesign**.
-3. Na stronie głównej w Avada Builderze dodaj dwa kontenery, w każdym
-   element **Code Block** (albo **Text Block**) z shortcode'em:
+3. Na stronie głównej w Avada Builderze dodaj kontenery z elementem
+   **Code Block** (albo **Text Block**). Proponowany układ:
 
-   ```
-   [pio_aktualnosci count="15"]
-   ```
-
-   ```
-   [pio_wydarzenia count="10"]
-   ```
+   | Kontener | Kolumny | Shortcode |
+   |---|---|---|
+   | 1 | 1/1 | `[pio_aktualnosci count="15"]` |
+   | 2 | 1/1 | `[pio_wydarzenia count="10"]` |
+   | 3 | 1/1 | `[pio_liturgia]` |
+   | 4 | 2/3 + 1/3 | `[pio_sakramenty]` · `[pio_cytaty]` |
+   | 5 (przed stopką) | 1/1 | `[pio_informacje]` |
 
    Kontener: szerokość „Site Width”, bez dodatkowych paddingów po bokach.
-4. Widoki TEC (lista wydarzeń i pojedyncze wydarzenie) oraz archiwum
-   aktualności zmieniają się same. Opcje: *Ustawienia → PioDesign*.
+   Sakramenty i cytaty dopasowują się do szerokości kolumny (container
+   queries), więc działają też na całą szerokość albo jedna pod drugą.
+   `[pio_informacje]` możesz też wstawić do stopki w *Avada → Layouts*,
+   wtedy pojawi się na każdej stronie.
+4. *Ustawienia → PioDesign*: sprawdź godziny Mszy, kancelarii, kontakt,
+   numer konta, strony zaprzyjaźnione i cytaty (są już wypełnione danymi z
+   parafiapio.pl).
+5. Widoki TEC (lista i pojedyncze wydarzenie) oraz archiwum aktualności
+   zmieniają się same.
 
 ### Aktualizacja z wersji w folderze `parafia-piodesign`
 
@@ -107,6 +117,60 @@ zmieniły, więc strona główna działa bez poprawek.
 | `weeks` | `5` | Długość osi w tygodniach (2–8). |
 | `title` / `kicker` | `Wydarzenia` / `Nadchodzące` | Nagłówki. |
 | `calendar_url` | strona kalendarza TEC | Adres przycisku „Cały kalendarz”. |
+
+`[pio_sakramenty]`
+
+| Parametr | Domyślnie | Opis |
+|---|---|---|
+| `parent` | `sakramenty-i-sakramentalia` | Slug strony nadrzędnej; slajdy to jej podstrony w kolejności z *Atrybuty strony → Kolejność*. |
+| `ids` | – | Zamiast tego konkretne strony, np. `ids="5313,5413"`. |
+| `exclude` | – | Slugi do pominięcia, np. `exclude="pogrzeb"`. |
+| `autoplay` | `7` | Sekundy na slajd, `0` wyłącza autoodtwarzanie. |
+| `title` / `kicker` | `Sakramenty` / `Droga wiary` | Nagłówki. |
+
+Tekst slajdu to **zajawka strony** (wtyczka włącza pole „Zajawka” dla
+stron). Zdjęcie to **obrazek wyróżniający** strony. Dopóki ich nie ma,
+wtyczka bierze teksty i zdjęcia z obecnego slajdera na stronie głównej.
+Spowiedź nie ma tam zdjęcia, więc pokazuje się z ozdobną literą – warto
+dodać jej obrazek wyróżniający.
+
+`[pio_cytaty]`
+
+| Parametr | Domyślnie | Opis |
+|---|---|---|
+| `title` | `Słowa na dziś` | Napis u góry karty. |
+| `autor` | `św. Ojciec Pio` | Podpis. |
+| `zdjecie` | – | ID obrazka z biblioteki albo adres URL (okrągły portret przy podpisie). |
+| `autoplay` | `9` | Sekundy na cytat, `0` wyłącza. |
+
+Cytaty edytujesz w *Ustawienia → PioDesign* (jeden w wierszu) albo
+wpisujesz między znacznikami: `[pio_cytaty]Pierwszy cytat
+Drugi cytat[/pio_cytaty]`.
+
+`[pio_liturgia]`
+
+| Parametr | Domyślnie | Opis |
+|---|---|---|
+| `dni` | `7` | Ile dni pokazać na pasku (od dziś, 1–14). |
+| `title` / `kicker` | `Liturgia dnia` / `Kalendarz liturgiczny` | Nagłówki. |
+
+Dane pochodzą z filtrów `kalendarz_liturgiczny_days` i
+`kalendarz_liturgiczny_day`: tytuł dnia, ranga, kolor (`color_hex`),
+czytania (sigla – wtyczka sama podpisuje I czytanie, Psalm, II czytanie i
+Ewangelię), wspomnienia dowolne, święta parafialne i okolicznościowe. Gdy
+rok nie jest zatwierdzony, pokazuje się wyliczony okres liturgiczny.
+
+`[pio_informacje]`: parametry `title` (`Zapraszamy`) i `kicker`. Treści z
+*Ustawienia → PioDesign*. Na żywo (także na stronach z pamięci podręcznej):
+
+- **najbliższa Msza** – „dziś 18:00 · za 1 godz. 12 min”, liczona według
+  czasu w Polsce; w Adwencie uwzględnia godziny z uwag typu „w adwencie
+  6:30”,
+- **kancelaria** – „Otwarte teraz · do 17:45” albo „Zamknięte · otwieramy w
+  środę o 9:00”; z opcją „nieczynne w I piątek miesiąca”,
+- kopiowanie numeru konta, telefonu i e-maila jednym kliknięciem,
+- mapa Google ładowana dopiero po kliknięciu (żadnych ciasteczek Google przy
+  wejściu na stronę).
 
 ## Kategorie wpisów
 
@@ -156,9 +220,19 @@ add_filter( 'piodesign_category_color', function ( $color, $slug ) {
 
 ## Archiwum aktualności
 
-Obejmuje: stronę wpisów (*Ustawienia → Czytanie → Strona z wpisami*),
-kategorie, tagi, archiwa miesięczne i roczne oraz wyszukiwanie ograniczone do
-wpisów (formularz w archiwum dodaje `post_type=post`).
+Obejmuje:
+
+- stronę **Aktualności** – wybraną w *Ustawienia → PioDesign*, a domyślnie
+  stronę o adresie `/aktualnosci/` (u Was to zwykła strona zbudowana w
+  Avadzie; wtyczka pokazuje na niej archiwum zamiast jej treści, a kolejne
+  strony mają adresy `/aktualnosci/page/2/`),
+- stronę wpisów z *Ustawienia → Czytanie*, jeśli jest ustawiona,
+- kategorie, tagi, archiwa miesięczne i roczne,
+- wyszukiwanie ograniczone do wpisów (formularz w archiwum dodaje
+  `post_type=post`).
+
+Archiwum możesz też wstawić w dowolne miejsce shortcode'em
+`[pio_archiwum]` (parametry `title`, `kicker`, `category`).
 
 - Nagłówek jak na stronie głównej, w uchu: liczba wpisów, numer strony i
   wyszukiwarka. Pod nim kategorie jako zakładki (z liczbą wpisów).
@@ -173,30 +247,16 @@ wpisów (formularz w archiwum dodaje `post_type=post`).
 
 ## Czcionki
 
-Czcionki są we wtyczce (`assets/fonts/`, WOFF2, znaki łacińskie i polskie,
-licencja SIL OFL dołączona): **Bricolage Grotesque** (tytuły, daty,
-etykiety) i **Newsreader** (treść, zajawki). Strona nie łączy się z Google
-Fonts. Dwa główne pliki są wczytywane z wyprzedzeniem (`preload`).
+Wtyczka **nie ładuje własnych czcionek**. Bierze kroje z *Avada → Options →
+Typography*: tytuły, daty, etykiety i przyciski z kroju nagłówków (H1),
+zajawki i treść z kroju treści (Body). Zmieniasz krój w Avadzie i cała
+wtyczka idzie za nim.
 
-### Na całej stronie
-
-Nie trzeba niczego wgrywać do Avady. Zaznacz *Ustawienia → PioDesign →
-Czcionki na całej stronie*. Wtyczka podmienia kroje w zmiennych typografii
-Avady (globalne zestawy Typography 1–5 oraz nagłówki, menu, przyciski,
-treść):
-
-- nagłówki, menu, przyciski, tytuły wpisów: Bricolage Grotesque,
-- treść: Newsreader.
-
-Rozmiary, grubości i interlinię nadal ustawiasz w *Avada → Options →
-Typography*. Dobrze wyglądają: nagłówki 700, menu 600, treść 17–18 px
-(Newsreader ma niższe małe litery niż typowy krój systemowy). Odznaczenie
-opcji przywraca kroje Avady.
-
-Jeśli wolisz zrobić to ręcznie w Avadzie: *Avada → Options → Typography →
-Custom Fonts*, wgraj pliki z `assets/fonts/` i wybierz je w Global
-Typography. Plików jest jednak kilka (zakresy znaków), więc opcja we
-wtyczce jest prostsza.
+Rozmiary, grubości, szerokość i odstępy liter są dobrane tak, żeby dobrze
+wyglądały zarówno z **Bricolage Grotesque** (krój ma oś szerokości, więc
+tytuły są zwężone, jak w projekcie), jak i z szeryfowym **Iowan Old Style**
+(tam zwężenie po prostu się nie stosuje, a tytuły są szersze i spokojniejsze).
+W podglądzie można przełączać jeden i drugi wariant.
 
 ## Dopasowanie do motywu
 
@@ -231,7 +291,7 @@ Options → Custom CSS*:
 | `piodesign_generic_categories` | Slugi kategorii pomijanych przy wyborze etykiety. |
 | `piodesign_category_color` | Kolor kategorii. |
 | `piodesign_template` | Ścieżka szablonu (możesz podmienić dowolny plik z `templates/`). |
-| `piodesign_load_fonts` | `false` wyłącza ładowanie czcionek przez wtyczkę. |
+| `piodesign_archive_query` | Argumenty `WP_Query` archiwum na stronie „Aktualności” i w `[pio_archiwum]`. |
 | `piodesign_cache_ttl`, `piodesign_tec_list`, `piodesign_tec_single`, `piodesign_news_archive` | Opisane wyżej. |
 
 ## Style i Avada
@@ -258,13 +318,29 @@ piodesign/
 ├── includes/wp-data.php       zapytania WP/TEC → dane dla szablonów
 ├── includes/tec.php           integracja z The Events Calendar
 ├── includes/archive.php       archiwum aktualności
-├── includes/settings.php      Ustawienia → PioDesign, czcionki na całej stronie
-├── templates/                 szablony HTML (news, events, news-archive, single-event, partials/…)
+├── includes/settings.php      Ustawienia → PioDesign
+├── includes/sections.php      [pio_sakramenty] [pio_cytaty] [pio_informacje] [pio_liturgia]
+├── includes/sections-core.php godziny Mszy, kancelaria, czytania, liturgia (bez WordPressa)
+├── templates/                 szablony HTML (news, events, news-archive, sacraments, quotes, liturgy, info, single-event, partials/…)
 ├── tec/                       szablony podpinane do TEC (lista, pojedyncze wydarzenie)
 ├── wp/news-archive.php        szablon motywu dla archiwum (nagłówek i stopka Avady)
 ├── assets/src/piodesign.css   źródło stylów
 ├── assets/piodesign.css       style po zbudowaniu (tools/build-css.php)
 ├── assets/piodesign.js        interakcje
-├── assets/piodesign-fonts.css + assets/fonts/   czcionki (WOFF2, OFL)
 └── tools/build-css.php        budowanie stylów
 ```
+
+## Zmiany
+
+**1.1**
+
+- Archiwum aktualności działa na zwykłej stronie „Aktualności”; nowy
+  shortcode `[pio_archiwum]`.
+- Nowe sekcje: `[pio_sakramenty]`, `[pio_cytaty]`, `[pio_liturgia]`,
+  `[pio_informacje]` i ich ustawienia.
+- Kroje z Avady zamiast czcionek wtyczki; typografia dostrojona pod
+  Bricolage Grotesque i Iowan Old Style.
+- Pojedyncze wydarzenie: cień „biletu” nie miga już przy każdej sekundzie
+  odliczania.
+- Wersje plików CSS/JS zawierają datę modyfikacji, więc przeglądarki nie
+  trzymają starych stylów po aktualizacji.

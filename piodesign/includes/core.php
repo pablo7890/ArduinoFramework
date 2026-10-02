@@ -617,6 +617,16 @@ function piodesign_render( $template, array $vars = [] ) {
 	return ob_get_clean();
 }
 
+function piodesign_initials( $name ) {
+	$skip  = [ 'im.', 'św.', 'i', 'w', 'pw.', 'ojca' ];
+	$words = array_filter( preg_split( '/\s+/u', (string) $name ), static fn( $w ) => ! in_array( mb_strtolower( $w ), $skip, true ) );
+	$out   = '';
+	foreach ( array_slice( array_values( $words ), 0, 3 ) as $w ) {
+		$out .= mb_strtoupper( mb_substr( $w, 0, 1 ) );
+	}
+	return $out;
+}
+
 function piodesign_icon( $name ) {
 	$paths = [
 		'clock'    => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
@@ -630,6 +640,13 @@ function piodesign_icon( $name ) {
 		'user'     => '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.5 4-5 7-5s5.8 1.5 7 5"/>',
 		'book'     => '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20"/>',
 		'download' => '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+		'copy'     => '<rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>',
+		'check'    => '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+		'heart'    => '<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>',
+		'external' => '<path d="M14 5h5v5M19 5l-8 8M17 14v4a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 5 18V8.5A1.5 1.5 0 0 1 6.5 7H10"/>',
+		'facebook' => '<path d="M14.5 8.5H17V5h-2.5A3.5 3.5 0 0 0 11 8.5V11H8.5v3.5H11V21h3.5v-6.5H17l.5-3.5h-3V8.5z"/>',
+		'youtube'  => '<rect x="3" y="6" width="18" height="12" rx="4"/><path d="M10.5 9.5v5l4-2.5z"/>',
+		'cross'    => '<path d="M12 3v18M7 8h10"/>',
 	];
 	if ( ! isset( $paths[ $name ] ) ) {
 		return '';

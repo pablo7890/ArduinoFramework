@@ -8,6 +8,11 @@
 	<header class="pv-bar">
 		<div class="pv-bar__in">
 			<p class="pv-brand"><b>Parafia: PioDesign</b><span>cruzLabs · projekt dla parafiapio.pl</span></p>
+			<div class="pv-type" role="group" aria-label="Kroje z Avady (Global Options)">
+				<span>Kroje:</span>
+				<button type="button" data-type="bricolage" aria-pressed="true">Bricolage + Newsreader</button>
+				<button type="button" data-type="iowan" aria-pressed="false">Iowan Old Style</button>
+			</div>
 			<nav class="pv-tabs" role="tablist" aria-label="Widoki">
 				<a href="#home" role="tab" id="tab-home" aria-controls="home" aria-selected="true">Strona główna</a>
 				<a href="#wydarzenie" role="tab" id="tab-wydarzenie" aria-controls="wydarzenie" aria-selected="false">Wydarzenie</a>
@@ -23,6 +28,7 @@
 				<li><b>Najedź</b> na zdjęcie z licznikiem zdjęć – przewinie się podgląd galerii.</li>
 				<li><b>Kliknij</b> kategorię nad wpisami – układ przełoży się płynnie.</li>
 				<li><b>Kliknij</b> kropkę lub pasek na osi wydarzeń – przeniesie do wydarzenia.</li>
+				<li><b>Przełącz</b> kroje w pasku u góry – układ dopasowuje się do krojów z Avady.</li>
 			</ul>
 			<div class="pv-stack">
 				{{HOME}}
@@ -43,7 +49,7 @@
 	</main>
 
 	<footer class="pv-foot">
-		<p>Podgląd zbudowany z szablonów wtyczki na treściach z parafiapio.pl ({{NPOSTS}} wpisów, {{NEVENTS}} wydarzeń), stan na {{TODAY}}. Kategorie wpisów w podglądzie to propozycja – dziś prawie wszystkie wpisy mają kategorię „Aktualności”. Dzień liturgiczny i święto parafialne to przykładowe dane; na stronie pochodzą z wtyczki „Parafia: Kalendarz liturgiczny”. Na telefonie widać 5 aktualności i 5 wydarzeń. Archiwum pokazuje pierwszą stronę z 18 wpisami; numery stron prowadzą na parafiapio.pl.</p>
+		<p>Podgląd zbudowany z szablonów wtyczki na treściach z parafiapio.pl ({{NPOSTS}} wpisów, {{NEVENTS}} wydarzeń), stan na {{TODAY}}. Kategorie wpisów w podglądzie to propozycja – dziś prawie wszystkie wpisy mają kategorię „Aktualności”. Dzień liturgiczny, czytania i święta parafialne to przykładowe dane; na stronie pochodzą z wtyczki „Parafia: Kalendarz liturgiczny”. Godziny Mszy, kancelaria i kontakt pochodzą z parafiapio.pl i można je zmienić w Ustawienia → PioDesign. Na telefonie widać 5 aktualności i 5 wydarzeń. Archiwum pokazuje pierwszą stronę z 18 wpisami; numery stron prowadzą na parafiapio.pl.</p>
 	</footer>
 </div>
 
@@ -58,6 +64,14 @@
 			var list = JSON.parse(el.getAttribute('data-gallery')).map(function (k) { return IMG[k] || k; });
 			el.setAttribute('data-gallery', JSON.stringify(list));
 		} catch (e) {}
+	});
+
+	// Typeface switch: the same variables Avada's Global Options set.
+	Array.prototype.forEach.call(document.querySelectorAll('.pv-type button'), function (b) {
+		b.addEventListener('click', function () {
+			document.documentElement.setAttribute('data-type', b.getAttribute('data-type'));
+			Array.prototype.forEach.call(document.querySelectorAll('.pv-type button'), function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+		});
 	});
 
 	var views = ['home', 'wydarzenie', 'kalendarz', 'aktualnosci'];

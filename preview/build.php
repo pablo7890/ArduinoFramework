@@ -41,26 +41,41 @@ $GLOBALS['pio_demo_colors'] = [
 ];
 // Stand-in for the "Parafia: Kalendarz liturgiczny" plugin: same filter, same
 // fields, sample values. On the live site the parish's own data is used.
+$W = [ 'biały', '#ffffff' ];
+$G = [ 'zielony', '#2e7d32' ];
+// [ title, rank, colour, readings, optional memorials, parish, occasional ]
 $GLOBALS['pio_demo_liturgy'] = [
-	'2026-10-01' => [ 'Św. Teresy od Dzieciątka Jezus, dziewicy i doktora Kościoła', 'wspomnienie obowiązkowe', 'biały', '#ffffff', [ 'Dni Eucharystyczne' ] ],
-	'2026-10-02' => [ 'Świętych Aniołów Stróżów', 'wspomnienie obowiązkowe', 'biały', '#ffffff', [ 'Dni Eucharystyczne' ] ],
-	'2026-10-03' => [ 'Sobota XXVI tygodnia zwykłego', 'dzień powszedni', 'zielony', '#2e7d32', [ 'Dni Eucharystyczne' ] ],
-	'2026-10-04' => [ 'XXVII Niedziela zwykła', 'niedziela', 'zielony', '#2e7d32', [] ],
-	'2026-10-05' => [ 'Św. Faustyny Kowalskiej, dziewicy', 'wspomnienie obowiązkowe', 'biały', '#ffffff', [] ],
+	'2026-10-02' => [ 'Świętych Aniołów Stróżów', 'wspomnienie obowiązkowe', $W, 'Wj 23,20-23a; Ps 91; Mt 18,1-5.10', [], [ 'Dni Eucharystyczne' ], [ 'Pierwszy piątek miesiąca' ] ],
+	'2026-10-03' => [ 'Sobota XXVI tygodnia zwykłego', 'dzień powszedni', $G, 'Hi 42,1-3.5-6.12-17; Ps 119; Łk 10,17-24', [ 'Najświętszej Maryi Panny w sobotę' ], [ 'Dni Eucharystyczne' ], [ 'Pierwsza sobota miesiąca' ] ],
+	'2026-10-04' => [ 'XXVII Niedziela zwykła', 'niedziela', $G, 'Iz 5,1-7; Ps 80; Flp 4,6-9; Mt 21,33-43', [], [], [] ],
+	'2026-10-05' => [ 'Św. Faustyny Kowalskiej, dziewicy', 'wspomnienie obowiązkowe', $W, 'Ga 1,6-12; Ps 111; Łk 10,25-37', [], [], [] ],
+	'2026-10-06' => [ 'Wtorek XXVII tygodnia zwykłego', 'dzień powszedni', $G, 'Ga 1,13-24; Ps 139; Łk 10,38-42', [ 'Św. Brunona, prezbitera' ], [], [] ],
+	'2026-10-07' => [ 'Najświętszej Maryi Panny Różańcowej', 'wspomnienie obowiązkowe', $W, 'Ga 2,1-2.7-14; Ps 117; Łk 11,1-4', [], [], [] ],
+	'2026-10-08' => [ 'Czwartek XXVII tygodnia zwykłego', 'dzień powszedni', $G, 'Ga 3,1-5; Łk 1,69-75; Łk 11,5-13', [], [], [] ],
+	'2026-10-09' => [ 'Piątek XXVII tygodnia zwykłego', 'dzień powszedni', $G, 'Ga 3,7-14; Ps 111; Łk 11,15-26', [ 'Św. Dionizego, biskupa, i Towarzyszy, męczenników', 'Św. Jana Leonardiego, prezbitera' ], [], [] ],
+	'2026-10-10' => [ 'Sobota XXVII tygodnia zwykłego', 'dzień powszedni', $G, 'Ga 3,22-29; Ps 105; Łk 11,27-28', [ 'Najświętszej Maryi Panny w sobotę' ], [], [] ],
+	'2026-10-11' => [ 'XXVIII Niedziela zwykła', 'niedziela', $G, 'Iz 25,6-10a; Ps 23; Flp 4,12-14.19-20; Mt 22,1-14', [], [], [ 'Dzień Papieski' ] ],
+	'2026-10-12' => [ 'Poniedziałek XXVIII tygodnia zwykłego', 'dzień powszedni', $G, 'Ga 4,22-24.26-27.31–5,1; Ps 113; Łk 11,29-32', [], [], [] ],
+	'2026-10-13' => [ 'Wtorek XXVIII tygodnia zwykłego', 'dzień powszedni', $G, 'Ga 5,1-6; Ps 119; Łk 11,37-41', [], [ 'Nabożeństwo fatimskie' ], [] ],
+	'2026-10-14' => [ 'Środa XXVIII tygodnia zwykłego', 'dzień powszedni', $G, 'Ga 5,18-25; Ps 1; Łk 11,42-46', [ 'Św. Kaliksta I, papieża i męczennika' ], [], [ 'Dzień Edukacji Narodowej' ] ],
+	'2026-10-15' => [ 'Św. Teresy od Jezusa, dziewicy i doktora Kościoła', 'wspomnienie obowiązkowe', $W, 'Ef 1,1-10; Ps 98; Łk 11,47-54', [], [], [] ],
 ];
+function pio_demo_day( $iso ) {
+	$d = $GLOBALS['pio_demo_liturgy'][ $iso ] ?? null;
+	return $d ? [
+		'title'              => $d[0],
+		'rank_label'         => $d[1],
+		'color_label'        => $d[2][0],
+		'color_hex'          => $d[2][1],
+		'readings'           => $d[3],
+		'optional_memorials' => $d[4],
+		'parish'             => $d[5],
+		'occasional'         => $d[6],
+	] : null;
+}
 function apply_filters( $hook, $value, ...$args ) {
 	if ( 'kalendarz_liturgiczny_day' === $hook ) {
-		$d = $GLOBALS['pio_demo_liturgy'][ $args[0] ] ?? null;
-		return $d ? [
-			'title'              => $d[0],
-			'rank_label'         => $d[1],
-			'color_label'        => $d[2],
-			'color_hex'          => $d[3],
-			'parish'             => $d[4],
-			'optional_memorials' => [],
-			'occasional'         => [],
-			'readings'           => '',
-		] : $value;
+		return pio_demo_day( $args[0] ) ?? $value;
 	}
 	if ( 'piodesign_category_color' === $hook && isset( $GLOBALS['pio_demo_colors'][ $args[0] ] ) ) {
 		return $GLOBALS['pio_demo_colors'][ $args[0] ];
@@ -69,6 +84,8 @@ function apply_filters( $hook, $value, ...$args ) {
 }
 
 require PIODESIGN_DIR . 'includes/core.php';
+require PIODESIGN_DIR . 'includes/sections-core.php';
+function piodesign_now() { return $GLOBALS['now']; }
 // Fresh assets/piodesign.css from assets/src/piodesign.css.
 passthru( escapeshellarg( PHP_BINARY ) . ' ' . escapeshellarg( PIODESIGN_DIR . 'tools/build-css.php' ) . ' >&2' );
 
@@ -164,6 +181,44 @@ $today = piodesign_date( $now, true, true );
 
 /* ------------------------------------------------------------ views */
 
+// Sacraments: the parish pages with the homepage slider's texts and images.
+$sac_def = piodesign_sacrament_defaults();
+$sac     = [];
+foreach ( $data['sacraments'] as $sp ) {
+	$def   = $sac_def[ $sp['slug'] ] ?? [ '', '', '' ];
+	$sac[] = [
+		'id'    => $sp['slug'],
+		'slug'  => $sp['slug'],
+		'title' => $def[2] ?: $sp['title'],
+		'text'  => $sp['excerpt'] ?: $def[0],
+		'url'   => $sp['url'],
+		'image' => $def[1] ? piodesign_frame( [ 'src' => 'https://parafiapio.pl/wp-content/uploads/' . $def[1], 'w' => 1280, 'h' => 853 ], 'post' ) : null,
+	];
+}
+$sacraments = piodesign_render( 'sacraments', [ 'slides' => $sac, 'title' => 'Sakramenty', 'kicker' => 'Droga wiary', 'autoplay' => 7, 'more_url' => '' ] );
+$opts       = piodesign_info_defaults();
+$quotes     = piodesign_render( 'quotes', [ 'quotes' => piodesign_quotes( $opts['cytaty'] ), 'title' => 'Słowa na dziś', 'author' => 'św. Ojciec Pio', 'photo' => '', 'autoplay' => 9 ] );
+$lit        = piodesign_liturgy( $now );
+$info       = piodesign_render(
+	'info',
+	[
+		'masses'   => piodesign_mass_schedule( $opts ),
+		'office'   => piodesign_office_hours( $opts['kancelaria'] ),
+		'o'        => $opts,
+		'partners' => piodesign_partners( $opts['partnerzy'] ),
+		'advent'   => 'advent' === $lit['slug'],
+		'today'    => (int) $now->format( 'N' ),
+		'title'    => 'Zapraszamy',
+		'kicker'   => 'Parafia św. Ojca Pio',
+	]
+);
+$lit_days = [];
+for ( $k = 0; $k < 7; $k++ ) {
+	$d          = $now->setTime( 0, 0 )->modify( '+' . $k . ' days' );
+	$lit_days[] = piodesign_liturgy_day( $d, pio_demo_day( $d->format( 'Y-m-d' ) ), $now );
+}
+$liturgy = piodesign_render( 'liturgy', [ 'days' => $lit_days, 'title' => 'Liturgia dnia', 'kicker' => 'Kalendarz liturgiczny' ] );
+
 $home = piodesign_render(
 	'news',
 	[
@@ -185,7 +240,7 @@ $home = piodesign_render(
 		'title'        => 'Wydarzenia',
 		'kicker'       => 'Nadchodzące',
 	]
-);
+) . $liturgy . '<div class="pv-cols">' . $sacraments . $quotes . '</div>' . $info;
 
 // Single: IX Kongres Grupy Modlitwy (poster image shows the "contain" frame).
 $single_id = (int) ( getenv( 'PIO_SINGLE' ) ?: 10780 );
@@ -278,14 +333,14 @@ $html  = strtr(
 /* ------------------------------------------------------------ embed fonts & images */
 
 function pio_inline_fonts() {
-	$css = file_get_contents( PIODESIGN_DIR . 'assets/piodesign-fonts.css' );
+	// The site gets its faces from Avada; the preview embeds the same files.
+	$css = file_get_contents( __DIR__ . '/fonts/fonts.css' );
 	return preg_replace_callback(
-		'#url\("fonts/([^"]+)"\)#',
-		static fn( $m ) => 'url("data:font/woff2;base64,' . base64_encode( file_get_contents( PIODESIGN_DIR . 'assets/fonts/' . $m[1] ) ) . '")',
+		'#url\("([^"]+\.woff2)"\)#',
+		static fn( $m ) => 'url("data:font/woff2;base64,' . base64_encode( file_get_contents( __DIR__ . '/fonts/' . $m[1] ) ) . '")',
 		$css
 	);
 }
-
 
 function pio_fetch_image( $url, $max_w, $cache_dir ) {
 	$file = $cache_dir . '/' . md5( $url . $max_w ) . '.webp';

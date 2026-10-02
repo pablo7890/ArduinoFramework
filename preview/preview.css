@@ -1,5 +1,20 @@
 /* Preview chrome only – not part of the plugin. */
-:root { color-scheme: light; }
+:root {
+	color-scheme: light;
+	/* What Avada's Global Options → Typography set on a real site. */
+	--h1_typography-font-family: "Bricolage Grotesque", system-ui, sans-serif;
+	--body_typography-font-family: "Newsreader", Georgia, serif;
+}
+:root[data-type="iowan"] {
+	--h1_typography-font-family: "Iowan Old Style", "Apple Garamond", Baskerville, "Times New Roman", "Droid Serif", Times, "Source Serif Pro", serif;
+	--body_typography-font-family: "Iowan Old Style", "Apple Garamond", Baskerville, "Times New Roman", "Droid Serif", Times, "Source Serif Pro", serif;
+}
+.pv-type { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font: 600 12.5px/1 "Bricolage Grotesque", system-ui, sans-serif; color: var(--pv-muted); }
+.pv-type span { margin-right: 4px; }
+.pv-type button { padding: 6px 10px; border: 1px solid var(--pv-line); border-radius: 999px; background: #fff; color: var(--pv-ink); font: inherit; cursor: pointer; }
+.pv-type button[aria-pressed="true"] { border-color: var(--pv-ink); background: var(--pv-ink); color: #fff; }
+.pv-cols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: stretch; }
+@media (max-width: 1000px) { .pv-cols { grid-template-columns: minmax(0, 1fr); } }
 html { background: #ffffff; }
 body { margin: 0; background: #ffffff; color: #1c1d21; }
 .pv { --pv-ink: #1c1d21; --pv-muted: #62656d; --pv-line: #e4e3e0; --pv-rust: #c14e00; min-height: 100vh; }

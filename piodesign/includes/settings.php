@@ -1,20 +1,50 @@
 <?php
 /**
- * Settings → PioDesign: site-wide fonts and the news archive.
+ * Settings → PioDesign: news archive, parish information, quotes.
  *
  * @package PioDesign
  */
 
 defined( 'ABSPATH' ) || exit;
 
-function piodesign_option( $key ) {
-	$defaults = [
-		'site_fonts'       => 0,
+function piodesign_settings_defaults() {
+	return [
 		'news_archive'     => 1,
+		'archive_page'     => 0, // 0 = page with the slug "aktualnosci", if any.
 		'archive_per_page' => 18,
-	];
-	$opts = wp_parse_args( (array) get_option( 'piodesign_settings', [] ), $defaults );
+	] + piodesign_info_defaults();
+}
+
+function piodesign_option( $key ) {
+	static $opts = null;
+	if ( null === $opts ) {
+		$opts = wp_parse_args( (array) get_option( 'piodesign_settings', [] ), piodesign_settings_defaults() );
+	}
 	return $opts[ $key ] ?? null;
+}
+
+/** All settings merged with defaults (for the sections). */
+function piodesign_options() {
+	return wp_parse_args( (array) get_option( 'piodesign_settings', [] ), piodesign_settings_defaults() );
+}
+
+/** The page that shows the news archive (setting, else the "aktualnosci" page). */
+function piodesign_archive_page_id() {
+	$id = (int) piodesign_option( 'archive_page' );
+	if ( $id && 'page' === get_post_type( $id ) ) {
+		return $id;
+	}
+	$page = get_page_by_path( 'aktualnosci' );
+	return $page ? (int) $page->ID : 0;
+}
+
+function piodesign_archive_url() {
+	$page = piodesign_archive_page_id();
+	if ( $page ) {
+		return get_permalink( $page );
+	}
+	$posts_page = (int) get_option( 'page_for_posts' );
+	return $posts_page ? get_permalink( $posts_page ) : home_url( '/' );
 }
 
 add_action(
@@ -32,18 +62,32 @@ add_action(
 			'piodesign_settings',
 			[
 				'type'              => 'array',
-				'sanitize_callback' => static function ( $in ) {
-					$in = (array) $in;
-					return [
-						'site_fonts'       => empty( $in['site_fonts'] ) ? 0 : 1,
-						'news_archive'     => empty( $in['news_archive'] ) ? 0 : 1,
-						'archive_per_page' => max( 6, min( 48, (int) ( $in['archive_per_page'] ?? 18 ) ) ),
-					];
-				},
+				'sanitize_callback' => 'piodesign_sanitize_settings',
 			]
 		);
 	}
 );
+
+function piodesign_sanitize_settings( $in ) {
+	$in  = (array) $in;
+	$def = piodesign_settings_defaults();
+	$out = [
+		'news_archive'        => empty( $in['news_archive'] ) ? 0 : 1,
+		'archive_page'        => max( 0, (int) ( $in['archive_page'] ?? 0 ) ),
+		'archive_per_page'    => max( 6, min( 48, (int) ( $in['archive_per_page'] ?? 18 ) ) ),
+		'kancelaria_i_piatek' => empty( $in['kancelaria_i_piatek'] ) ? 0 : 1,
+	];
+	foreach ( [ 'msze_niedziela', 'msze_powszednie', 'msze_sobota', 'kancelaria', 'adres', 'partnerzy', 'cytaty' ] as $k ) {
+		$out[ $k ] = isset( $in[ $k ] ) ? sanitize_textarea_field( $in[ $k ] ) : $def[ $k ];
+	}
+	foreach ( [ 'kancelaria_uwagi', 'nazwa', 'telefon', 'konto', 'mapa' ] as $k ) {
+		$out[ $k ] = isset( $in[ $k ] ) ? sanitize_text_field( $in[ $k ] ) : $def[ $k ];
+	}
+	$out['email']    = isset( $in['email'] ) ? sanitize_email( $in['email'] ) : $def['email'];
+	$out['facebook'] = isset( $in['facebook'] ) ? esc_url_raw( $in['facebook'] ) : $def['facebook'];
+	$out['youtube']  = isset( $in['youtube'] ) ? esc_url_raw( $in['youtube'] ) : $def['youtube'];
+	return $out;
+}
 
 add_filter(
 	'plugin_action_links_' . plugin_basename( PIODESIGN_DIR . 'piodesign.php' ),
@@ -53,78 +97,112 @@ add_filter(
 	}
 );
 
+/* Pages get an excerpt box, used as the text of [pio_sakramenty] slides. */
+add_action(
+	'init',
+	static function () {
+		add_post_type_support( 'page', 'excerpt' );
+	}
+);
+
 function piodesign_settings_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
+	$o    = piodesign_options();
+	$name = static fn( $k ) => 'piodesign_settings[' . $k . ']';
+	$ta   = static function ( $k, $rows, $help ) use ( $o, $name ) {
+		printf(
+			'<textarea id="pd-%1$s" name="%2$s" rows="%3$d" class="large-text code">%4$s</textarea><p class="description">%5$s</p>',
+			esc_attr( $k ),
+			esc_attr( $name( $k ) ),
+			(int) $rows,
+			esc_textarea( $o[ $k ] ),
+			wp_kses( $help, [ 'code' => [], 'br' => [], 'strong' => [] ] )
+		);
+	};
+	$tx = static function ( $k, $help = '', $type = 'text' ) use ( $o, $name ) {
+		printf(
+			'<input id="pd-%1$s" type="%2$s" name="%3$s" value="%4$s" class="regular-text">%5$s',
+			esc_attr( $k ),
+			esc_attr( $type ),
+			esc_attr( $name( $k ) ),
+			esc_attr( $o[ $k ] ),
+			$help ? '<p class="description">' . esc_html( $help ) . '</p>' : ''
+		);
+	};
 	?>
 	<div class="wrap">
 		<h1>Parafia: PioDesign</h1>
+		<p>Shortcode'y: <code>[pio_aktualnosci]</code> <code>[pio_wydarzenia]</code> <code>[pio_sakramenty]</code> <code>[pio_cytaty]</code> <code>[pio_liturgia]</code> <code>[pio_informacje]</code> <code>[pio_archiwum]</code>. Kroje pisma pochodzą z <em>Avada → Options → Typography</em>.</p>
 		<form method="post" action="options.php">
 			<?php settings_fields( 'piodesign' ); ?>
+
+			<h2 class="title">Archiwum aktualności</h2>
 			<table class="form-table" role="presentation">
 				<tr>
-					<th scope="row">Czcionki na całej stronie</th>
+					<th scope="row">Nowy wygląd archiwum</th>
 					<td>
-						<label>
-							<input type="checkbox" name="piodesign_settings[site_fonts]" value="1" <?php checked( piodesign_option( 'site_fonts' ) ); ?>>
-							Użyj czcionek PioDesign w całym motywie Avada
-						</label>
-						<p class="description">
-							Nagłówki, menu, przyciski i tytuły: <strong>Bricolage Grotesque</strong>. Treść: <strong>Newsreader</strong>.
-							Czcionki są we wtyczce (bez Google Fonts). Nadpisuje kroje z <em>Avada → Options → Typography</em>;
-							rozmiary i grubości nadal ustawiasz w Avadzie. Wyłączenie przywraca kroje Avady.
-						</p>
+						<label><input type="checkbox" name="<?php echo esc_attr( $name( 'news_archive' ) ); ?>" value="1" <?php checked( $o['news_archive'] ); ?>> Strona aktualności, kategorie, tagi, archiwa miesięczne i wyszukiwanie we wpisach</label>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row">Archiwum aktualności</th>
+					<th scope="row"><label for="pd-archive_page">Strona „Aktualności”</label></th>
 					<td>
-						<label>
-							<input type="checkbox" name="piodesign_settings[news_archive]" value="1" <?php checked( piodesign_option( 'news_archive' ) ); ?>>
-							Nowy wygląd strony wpisów, kategorii, tagów, archiwów miesięcznych i wyszukiwania we wpisach
-						</label>
-						<p class="description">Jeśli w <em>Avada → Layouts</em> jest przypisany układ dla archiwów, ma on pierwszeństwo dla tych stron, które obejmuje.</p>
+						<?php
+						wp_dropdown_pages(
+							[
+								'name'              => esc_attr( $name( 'archive_page' ) ),
+								'id'                => 'pd-archive_page',
+								'selected'          => (int) $o['archive_page'],
+								'show_option_none'  => '— wykryj automatycznie (strona /aktualnosci/) —',
+								'option_none_value' => '0',
+							]
+						);
+						?>
+						<p class="description">Na tej stronie wtyczka pokaże archiwum zamiast treści zbudowanej w Avadzie. Teraz: <?php echo piodesign_archive_page_id() ? '<a href="' . esc_url( get_permalink( piodesign_archive_page_id() ) ) . '">' . esc_html( get_the_title( piodesign_archive_page_id() ) ) . '</a>' : 'brak strony'; ?>.</p>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="piodesign-per-page">Wpisów na stronę archiwum</label></th>
-					<td>
-						<input id="piodesign-per-page" type="number" min="6" max="48" step="3" name="piodesign_settings[archive_per_page]" value="<?php echo (int) piodesign_option( 'archive_per_page' ); ?>" class="small-text">
-						<p class="description">Najlepiej wielokrotność 3 (karty stoją po trzy w rzędzie).</p>
-					</td>
+					<th scope="row"><label for="pd-per-page">Wpisów na stronę</label></th>
+					<td><input id="pd-per-page" type="number" min="6" max="48" step="3" name="<?php echo esc_attr( $name( 'archive_per_page' ) ); ?>" value="<?php echo (int) $o['archive_per_page']; ?>" class="small-text"> <span class="description">najlepiej wielokrotność 3</span></td>
 				</tr>
 			</table>
+
+			<h2 class="title">Porządek Mszy świętych <small>(<code>[pio_informacje]</code>)</small></h2>
+			<table class="form-table" role="presentation">
+				<tr><th scope="row"><label for="pd-msze_niedziela">Niedziele i święta</label></th><td><?php $ta( 'msze_niedziela', 6, 'Jedna Msza w wierszu: <code>godzina | uwaga</code>, np. <code>12:30 | suma parafialna</code>.' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-msze_powszednie">Poniedziałek – piątek</label></th><td><?php $ta( 'msze_powszednie', 4, 'Uwaga „w adwencie 6:30” sprawia, że w Adwencie licznik „najbliższa Msza” liczy od 6:30.' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-msze_sobota">Sobota</label></th><td><?php $ta( 'msze_sobota', 3, '' ); ?></td></tr>
+			</table>
+
+			<h2 class="title">Kancelaria</h2>
+			<table class="form-table" role="presentation">
+				<tr><th scope="row"><label for="pd-kancelaria">Godziny</label></th><td><?php $ta( 'kancelaria', 4, '<code>dzień | od–do</code>, np. <code>środa | 9:00–10:00</code>.' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-kancelaria_uwagi">Uwagi</label></th><td><?php $tx( 'kancelaria_uwagi' ); ?></td></tr>
+				<tr><th scope="row">I piątek miesiąca</th><td><label><input type="checkbox" name="<?php echo esc_attr( $name( 'kancelaria_i_piatek' ) ); ?>" value="1" <?php checked( $o['kancelaria_i_piatek'] ); ?>> Kancelaria nieczynna w I piątek miesiąca (status „otwarte / zamknięte” to uwzględnia)</label></td></tr>
+			</table>
+
+			<h2 class="title">Kontakt i wsparcie</h2>
+			<table class="form-table" role="presentation">
+				<tr><th scope="row"><label for="pd-nazwa">Nazwa parafii</label></th><td><?php $tx( 'nazwa' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-adres">Adres</label></th><td><?php $ta( 'adres', 2, '' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-telefon">Telefon</label></th><td><?php $tx( 'telefon' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-email">E-mail</label></th><td><?php $tx( 'email', '', 'email' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-konto">Numer konta</label></th><td><?php $tx( 'konto' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-mapa">Mapa – adres do wyszukania</label></th><td><?php $tx( 'mapa', 'Mapa Google ładuje się dopiero po kliknięciu (bez ciasteczek Google przy wejściu na stronę).' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-partnerzy">Strony zaprzyjaźnione</label></th><td><?php $ta( 'partnerzy', 3, '<code>nazwa | adres strony | krótki opis</code>' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-facebook">Facebook</label></th><td><?php $tx( 'facebook', '', 'url' ); ?></td></tr>
+				<tr><th scope="row"><label for="pd-youtube">YouTube</label></th><td><?php $tx( 'youtube', '', 'url' ); ?></td></tr>
+			</table>
+
+			<h2 class="title">Cytaty św. Ojca Pio <small>(<code>[pio_cytaty]</code>)</small></h2>
+			<table class="form-table" role="presentation">
+				<tr><th scope="row"><label for="pd-cytaty">Cytaty</label></th><td><?php $ta( 'cytaty', 8, 'Jeden cytat w wierszu, bez cudzysłowów.' ); ?></td></tr>
+			</table>
+
 			<?php submit_button(); ?>
 		</form>
 	</div>
 	<?php
 }
-
-/* ---------------------------------------------------------------------------
- * Site-wide fonts: point Avada's typography variables at our faces.
- * `html:root` outranks Avada's `:root`, and because Avada's per-element
- * variables (h1, body, nav…) are defined on :root as var(--awb-typography…),
- * overriding both levels covers global typography sets and direct choices.
- * ------------------------------------------------------------------------ */
-
-add_action(
-	'wp_enqueue_scripts',
-	static function () {
-		if ( ! piodesign_option( 'site_fonts' ) ) {
-			return;
-		}
-		wp_enqueue_style( 'piodesign-fonts' );
-		$display = '"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif';
-		$text    = '"Newsreader", "Iowan Old Style", Georgia, serif';
-		$vars    = [];
-		foreach ( [ 'awb-typography1', 'awb-typography2', 'awb-typography3', 'awb-typography5', 'h1_typography', 'h2_typography', 'h3_typography', 'h4_typography', 'h5_typography', 'h6_typography', 'post_title_typography', 'post_titles_extras_typography', 'footer_headings_typography', 'button_typography', 'nav_typography', 'mobile_menu_typography' ] as $v ) {
-			$vars[] = '--' . $v . '-font-family:' . $display;
-		}
-		foreach ( [ 'awb-typography4', 'body_typography' ] as $v ) {
-			$vars[] = '--' . $v . '-font-family:' . $text;
-		}
-		wp_add_inline_style( 'piodesign-fonts', 'html:root{' . implode( ';', $vars ) . '}' );
-	},
-	20
-);

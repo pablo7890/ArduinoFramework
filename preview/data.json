@@ -1566,5 +1566,49 @@
    "featured": false,
    "cost": ""
   }
+ ],
+ "sacraments": [
+  {
+   "slug": "chrzest",
+   "title": "Chrzest",
+   "url": "https://parafiapio.pl/sakramenty-i-sakramentalia/chrzest/",
+   "excerpt": ""
+  },
+  {
+   "slug": "bierzmowanie",
+   "title": "Bierzmowanie",
+   "url": "https://parafiapio.pl/sakramenty-i-sakramentalia/bierzmowanie/",
+   "excerpt": ""
+  },
+  {
+   "slug": "i-komunia-swieta",
+   "title": "I Komunia Święta",
+   "url": "https://parafiapio.pl/sakramenty-i-sakramentalia/i-komunia-swieta/",
+   "excerpt": ""
+  },
+  {
+   "slug": "malzenstwo",
+   "title": "Małżeństwo",
+   "url": "https://parafiapio.pl/sakramenty-i-sakramentalia/malzenstwo/",
+   "excerpt": ""
+  },
+  {
+   "slug": "spowiedz",
+   "title": "Spowiedź",
+   "url": "https://parafiapio.pl/sakramenty-i-sakramentalia/spowiedz/",
+   "excerpt": ""
+  },
+  {
+   "slug": "namaszczenie-chorych",
+   "title": "Namaszczenie chorych",
+   "url": "https://parafiapio.pl/sakramenty-i-sakramentalia/namaszczenie-chorych/",
+   "excerpt": ""
+  },
+  {
+   "slug": "pogrzeb",
+   "title": "Pogrzeb",
+   "url": "https://parafiapio.pl/sakramenty-i-sakramentalia/pogrzeb/",
+   "excerpt": ""
+  }
  ]
 }

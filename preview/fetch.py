@@ -97,8 +97,14 @@ def main():
             "cost": e.get("cost", ""),
         })
 
+    parent = get(f"{SITE}/wp-json/wp/v2/pages?slug=sakramenty-i-sakramentalia&_fields=id")[0]["id"]
+    sacraments = [
+        {"slug": p["slug"], "title": html.unescape(p["title"]["rendered"]), "url": p["link"], "excerpt": text(p["excerpt"]["rendered"])}
+        for p in get(f"{SITE}/wp-json/wp/v2/pages?parent={parent}&per_page=20&orderby=menu_order&order=asc&_fields=slug,title,link,excerpt")
+    ]
+
     with open(os.path.join(HERE, "data.json"), "w", encoding="utf-8") as f:
-        json.dump({"posts": out_posts, "total_posts": total_posts, "events": out_events}, f, ensure_ascii=False, indent=1)
+        json.dump({"posts": out_posts, "total_posts": total_posts, "events": out_events, "sacraments": sacraments}, f, ensure_ascii=False, indent=1)
     print(f"{len(out_posts)} posts, {len(out_events)} events")
 
 
