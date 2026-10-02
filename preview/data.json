@@ -368,8 +368,234 @@
    ],
    "photo_count": 8,
    "words": 235
+  },
+  {
+   "id": 10263,
+   "title": "Betlejem na Mazurach",
+   "url": "https://parafiapio.pl/2026/07/31/betlejem-na-mazurach/",
+   "date": "2026-07-31T16:48:33",
+   "slug": "betlejem-na-mazurach",
+   "excerpt": "Wakacje to czas, na który czeka się przez cały rok.  […]",
+   "category": {
+    "name": "Aktualności",
+    "slug": "aktualnosci"
+   },
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/08/759872837_1551888403638801_5341474295485857571_n-1024x769.jpg",
+    "w": 1600,
+    "h": 1201,
+    "alt": ""
+   },
+   "gallery": [
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/759872837_1551888403638801_5341474295485857571_n/2029982773.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/761986763_1551903733637268_4198948801094921411_n/2216095978.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/761912548_1551908616970113_8349734349850646455_n/3260418558.jpg"
+   ],
+   "photo_count": 5,
+   "words": 268
+  },
+  {
+   "id": 10181,
+   "title": "Gimnastyka usprawniająca",
+   "url": "https://parafiapio.pl/2026/07/31/gimnastyka-usprawniajaca/",
+   "date": "2026-07-31T12:55:58",
+   "slug": "gimnastyka-usprawniajaca",
+   "excerpt": "W naszym Domu Parafialnym w ramach klubu czwartkowego od początku  […]",
+   "category": {
+    "name": "Aktualności",
+    "slug": "aktualnosci"
+   },
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/08/PHOTO-2026-08-12-10-17-03-4-1024x768.jpg",
+    "w": 2000,
+    "h": 1500,
+    "alt": ""
+   },
+   "gallery": [
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/PHOTO-2026-08-12-10-20-39-3/1293359657.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/PHOTO-2026-08-12-10-17-04/365913315.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/PHOTO-2026-08-12-10-17-03-8/3126323941.jpg"
+   ],
+   "photo_count": 6,
+   "words": 63
+  },
+  {
+   "id": 10179,
+   "title": "Solanki",
+   "url": "https://parafiapio.pl/2026/07/28/solanki/",
+   "date": "2026-07-28T12:53:23",
+   "slug": "solanki",
+   "excerpt": "We wtorek, 28 lipca, wybraliśmy się na solanki do Grudziądza.  […]",
+   "category": {
+    "name": "Aktualności",
+    "slug": "aktualnosci"
+   },
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/08/PHOTO-2026-08-12-10-17-07-768x1024.jpg",
+    "w": 1500,
+    "h": 2000,
+    "alt": ""
+   },
+   "gallery": [
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/PHOTO-2026-08-12-10-17-10-6/2603868239.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/PHOTO-2026-08-12-10-17-09-5/3613625454.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/PHOTO-2026-08-12-10-17-09-2/1045040624.jpg"
+   ],
+   "photo_count": 10,
+   "words": 63
+  },
+  {
+   "id": 10177,
+   "title": "Profilaktyka lecznicza",
+   "url": "https://parafiapio.pl/2026/07/25/profilaktyka-lecznicza/",
+   "date": "2026-07-25T12:48:38",
+   "slug": "profilaktyka-lecznicza",
+   "excerpt": "W naszym Domu Parafialnym od początku lipca Parafianie mają możliwość  […]",
+   "category": {
+    "name": "Aktualności",
+    "slug": "aktualnosci"
+   },
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/08/WhatsApp-Image-2026-08-12-at-10.56.40-1024x771.jpeg",
+    "w": 2040,
+    "h": 1536,
+    "alt": ""
+   },
+   "gallery": [
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/WhatsApp-Image-2026-08-12-at-10_56_40/980062669.jpeg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/PHOTO-2026-08-12-10-23-07/3283261772.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/08/PHOTO-2026-08-12-10-20-39-4/4205715332.jpg"
+   ],
+   "photo_count": 4,
+   "words": 63
+  },
+  {
+   "id": 10107,
+   "title": "Oaza Dzieci Bożych w Półcznie 2026",
+   "url": "https://parafiapio.pl/2026/07/18/oaza-dzieci-bozych-w-polcznie-2026/",
+   "date": "2026-07-18T18:00:44",
+   "slug": "oaza-dzieci-bozych-w-polcznie-2026",
+   "excerpt": "W dniach od 12 do 18 lipca 2026 roku grupa  […]",
+   "category": {
+    "name": "Aktualności",
+    "slug": "aktualnosci"
+   },
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/07/e1d344a9-6fe6-4786-a0c4-3f8058c427f7-1024x768.jpg",
+    "w": 1600,
+    "h": 1200,
+    "alt": ""
+   },
+   "gallery": [
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/IMG_9558-scaled/3507822365.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/IMG_9557-scaled/2573752324.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/IMG_9515-scaled/1809337288.jpg"
+   ],
+   "photo_count": 14,
+   "words": 156
+  },
+  {
+   "id": 10060,
+   "title": "Muzyczne Mozaiki – koncert „Z Tobą chcę być, o Chryste”",
+   "url": "https://parafiapio.pl/2026/07/12/muzyczne-mozaiki-koncert-muzyki-klasycznej/",
+   "date": "2026-07-12T16:00:12",
+   "slug": "muzyczne-mozaiki-koncert-muzyki-klasycznej",
+   "excerpt": "W niedzielę, 12 lipca br., w Lokalnym Centrum Kultury w  […]",
+   "category": {
+    "name": "Aktualności",
+    "slug": "aktualnosci"
+   },
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/07/7073d8be-5862-4949-9159-097540952bc3-1024x768.jpg",
+    "w": 1600,
+    "h": 1200,
+    "alt": ""
+   },
+   "gallery": [
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/efe1d1c9-1002-422b-adfa-e09daca00b20/1584777515.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/d3baf19e-6a7d-4799-b2e0-e1bd7595d864/2876824304.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/ba1226b1-fa85-4ab5-8bf5-73e454db0250/3845246789.jpg"
+   ],
+   "photo_count": 19,
+   "words": 433
+  },
+  {
+   "id": 9969,
+   "title": "Kolonia w Zawoi 2026 trwa!",
+   "url": "https://parafiapio.pl/2026/07/05/kolonia-w-zawo-2026-trwa/",
+   "date": "2026-07-05T09:56:32",
+   "slug": "kolonia-w-zawo-2026-trwa",
+   "excerpt": "Kolonia w Zawoi 2026 trwa w najlepsze! Każdy dzień przynosi  […]",
+   "category": {
+    "name": "Aktualności",
+    "slug": "aktualnosci"
+   },
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/07/573e8931-8350-4473-90a8-5f2ceca93feb-1024x768.jpg",
+    "w": 2048,
+    "h": 1536,
+    "alt": ""
+   },
+   "gallery": [
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/ecd41a3d-844e-470d-94e6-d82e0d2ce606/4261775743.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/573e8931-8350-4473-90a8-5f2ceca93feb/4055033406.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/449271cf-1231-45f3-993e-7d134f883a08/2614492386.jpg"
+   ],
+   "photo_count": 76,
+   "words": 189
+  },
+  {
+   "id": 9936,
+   "title": "Kolonia w Zawoi 2026 – wycieczka do Energylandii",
+   "url": "https://parafiapio.pl/2026/07/03/kolonia-w-zawoi-2026-wycieczka-do-energylandii/",
+   "date": "2026-07-03T11:01:03",
+   "slug": "kolonia-w-zawoi-2026-wycieczka-do-energylandii",
+   "excerpt": "W czwartek, 2 lipca 2026 roku, uczestnicy kolonii w Zawoi  […]",
+   "category": {
+    "name": "Aktualności",
+    "slug": "aktualnosci"
+   },
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/07/IMG_8094-1024x768.jpg",
+    "w": 2560,
+    "h": 1920,
+    "alt": ""
+   },
+   "gallery": [
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/IMG_8127-scaled/221259516.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/IMG_8118-scaled/3379655182.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/IMG_8116-scaled/3186068522.jpg"
+   ],
+   "photo_count": 17,
+   "words": 168
+  },
+  {
+   "id": 9940,
+   "title": "XXI Finały Mistrzostw Polski LSO o Puchar KnC 2026",
+   "url": "https://parafiapio.pl/2026/07/02/xxi-finaly-mistrzostw-polski-lso-o-puchar-knc-2026/",
+   "date": "2026-07-02T00:00:09",
+   "slug": "xxi-finaly-mistrzostw-polski-lso-o-puchar-knc-2026",
+   "excerpt": "W miniony weekend odbyły się XXI finały Mistrzostw Polski Liturgicznej  […]",
+   "category": {
+    "name": "Aktualności",
+    "slug": "aktualnosci"
+   },
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/07/efd8da96-e8d8-401c-abb1-31a11a34e28c.jpg",
+    "w": 800,
+    "h": 600,
+    "alt": ""
+   },
+   "gallery": [
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/50cf5525-6317-4da5-b93e-18b3669c8bfa/1535783933.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/7875f1ef-ac65-4bfe-a62a-44885b4b677a/1578084211.jpg",
+    "https://parafiapio.pl/wp-content/uploads/cache/2026/07/62954a8c-57ad-46cd-bbbc-27009bc91f38/3977453809.jpg"
+   ],
+   "photo_count": 22,
+   "words": 215
   }
  ],
+ "total_posts": 117,
  "events": [
   {
    "id": 10148,

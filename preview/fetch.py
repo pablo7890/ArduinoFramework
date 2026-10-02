@@ -17,10 +17,11 @@ SITE = "https://parafiapio.pl"
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
-def get(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "pio-gazeta-preview/1.0"})
+def get(url, with_headers=False):
+    req = urllib.request.Request(url, headers={"User-Agent": "piodesign-preview/1.0"})
     with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read().decode("utf-8"))
+        data = json.loads(r.read().decode("utf-8"))
+        return (data, r.headers) if with_headers else data
 
 
 def text(s):
@@ -37,7 +38,8 @@ def post_images(content):
 
 
 def main():
-    posts = get(f"{SITE}/wp-json/wp/v2/posts?per_page=15&_embed=wp:featuredmedia,wp:term")
+    posts, headers = get(f"{SITE}/wp-json/wp/v2/posts?per_page=24&_embed=wp:featuredmedia,wp:term", True)
+    total_posts = int(headers.get("X-WP-Total", len(posts)))
     out_posts = []
     for p in posts:
         fm = (p.get("_embedded", {}).get("wp:featuredmedia") or [{}])[0]
@@ -96,7 +98,7 @@ def main():
         })
 
     with open(os.path.join(HERE, "data.json"), "w", encoding="utf-8") as f:
-        json.dump({"posts": out_posts, "events": out_events}, f, ensure_ascii=False, indent=1)
+        json.dump({"posts": out_posts, "total_posts": total_posts, "events": out_events}, f, ensure_ascii=False, indent=1)
     print(f"{len(out_posts)} posts, {len(out_events)} events")
 
 

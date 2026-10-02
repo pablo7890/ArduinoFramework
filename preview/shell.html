@@ -12,6 +12,7 @@
 				<a href="#home" role="tab" id="tab-home" aria-controls="home" aria-selected="true">Strona główna</a>
 				<a href="#wydarzenie" role="tab" id="tab-wydarzenie" aria-controls="wydarzenie" aria-selected="false">Wydarzenie</a>
 				<a href="#kalendarz" role="tab" id="tab-kalendarz" aria-controls="kalendarz" aria-selected="false">Kalendarz</a>
+				<a href="#aktualnosci" role="tab" id="tab-aktualnosci" aria-controls="aktualnosci" aria-selected="false">Archiwum aktualności</a>
 			</nav>
 		</div>
 	</header>
@@ -35,10 +36,14 @@
 		<section class="pv-view pio-tec" id="kalendarz" role="tabpanel" aria-labelledby="tab-kalendarz" hidden>
 			{{ARCHIVE}}
 		</section>
+
+		<section class="pv-view" id="aktualnosci" role="tabpanel" aria-labelledby="tab-aktualnosci" hidden>
+			{{ARCHIVE_NEWS}}
+		</section>
 	</main>
 
 	<footer class="pv-foot">
-		<p>Podgląd zbudowany z szablonów wtyczki na treściach z parafiapio.pl ({{NPOSTS}} wpisów, {{NEVENTS}} wydarzeń), stan na {{TODAY}}. Kategorie wpisów w podglądzie to propozycja – dziś prawie wszystkie wpisy mają kategorię „Aktualności”. Dzień liturgiczny i święto parafialne to przykładowe dane; na stronie pochodzą z wtyczki „Parafia: Kalendarz liturgiczny”. Na telefonie widać 5 aktualności i 5 wydarzeń.</p>
+		<p>Podgląd zbudowany z szablonów wtyczki na treściach z parafiapio.pl ({{NPOSTS}} wpisów, {{NEVENTS}} wydarzeń), stan na {{TODAY}}. Kategorie wpisów w podglądzie to propozycja – dziś prawie wszystkie wpisy mają kategorię „Aktualności”. Dzień liturgiczny i święto parafialne to przykładowe dane; na stronie pochodzą z wtyczki „Parafia: Kalendarz liturgiczny”. Na telefonie widać 5 aktualności i 5 wydarzeń. Archiwum pokazuje pierwszą stronę z 18 wpisami; numery stron prowadzą na parafiapio.pl.</p>
 	</footer>
 </div>
 
@@ -55,7 +60,7 @@
 		} catch (e) {}
 	});
 
-	var views = ['home', 'wydarzenie', 'kalendarz'];
+	var views = ['home', 'wydarzenie', 'kalendarz', 'aktualnosci'];
 	function show(id, scroll) {
 		if (views.indexOf(id) < 0) { id = 'home'; }
 		views.forEach(function (v) {
@@ -68,10 +73,17 @@
 		var a = e.target.closest && e.target.closest('a[href]');
 		if (!a) { return; }
 		var href = a.getAttribute('href');
-		if (href === '#home' || href === '#wydarzenie' || href === '#kalendarz') {
+		if (href === '#home' || href === '#wydarzenie' || href === '#kalendarz' || href === '#aktualnosci') {
 			e.preventDefault();
 			history.replaceState(null, '', href);
 			show(href.slice(1), true);
+			return;
+		}
+		// Archive links on the homepage open the archive tab.
+		if (/parafiapio\.pl\/aktualnosci\/?$/.test(a.href)) {
+			e.preventDefault();
+			history.replaceState(null, '', '#aktualnosci');
+			show('aktualnosci', true);
 			return;
 		}
 		// The one event rendered as a single view opens in-page.

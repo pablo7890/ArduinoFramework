@@ -19,7 +19,7 @@ $cache_dir = getenv( 'PIO_CACHE' ) ?: __DIR__ . '/.cache';
 @mkdir( dirname( $out ), 0777, true );
 @mkdir( $cache_dir, 0777, true );
 
-define( 'PIO_GAZETA_DIR', $root . '/pio-gazeta/' );
+define( 'PIODESIGN_DIR', $root . '/piodesign/' );
 
 /* ------------------------------------------------------------ WordPress shims */
 
@@ -62,13 +62,15 @@ function apply_filters( $hook, $value, ...$args ) {
 			'readings'           => '',
 		] : $value;
 	}
-	if ( 'pio_gazeta_category_color' === $hook && isset( $GLOBALS['pio_demo_colors'][ $args[0] ] ) ) {
+	if ( 'piodesign_category_color' === $hook && isset( $GLOBALS['pio_demo_colors'][ $args[0] ] ) ) {
 		return $GLOBALS['pio_demo_colors'][ $args[0] ];
 	}
 	return $value;
 }
 
-require PIO_GAZETA_DIR . 'includes/core.php';
+require PIODESIGN_DIR . 'includes/core.php';
+// Fresh assets/piodesign.css from assets/src/piodesign.css.
+passthru( escapeshellarg( PHP_BINARY ) . ' ' . escapeshellarg( PIODESIGN_DIR . 'tools/build-css.php' ) . ' >&2' );
 
 /* ------------------------------------------------------------ data */
 
@@ -93,11 +95,20 @@ $demo_categories = [
 	10213 => $cat( 'Kultura', 'kultura' ),
 	10249 => $cat( 'Liturgia', 'liturgia' ),
 	10192 => $cat( 'Pielgrzymki', 'pielgrzymki' ),
+	10263 => $cat( 'Wspólnoty', 'wspolnoty' ),
+	10181 => $cat( 'Caritas', 'caritas' ),
+	10179 => $cat( 'Caritas', 'caritas' ),
+	10177 => $cat( 'Caritas', 'caritas' ),
+	10107 => $cat( 'Wspólnoty', 'wspolnoty' ),
+	10060 => $cat( 'Kultura', 'kultura' ),
+	9969  => $cat( 'Wspólnoty', 'wspolnoty' ),
+	9936  => $cat( 'Wspólnoty', 'wspolnoty' ),
+	9940  => $cat( 'Liturgia', 'liturgia' ),
 ];
 
 $posts = [];
 foreach ( $data['posts'] as $p ) {
-	$posts[] = pio_gazeta_post(
+	$posts[] = piodesign_post(
 		[
 			'id'          => $p['id'],
 			'title'       => $p['title'],
@@ -123,7 +134,7 @@ $strip = static function ( $html ) {
 
 $events = [];
 foreach ( $data['events'] as $e ) {
-	$events[] = pio_gazeta_event(
+	$events[] = piodesign_event(
 		[
 			'id'        => $e['id'],
 			'title'     => $e['title'],
@@ -148,28 +159,28 @@ usort( $events, static fn( $a, $b ) => $a['start_ts'] <=> $b['start_ts'] );
 $upcoming = array_values( array_filter( $events, static fn( $e ) => 'past' !== $e['status'] ) );
 $home_ev  = array_slice( $upcoming, 0, 10 );
 
-$day   = pio_gazeta_day( $now, apply_filters( 'kalendarz_liturgiczny_day', null, $now->format( 'Y-m-d' ) ) );
-$today = pio_gazeta_date( $now, true, true );
+$day   = piodesign_day( $now, apply_filters( 'kalendarz_liturgiczny_day', null, $now->format( 'Y-m-d' ) ) );
+$today = piodesign_date( $now, true, true );
 
 /* ------------------------------------------------------------ views */
 
-$home = pio_gazeta_render(
+$home = piodesign_render(
 	'news',
 	[
-		'posts'       => $posts,
+		'posts'       => array_slice( $posts, 0, 15 ),
 		'day'         => $day,
 		'mobile'      => 5,
 		'archive_url' => 'https://parafiapio.pl/aktualnosci/',
 		'title'       => 'Aktualności',
 		'kicker'      => 'Z życia parafii',
 	]
-) . pio_gazeta_render(
+) . piodesign_render(
 	'events',
 	[
 		'events'       => $home_ev,
-		'grouped'      => pio_gazeta_group_events( $home_ev, $now ),
+		'grouped'      => piodesign_group_events( $home_ev, $now ),
 		'mobile'       => 5,
-		'timeline'     => pio_gazeta_timeline( $events, $now ),
+		'timeline'     => piodesign_timeline( $events, $now ),
 		'calendar_url' => '#kalendarz',
 		'title'        => 'Wydarzenia',
 		'kicker'       => 'Nadchodzące',
@@ -181,7 +192,7 @@ $single_id = (int) ( getenv( 'PIO_SINGLE' ) ?: 10780 );
 $idx       = array_search( $single_id, array_column( $events, 'id' ), true );
 $single_e  = $events[ $idx ];
 $related   = array_slice( array_values( array_filter( $upcoming, static fn( $e ) => $e['id'] !== $single_id ) ), 0, 3 );
-$single    = pio_gazeta_render(
+$single    = piodesign_render(
 	'single-event',
 	[
 		'e'            => $single_e,
@@ -201,21 +212,50 @@ foreach ( array_slice( $upcoming, 0, 12 ) as $k => $e ) {
 	$m   = substr( $sep, 0, 7 );
 	if ( $m !== $last_month ) {
 		$d             = new DateTimeImmutable( $sep, $tz );
-		$archive_rows .= pio_gazeta_render( 'partials/month-head', [ 'month' => pio_gazeta_months( 'nom' )[ (int) $d->format( 'n' ) ], 'year' => $d->format( 'Y' ) ] );
+		$archive_rows .= piodesign_render( 'partials/month-head', [ 'month' => piodesign_months( 'nom' )[ (int) $d->format( 'n' ) ], 'year' => $d->format( 'Y' ) ] );
 		$last_month    = $m;
 	}
-	$archive_rows .= pio_gazeta_render( 'partials/event-row', [ 'e' => $e, 'context' => 'archive', 'i' => $k ] );
+	$archive_rows .= piodesign_render( 'partials/event-row', [ 'e' => $e, 'context' => 'archive', 'i' => $k ] );
 }
-$archive = pio_gazeta_render(
+$archive = piodesign_render(
 	'archive-hero',
 	[
 		'day'      => $day,
-		'timeline' => pio_gazeta_timeline( $events, $now ),
+		'timeline' => piodesign_timeline( $events, $now ),
 	]
 );
 $archive .= file_get_contents( __DIR__ . '/tec-bar.html' );
 $archive .= '<div class="tribe-events-calendar-list">' . $archive_rows . '</div>';
 $archive .= '<nav class="tec-mock-nav"><span>‹ Wcześniejsze wydarzenia</span><span>Dzisiaj</span><span class="is-on">Następne wydarzenia ›</span></nav>';
+
+// News archive, page 1 of the posts page.
+$per_page   = 18;
+$total      = (int) ( $data['total_posts'] ?? count( $posts ) );
+$cat_counts = [];
+foreach ( $posts as $p ) {
+	$slug = $p['category']['slug'];
+	$cat_counts[ $slug ] = ( $cat_counts[ $slug ] ?? [ 'name' => $p['category']['name'], 'url' => '#aktualnosci', 'count' => 0, 'color' => $p['category']['color'], 'active' => false ] );
+	$cat_counts[ $slug ]['count']++;
+}
+uasort( $cat_counts, static fn( $a, $b ) => $b['count'] <=> $a['count'] );
+$pages        = (int) ceil( $total / $per_page );
+$news_archive = piodesign_render(
+	'news-archive',
+	[
+		'posts'       => array_slice( $posts, 0, $per_page ),
+		'title'       => 'Aktualności',
+		'kicker'      => 'Z życia parafii',
+		'description' => '',
+		'cats'        => array_values( $cat_counts ),
+		'all_url'     => '#aktualnosci',
+		'all_active'  => true,
+		'page'        => 1,
+		'pages'       => $pages,
+		'total'       => $total,
+		'pager'       => piodesign_pager( 1, $pages, static fn( $n ) => 'https://parafiapio.pl/aktualnosci/page/' . $n . '/' ),
+		'search'      => [ 'action' => 'https://parafiapio.pl/', 'value' => '' ],
+	]
+);
 
 /* ------------------------------------------------------------ page */
 
@@ -223,13 +263,14 @@ $shell = file_get_contents( __DIR__ . '/shell.html' );
 $html  = strtr(
 	$shell,
 	[
-		'{{CSS}}'      => pio_inline_fonts() . "\n" . file_get_contents( PIO_GAZETA_DIR . 'assets/pio-gazeta.css' ) . "\n" . file_get_contents( __DIR__ . '/preview.css' ),
-		'{{JS}}'       => file_get_contents( PIO_GAZETA_DIR . 'assets/pio-gazeta.js' ),
+		'{{CSS}}'      => pio_inline_fonts() . "\n" . file_get_contents( PIODESIGN_DIR . 'assets/piodesign.css' ) . "\n" . file_get_contents( __DIR__ . '/preview.css' ),
+		'{{JS}}'       => file_get_contents( PIODESIGN_DIR . 'assets/piodesign.js' ),
 		'{{HOME}}'     => $home,
 		'{{SINGLE}}'   => $single,
 		'{{ARCHIVE}}'  => $archive,
 		'{{TODAY}}'    => esc_html( $today ),
-		'{{NPOSTS}}'   => count( $posts ),
+		'{{NPOSTS}}'   => 15,
+		'{{ARCHIVE_NEWS}}' => $news_archive,
 		'{{NEVENTS}}'  => count( $home_ev ),
 	]
 );
@@ -237,10 +278,10 @@ $html  = strtr(
 /* ------------------------------------------------------------ embed fonts & images */
 
 function pio_inline_fonts() {
-	$css = file_get_contents( PIO_GAZETA_DIR . 'assets/pio-gazeta-fonts.css' );
+	$css = file_get_contents( PIODESIGN_DIR . 'assets/piodesign-fonts.css' );
 	return preg_replace_callback(
 		'#url\("fonts/([^"]+)"\)#',
-		static fn( $m ) => 'url("data:font/woff2;base64,' . base64_encode( file_get_contents( PIO_GAZETA_DIR . 'assets/fonts/' . $m[1] ) ) . '")',
+		static fn( $m ) => 'url("data:font/woff2;base64,' . base64_encode( file_get_contents( PIODESIGN_DIR . 'assets/fonts/' . $m[1] ) ) . '")',
 		$css
 	);
 }

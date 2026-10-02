@@ -1,10 +1,10 @@
 # parafiapio.pl – moduły WordPress
 
-## `pio-gazeta/` – wtyczka „Parafia: PioDesign”
+## `piodesign/` – wtyczka „Parafia: PioDesign”
 
 Nowy wygląd aktualności i wydarzeń na stronie głównej oraz widoków
 The Events Calendar (pojedyncze wydarzenie, lista). Instalacja i opis:
-[pio-gazeta/README.md](pio-gazeta/README.md).
+[piodesign/README.md](piodesign/README.md).
 
 ## `preview/`
 
