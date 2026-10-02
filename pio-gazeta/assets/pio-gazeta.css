@@ -82,7 +82,6 @@
 /* shared small type */
 .pio-meta,
 .pio-ev__rel,
-.pio-dateline,
 .pio-group-h,
 .pio-mast__kicker,
 .pio-chip,
@@ -120,29 +119,62 @@
 
 /* ---------------------------------------------------------------- dateline & liturgy */
 
-.pio-dateline {
+.pio-day {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: center;
-	gap: .35em 1.2em;
+	align-items: stretch;
+	row-gap: 12px;
+	min-width: 0;
+	font-family: var(--pio-display);
+}
+.pio-day__field {
+	display: grid;
+	align-content: start;
+	gap: 5px;
+	min-width: 0;
+	margin: 0;
+	padding: 0 22px;
+	border-left: 1px solid var(--c-line);
+}
+.pio-day__field:first-child { padding-left: 0; border-left: 0; }
+.pio-day__label {
 	color: var(--c-muted);
-	font-size: 13px;
-	font-weight: 600;
-	letter-spacing: .06em;
+	font-size: 11.5px;
+	font-weight: 700;
+	letter-spacing: .12em;
+	line-height: 1;
 	text-transform: uppercase;
 }
-.pio-lit { display: inline-flex; align-items: center; gap: .55em; color: var(--c-fg); }
+.pio-day__field--date .pio-day__label { color: var(--c-accent); }
+.pio-day__value {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	color: var(--c-fg);
+	font-size: 15.5px;
+	font-weight: 650;
+	line-height: 1.3;
+	text-wrap: balance;
+}
+.pio-day__value small { margin-left: .3em; color: var(--c-muted); font-size: 13px; font-weight: 500; }
+@media (max-width: 700px) {
+	.pio-day { display: grid; gap: 12px; }
+	.pio-day__field { padding: 0; border: 0; }
+}
 .pio-lit__dot {
 	position: relative;
-	width: 10px; height: 10px;
+	flex: none;
+	width: 11px; height: 11px;
 	border-radius: 50%;
 	background: var(--lit);
+	box-shadow: inset 0 0 0 1px rgba(28, 29, 33, .22); /* keeps white visible */
 }
 .pio-lit__dot::after {
 	content: "";
 	position: absolute; inset: -4px;
 	border-radius: 50%;
 	border: 1.5px solid var(--lit);
+	border-color: color-mix(in srgb, var(--lit) 75%, #8a8478);
 	opacity: .5;
 	animation: pio-ring 2.8s var(--pio-ease) infinite;
 }
@@ -154,7 +186,7 @@
 .pio-mast__row {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: center;
+	align-items: flex-end;
 	justify-content: space-between;
 	gap: 8px 24px;
 	padding-bottom: 12px;
@@ -188,6 +220,7 @@
 	padding-bottom: .06em;
 	animation: pio-rise 1s var(--pio-ease) both;
 }
+.pio-archive-hero__word { font-size: clamp(2.7rem, 7.4vw, 6.4rem); line-height: .9; }
 
 .pio-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .pio-chip {
@@ -471,15 +504,56 @@ a:focus-visible .pio-frame > .pio-frame__img { transform: scale(1.045); }
 }
 .pio-events .pio-mast__kicker { color: var(--pio-gold); }
 
+/* Two balanced newspaper columns: the "next up" card opens the first one,
+   the agenda flows on underneath it and into the second. */
 .pio-events__layout {
-	display: grid;
-	grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-	gap: clamp(24px, 3.5vw, 56px);
-	align-items: start;
+	columns: 2;
+	column-gap: clamp(28px, 4vw, 64px);
+	column-rule: 1px solid var(--c-line);
 }
-.pio-events__lead { display: grid; gap: 28px; }
+.pio-events__lead {
+	display: grid;
+	gap: 28px;
+	margin-bottom: 34px;
+	break-inside: avoid;
+}
+.pio-agenda__group { margin-bottom: 30px; }
+.pio-agenda__group .pio-group-h { break-after: avoid; }
+.pio-events__layout .pio-ev,
+.pio-events__more { break-inside: avoid; }
 @media (max-width: 960px) {
-	.pio-events__layout { grid-template-columns: minmax(0, 1fr); }
+	.pio-events__layout { columns: 1; }
+}
+
+.pio-events__more {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 4px 16px;
+	padding: 18px 20px;
+	border: 1px solid rgba(219, 165, 98, .45);
+	border-radius: var(--pio-radius);
+	background: rgba(219, 165, 98, .07);
+	font-family: var(--pio-display);
+	transition: background-color .3s, border-color .3s, color .3s;
+}
+.pio-events__more-t { font-size: 1.15rem; font-weight: 700; }
+.pio-events__more-s { grid-row: 2; color: var(--c-muted); font-size: 13.5px; font-weight: 500; }
+.pio-events__more .pio-i { grid-row: 1 / span 2; grid-column: 2; width: 22px; height: 22px; color: var(--pio-gold); transition: transform .35s var(--pio-ease); }
+.pio-events__more:hover { background: var(--pio-gold); border-color: var(--pio-gold); color: var(--pio-night); }
+.pio-events__more:hover .pio-events__more-s,
+.pio-events__more:hover .pio-i { color: var(--pio-night); }
+.pio-events__more:hover .pio-i { transform: translateX(4px); }
+
+/* Phones: a short list, then the way to everything else. */
+.pio-narrow-only { display: none; }
+@media (max-width: 700px) {
+	.pio-newsroom:not(.is-filtered) .pio-mhide,
+	.pio-events .pio-mhide { display: none; }
+	.pio-agenda__group .pio-group-h b { display: none; } /* counts include rows hidden here */
+	.pio-wide-only { display: none; }
+	.pio-narrow-only { display: inline; }
+	.pio-news__more { width: 100%; justify-content: center; padding-block: 1em; }
 }
 
 /* next up */
@@ -629,8 +703,6 @@ a:focus-visible .pio-frame > .pio-frame__img { transform: scale(1.045); }
 	font-size: 12px;
 	letter-spacing: 0;
 }
-.pio-agenda { display: grid; gap: 30px; min-width: 0; }
-.pio-agenda__group { display: grid; }
 
 /* ---------------------------------------------------------------- event row */
 
@@ -902,6 +974,7 @@ a:focus-visible .pio-frame > .pio-frame__img { transform: scale(1.045); }
 	padding-bottom: 28px;
 	border-bottom: 1px solid var(--c-line);
 }
+.pio-archive-hero .pio-day { padding-bottom: 14px; border-bottom: 1px solid var(--c-line); }
 .pio-archive-hero__lede { max-width: 60ch; color: var(--c-muted); font-size: 1.12rem; }
 .pio-archive-hero .pio-tl__day.is-sunday { background: rgba(193, 78, 0, .05); }
 .pio-archive-hero .pio-tl__dot { background: var(--pio-rust); }
@@ -917,6 +990,7 @@ a:focus-visible .pio-frame > .pio-frame__img { transform: scale(1.045); }
 
 .pio-month {
 	display: flex;
+	font-family: var(--pio-display);
 	align-items: baseline;
 	gap: .3em;
 	margin: clamp(28px, 4vw, 56px) 0 8px !important;

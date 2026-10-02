@@ -47,8 +47,7 @@ add_action(
 		echo pio_gazeta_render( // phpcs:ignore WordPress.Security.EscapeOutput
 			'archive-hero',
 			[
-				'liturgy'  => pio_gazeta_liturgy( $now ),
-				'today'    => pio_gazeta_date( $now, true, true ),
+				'day'      => pio_gazeta_wp_day( $now ),
 				'timeline' => pio_gazeta_get_timeline(),
 			]
 		);

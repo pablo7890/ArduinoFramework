@@ -5,6 +5,7 @@
  * @var array  $e       Normalised event (pio_gazeta_event()).
  * @var string $context home | archive.
  * @var int    $i
+ * @var bool   $mhide   Hidden on phones.
  */
 
 $context = $context ?? 'home';
@@ -12,6 +13,9 @@ $i       = $i ?? 0;
 $classes = [ 'pio-ev', 'pio-ev--' . $e['status'], 'pio-ev--' . $context ];
 if ( 'archive' === $context ) {
 	$classes[] = 'pio'; // TEC markup around us is not inside a .pio wrapper.
+}
+if ( ! empty( $mhide ) ) {
+	$classes[] = 'pio-mhide';
 }
 if ( $e['featured'] ) {
 	$classes[] = 'pio-ev--featured';

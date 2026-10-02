@@ -3,8 +3,8 @@
  * Homepage newsroom: lead story, two seconds, a grid and a column of briefs.
  *
  * @var array  $posts       Normalised posts.
- * @var array  $liturgy     pio_gazeta_liturgy().
- * @var string $today       "wtorek, 29 września 2026".
+ * @var array  $day         pio_gazeta_day().
+ * @var int    $mobile      Stories shown on phones before the archive link.
  * @var string $archive_url
  * @var string $title
  * @var string $kicker
@@ -26,16 +26,10 @@ uasort( $cats, static fn( $a, $b ) => $b['count'] <=> $a['count'] );
 
 $uid = 'pio-news-' . substr( md5( serialize( array_column( $posts, 'id' ) ) ), 0, 6 );
 ?>
-<section class="pio pio-news" id="<?php echo esc_attr( $uid ); ?>" style="--lit: <?php echo esc_attr( $liturgy['color'] ); ?>;" aria-labelledby="<?php echo esc_attr( $uid ); ?>-h">
+<section class="pio pio-news" id="<?php echo esc_attr( $uid ); ?>" aria-labelledby="<?php echo esc_attr( $uid ); ?>-h">
 	<header class="pio-mast">
 		<div class="pio-mast__row">
-			<p class="pio-dateline">
-				<span><?php echo esc_html( $today ); ?></span>
-				<span class="pio-lit" title="Kolor liturgiczny: <?php echo esc_attr( $liturgy['color_name'] ); ?>">
-					<i class="pio-lit__dot" aria-hidden="true"></i>
-					<?php echo esc_html( trim( $liturgy['label'] . ( $liturgy['week'] ? ', ' . $liturgy['week'] : '' ) ) ); ?>
-				</span>
-			</p>
+			<?php echo pio_gazeta_render( 'partials/dayline', [ 'day' => $day ] ); // phpcs:ignore ?>
 			<a class="pio-btn pio-btn--ghost pio-mast__all" href="<?php echo esc_url( $archive_url ); ?>">Wszystkie wpisy <?php echo pio_gazeta_icon( 'arrow' ); // phpcs:ignore ?></a>
 		</div>
 		<h2 class="pio-mast__title" id="<?php echo esc_attr( $uid ); ?>-h">
@@ -66,15 +60,20 @@ $uid = 'pio-news-' . substr( md5( serialize( array_column( $posts, 'id' ) ) ), 0
 			} else {
 				$variant = 'brief';
 			}
+			$mhide = $i >= $mobile;
 			if ( 9 === $i ) {
-				echo '<h3 class="pio-briefs-h"><span>Z ostatnich tygodni</span></h3>';
+				echo '<h3 class="pio-briefs-h' . ( $mhide ? ' pio-mhide' : '' ) . '"><span>Z ostatnich tygodni</span></h3>';
 			}
-			echo pio_gazeta_render( 'partials/post-card', compact( 'p', 'variant', 'i' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
+			echo pio_gazeta_render( 'partials/post-card', compact( 'p', 'variant', 'i', 'mhide' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
 		}
 		?>
 	</div>
 
 	<footer class="pio-news__foot">
-		<a class="pio-btn" href="<?php echo esc_url( $archive_url ); ?>">Starsze aktualności <?php echo pio_gazeta_icon( 'arrow' ); // phpcs:ignore ?></a>
+		<a class="pio-btn pio-news__more" href="<?php echo esc_url( $archive_url ); ?>">
+			<span class="pio-wide-only">Starsze aktualności</span>
+			<span class="pio-narrow-only">Wszystkie aktualności</span>
+			<?php echo pio_gazeta_icon( 'arrow' ); // phpcs:ignore ?>
+		</a>
 	</footer>
 </section>

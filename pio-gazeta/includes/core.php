@@ -174,6 +174,48 @@ function pio_gazeta_liturgy( DateTimeImmutable $now ) {
 	return $make( 'ordinary', 'Okres zwykły', pio_gazeta_roman( max( 1, $week ) ) . ' tydzień', 'green' );
 }
 
+/**
+ * Everything the dateline shows about a day: weekday, date, liturgical day,
+ * colour and parish feast.
+ *
+ * @param array|null $ext Day from the "Parafia: Kalendarz liturgiczny" plugin
+ *                        (filter kalendarz_liturgiczny_day). When null, the
+ *                        season is computed here as a fallback.
+ */
+function pio_gazeta_day( DateTimeImmutable $now, $ext = null ) {
+	$base = [
+		'weekday' => pio_gazeta_weekdays()[ (int) $now->format( 'N' ) ],
+		'date'    => pio_gazeta_date( $now, true ),
+		'iso'     => $now->format( 'Y-m-d' ),
+	];
+	$list = static function ( $v ) {
+		$v = is_array( $v ) ? $v : ( '' === (string) $v ? [] : [ (string) $v ] );
+		return implode( ', ', array_filter( array_map( 'trim', $v ) ) );
+	};
+
+	if ( is_array( $ext ) && ! empty( $ext['title'] ) ) {
+		$color = (string) ( $ext['color_hex'] ?? '' );
+		return $base + [
+			'title'       => (string) $ext['title'],
+			'rank'        => (string) ( $ext['rank_label'] ?? '' ),
+			'color'       => preg_match( '/^#[0-9a-f]{3,8}$/i', $color ) ? $color : '#3f7a4f',
+			'color_label' => (string) ( $ext['color_label'] ?? '' ),
+			'parish'      => $list( $ext['parish'] ?? [] ),
+			'source'      => 'kalendarz',
+		];
+	}
+
+	$l = pio_gazeta_liturgy( $now );
+	return $base + [
+		'title'       => trim( $l['label'] . ( $l['week'] ? ', ' . $l['week'] : '' ) ),
+		'rank'        => '',
+		'color'       => $l['color'],
+		'color_label' => $l['color_name'],
+		'parish'      => '',
+		'source'      => 'fallback',
+	];
+}
+
 /* ---------------------------------------------------------------------------
  * Categories
  * ------------------------------------------------------------------------ */

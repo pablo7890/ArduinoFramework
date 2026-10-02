@@ -12,6 +12,13 @@ function pio_gazeta_now() {
 	return new DateTimeImmutable( 'now', wp_timezone() );
 }
 
+/** Today for the dateline, from "Parafia: Kalendarz liturgiczny" when active. */
+function pio_gazeta_wp_day( $now = null ) {
+	$now = $now ?: pio_gazeta_now();
+	$ext = apply_filters( 'kalendarz_liturgiczny_day', null, $now->format( 'Y-m-d' ) );
+	return pio_gazeta_day( $now, $ext );
+}
+
 /** Image data for an attachment, with the full-size ratio for the frame. */
 function pio_gazeta_wp_image( $attachment_id, $size = 'large' ) {
 	$attachment_id = (int) $attachment_id;

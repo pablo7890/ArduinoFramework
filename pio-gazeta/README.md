@@ -1,4 +1,8 @@
-# Pio Gazeta – aktualności i kalendarz dla parafiapio.pl
+# Parafia: PioDesign
+
+Wersja 1.0 · autor: cruzLabs
+
+Nowy wygląd aktualności i kalendarza dla parafiapio.pl.
 
 Wtyczka WordPress, która daje stronie głównej parafii nowy układ aktualności
 i wydarzeń oraz nowy wygląd widoków The Events Calendar (TEC, wersja darmowa).
@@ -14,14 +18,21 @@ Co jest w środku:
 
 ## Pomysły, których nie ma na co drugiej stronie
 
-- **Kolor liturgiczny w nagłówku.** Nad aktualnościami jest data i okres
-  liturgiczny („Okres zwykły, XXVI tydzień”) z kropką w kolorze liturgicznym
-  (zielony / fioletowy / biały / czerwony). Liczony automatycznie z daty
-  Wielkanocy, bez żadnej konfiguracji.
+- **Dzień liturgiczny w nagłówku.** Nad aktualnościami i nad kalendarzem:
+  dzień tygodnia z datą, kółeczko w kolorze liturgicznym, „Dzień liturgiczny”
+  (z rangą i kolorem) oraz „Święto parafialne”. Dane pochodzą z wtyczki
+  **Parafia: Kalendarz liturgiczny** (filtr `kalendarz_liturgiczny_day`).
+  Gdy jej nie ma albo rok nie jest zatwierdzony, wtyczka sama liczy okres
+  liturgiczny („Okres zwykły, XXVI tydzień”) i pokazuje go jako „Okres
+  liturgiczny”. Pole „Święto parafialne” pojawia się tylko, gdy w danym
+  dniu coś jest wpisane.
 - **Podgląd galerii na najechanie.** Wpis z fotorelacją pokazuje licznik zdjęć
   („137 zdjęć”), a po najechaniu myszą przewija 3 kolejne zdjęcia z galerii
   (FooGallery, galerie WordPressa i zdjęcia we wpisie są wykrywane same).
   Na telefonie galeria odtwarza się, gdy karta jest na środku ekranu.
+- **Dwie gazetowe kolumny wydarzeń.** Karta „Najbliżej” otwiera pierwszą
+  kolumnę, a lista płynie pod nią i dalej w drugiej; kolumny wyrównują się
+  same, bez pustych miejsc. Na końcu jest kafelek „Pełny kalendarz parafii”.
 - **Oś wydarzeń.** Pas 5 tygodni: kropka to wydarzenie jednodniowe, pasek to
   wydarzenie kilkudniowe (np. „Modlitwa różańcowa w październiku”). Niedziele
   są wyróżnione. Klik w kropkę przewija do wydarzenia i je podświetla;
@@ -46,7 +57,7 @@ odliczanie. Wszystko wyłącza się przy systemowym „ogranicz ruch”.
 
 1. Skopiuj folder `pio-gazeta` do `wp-content/plugins/` (albo spakuj go do ZIP
    i wgraj w *Wtyczki → Dodaj nową → Wyślij wtyczkę na serwer*).
-2. Włącz wtyczkę **Pio Gazeta – aktualności i kalendarz**.
+2. Włącz wtyczkę **Parafia: PioDesign**.
 3. Na stronie głównej w Avada Builderze usuń obecne elementy „Aktualności”
    i „Wydarzenia”, a w ich miejsce dodaj dwa kontenery, w każdym element
    **Code Block** (albo **Text Block**) z shortcode'em:
@@ -71,6 +82,7 @@ odliczanie. Wszystko wyłącza się przy systemowym „ogranicz ruch”.
 | Parametr | Domyślnie | Opis |
 |---|---|---|
 | `count` | `15` | Liczba wpisów. Układ: 1 główny + 2 boczne + 6 w siatce + reszta jako krótkie wzmianki. |
+| `mobile` | `5` | Ile wpisów widać na telefonie (do 700 px); pod nimi przycisk „Wszystkie aktualności”. Filtr kategorii nadal przeszukuje wszystkie. |
 | `category` | – | Slug kategorii, jeśli chcesz tylko jedną. |
 | `title` | `Aktualności` | Duży tytuł sekcji. |
 | `kicker` | `Z życia parafii` | Mały napis nad tytułem. |
@@ -81,6 +93,7 @@ odliczanie. Wszystko wyłącza się przy systemowym „ogranicz ruch”.
 | Parametr | Domyślnie | Opis |
 |---|---|---|
 | `count` | `10` | Liczba nadchodzących (i trwających) wydarzeń. |
+| `mobile` | `5` | Ile wydarzeń widać na telefonie (karta „Najbliżej” + lista); pod nimi „Pełny kalendarz parafii”. Blok „Trwa teraz” zostaje widoczny. |
 | `category` | – | Slug kategorii wydarzeń TEC. |
 | `weeks` | `5` | Długość osi w tygodniach (2–8). |
 | `title` / `kicker` | `Wydarzenia` / `Nadchodzące` | Nagłówki. |
@@ -128,12 +141,13 @@ add_filter( 'pio_gazeta_category_color', function ( $color, $slug ) {
   add_filter( 'pio_gazeta_tec_single', '__return_false' ); // pojedyncze
   ```
 
-## Czcionki i RODO
+## Czcionki
 
-Wtyczka ładuje z Google Fonts dwa kroje: **Bricolage Grotesque** (tytuły,
-daty, etykiety) i **Newsreader** (treść, zajawki). Jeśli wolicie hostować
-czcionki lokalnie (zalecane przy RODO), wgrajcie je w *Avada → Options →
-Typography → Custom Fonts* i wyłączcie ładowanie z Google:
+Czcionki są we wtyczce (`assets/fonts/`, WOFF2, znaki łacińskie i polskie,
+licencja SIL OFL dołączona): **Bricolage Grotesque** (tytuły, daty,
+etykiety) i **Newsreader** (treść, zajawki). Strona nie łączy się z Google
+Fonts. Dwa główne pliki są wczytywane z wyprzedzeniem (`preload`).
+Jeśli motyw sam dostarcza te kroje, można wyłączyć ładowanie:
 
 ```php
 add_filter( 'pio_gazeta_load_fonts', '__return_false' );

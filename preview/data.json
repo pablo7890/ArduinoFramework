@@ -372,18 +372,65 @@
  ],
  "events": [
   {
-   "id": 10489,
-   "title": "Spotkania seniorów w parafii",
-   "url": "https://parafiapio.pl/wydarzenie/spotkania-seniorow-w-parafii/",
-   "start": "2026-09-01 00:00:00",
-   "end": "2026-09-30 23:59:59",
+   "id": 10148,
+   "title": "Wyjazd do Lichenia i Kalisza",
+   "url": "https://parafiapio.pl/wydarzenie/wyjazd-do-lichenia-i-kalisza/",
+   "start": "2026-08-26 00:00:00",
+   "end": "2026-08-27 23:59:59",
    "all_day": true,
-   "excerpt": "Serdecznie zapraszamy wszystkich seniorów do udziału w spotkaniach Czwartkowego Klubu Kawowego, które odbywają się w każdy czwartek w godz. 9.00-12.00 w naszej parafialnej kawiarence oraz dodatkowo w wybrane wtorki. Spotkania seniorów w naszej parafii to nie tylko okazja, aby wspólnie spędzić czas, ale także możliwość wysłuchania ciekawych wykładów (w tym z zakresu profilaktyki zdrowotnej), a takż",
-   "content": "<p>Serdecznie zapraszamy wszystkich seniorów do udziału w spotkaniach Czwartkowego Klubu Kawowego, które odbywają się w każdy czwartek w godz. 9.00-12.00 w naszej parafialnej kawiarence oraz dodatkowo w wybrane wtorki. Spotkania seniorów w naszej parafii to nie tylko okazja, aby wspólnie spędzić czas, ale także możliwość wysłuchania ciekawych wykładów (w tym z zakresu profilaktyki zdrowotnej), a także prowadzone przez specjalistkę ćwiczenia usprawniające czy wiele innych inicjatyw.</p>",
+   "excerpt": "Stowarzyszenie Inicjatyw Lokalnych im. Św. Ojca Pio w ramach programu „Razem raźniej na emeryturze” dofinansowanego przez Wojewodę Pomorskiego \n  zaprasza seniorów na wspólny wyjazd do Lichenia i Kalisza   \n  w dniach 26-27 sierpnia br.   \n Koszt 280 zł. Są jeszcze wolne miejsca. Zapisy w zakrystii.",
+   "content": "<p style=\"text-align: center;\">Stowarzyszenie Inicjatyw Lokalnych im. Św. Ojca Pio w ramach programu „Razem raźniej na emeryturze” dofinansowanego przez Wojewodę Pomorskiego</p>\n<p style=\"text-align: center;\"><strong>zaprasza seniorów na wspólny wyjazd do Lichenia i Kalisza </strong></p>\n<p style=\"text-align: center;\"><strong>w dniach 26-27 sierpnia br. </strong></p>\n<p style=\"text-align: center;\">Koszt 280 zł. Są jeszcze wolne miejsca. Zapisy w zakrystii.</p>",
    "image": {
-    "src": "https://parafiapio.pl/wp-content/uploads/2026/09/razem-razniej-h2.png",
-    "w": 1620,
-    "h": 902
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/08/Lichen_bazylika_2.jpg",
+    "w": 1920,
+    "h": 1557
+   },
+   "venue": {},
+   "organizer": {
+    "name": "Stowarzyszenie Inicjatyw Lokalnych im. św. Ojca Pio",
+    "url": "http://sil-pio.pl"
+   },
+   "category": null,
+   "featured": false,
+   "cost": ""
+  },
+  {
+   "id": 10370,
+   "title": "25-lecie Parafialnego Zespołu Caritas",
+   "url": "https://parafiapio.pl/wydarzenie/25-lecie-parafialnego-zespolu-caritas/",
+   "start": "2026-08-30 08:00:00",
+   "end": "2026-09-01 23:00:00",
+   "all_day": false,
+   "excerpt": "We wtorek, 1 września zapraszamy Parafialny Zespół Caritas na godz. 18.00 na mszę świętą, a następnie na spotkanie organizacyjne. Parafialny Zespół Caritas został powołany do istnienia jesienią 2001 roku, co oznacza, że w tym czasie obchodzi 25 lat swojego istnienia. Z tej okazji najbliższe spotkanie odbędzie się przy wspólnym grillu, pod wiatą, na zapleczu domu parafialnego. Zapraszamy wszystkich",
+   "content": "<p>We wtorek, 1 września zapraszamy Parafialny Zespół Caritas na godz. 18.00 na mszę świętą, a następnie na spotkanie organizacyjne. Parafialny Zespół Caritas został powołany do istnienia jesienią 2001 roku, co oznacza, że w tym czasie obchodzi 25 lat swojego istnienia. Z tej okazji najbliższe spotkanie odbędzie się przy wspólnym grillu, pod wiatą, na zapleczu domu parafialnego. Zapraszamy wszystkich aktualnych członków Zespołu, a także tych, którzy w minione lata w nim posługiwali.</p>",
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/08/parafialny_zespol_caritas-620x295-1-e1788077000954.jpg",
+    "w": 432,
+    "h": 295
+   },
+   "venue": {
+    "name": "Parafia św. Ojca Pio",
+    "address": "ul. Przemyska 21",
+    "city": "Gdańsk"
+   },
+   "organizer": {},
+   "category": null,
+   "featured": false,
+   "cost": ""
+  },
+  {
+   "id": 10308,
+   "title": "Poświęcenie przyborów szkolnych",
+   "url": "https://parafiapio.pl/wydarzenie/poswiecenie-przyborow-szkolnych/",
+   "start": "2026-08-30 11:15:00",
+   "end": "2026-08-30 12:00:00",
+   "all_day": false,
+   "excerpt": "Zapraszamy wszystkich nauczycieli oraz dzieci i młodzież na Mszę św. inaugurującą rok szkolny 2026/27, która dobędzie się w niedzielę 30 sierpnia o godzinie 11.15. Prosimy wszystkie dzieci i młodzież o przyniesienie tornistrów i przyborów szkolnych do poświęcenia.",
+   "content": "<p>Zapraszamy wszystkich nauczycieli oraz dzieci i młodzież na Mszę św. inaugurującą rok szkolny 2026/27, która dobędzie się w niedzielę 30 sierpnia o godzinie 11.15. Prosimy wszystkie dzieci i młodzież o przyniesienie tornistrów i przyborów szkolnych do poświęcenia.</p>",
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/08/bru-no-back-to-school-2737002-scaled.jpg",
+    "w": 2560,
+    "h": 1707
    },
    "venue": {
     "name": "Parafia św. Ojca Pio",
@@ -1137,6 +1184,30 @@
     "src": "https://parafiapio.pl/wp-content/uploads/2026/09/stevepb-first-aid-908591-scaled.jpg",
     "w": 2560,
     "h": 1707
+   },
+   "venue": {
+    "name": "Parafia św. Ojca Pio",
+    "address": "ul. Przemyska 21",
+    "city": "Gdańsk"
+   },
+   "organizer": {},
+   "category": null,
+   "featured": false,
+   "cost": ""
+  },
+  {
+   "id": 10489,
+   "title": "Spotkania seniorów w parafii",
+   "url": "https://parafiapio.pl/wydarzenie/spotkania-seniorow-w-parafii/",
+   "start": "2026-11-01 00:00:00",
+   "end": "2026-11-30 23:59:59",
+   "all_day": true,
+   "excerpt": "Serdecznie zapraszamy wszystkich seniorów do udziału w spotkaniach Czwartkowego Klubu Kawowego, które odbywają się w każdy czwartek w godz. 9.00-12.00 w naszej parafialnej kawiarence oraz dodatkowo w wybrane wtorki. Spotkania seniorów w naszej parafii to nie tylko okazja, aby wspólnie spędzić czas, ale także możliwość wysłuchania ciekawych wykładów (w tym z zakresu profilaktyki zdrowotnej), a takż",
+   "content": "<p>Serdecznie zapraszamy wszystkich seniorów do udziału w spotkaniach Czwartkowego Klubu Kawowego, które odbywają się w każdy czwartek w godz. 9.00-12.00 w naszej parafialnej kawiarence oraz dodatkowo w wybrane wtorki. Spotkania seniorów w naszej parafii to nie tylko okazja, aby wspólnie spędzić czas, ale także możliwość wysłuchania ciekawych wykładów (w tym z zakresu profilaktyki zdrowotnej), a także prowadzone przez specjalistkę ćwiczenia usprawniające czy wiele innych inicjatyw.</p>",
+   "image": {
+    "src": "https://parafiapio.pl/wp-content/uploads/2026/09/razem-razniej-h2.png",
+    "w": 1620,
+    "h": 902
    },
    "venue": {
     "name": "Parafia św. Ojca Pio",

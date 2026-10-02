@@ -6,6 +6,7 @@
  * @var array  $events       Normalised events.
  * @var array  $timeline     pio_gazeta_timeline() over a wider set of events.
  * @var array  $grouped      pio_gazeta_group_events().
+ * @var int    $mobile       Events shown on phones (incl. "next up") before the calendar link.
  * @var string $calendar_url
  * @var string $title
  * @var string $kicker
@@ -48,17 +49,25 @@ $i   = 0;
 			<?php endif; ?>
 		</div>
 
-		<div class="pio-agenda">
-			<?php foreach ( $grouped['groups'] as $label => $items ) : ?>
-				<div class="pio-agenda__group">
-					<h3 class="pio-group-h"><?php echo esc_html( $label ); ?> <b><?php echo count( $items ); ?></b></h3>
-					<?php
-					foreach ( $items as $e ) {
-						echo pio_gazeta_render( 'partials/event-row', [ 'e' => $e, 'context' => 'home', 'i' => $i++ ] ); // phpcs:ignore
-					}
-					?>
-				</div>
-			<?php endforeach; ?>
-		</div>
+		<?php
+		$limit = max( 0, $mobile - ( $grouped['featured'] ? 1 : 0 ) );
+		foreach ( $grouped['groups'] as $label => $items ) :
+			?>
+			<div class="pio-agenda__group<?php echo $i >= $limit ? ' pio-mhide' : ''; ?>">
+				<h3 class="pio-group-h"><?php echo esc_html( $label ); ?> <b><?php echo count( $items ); ?></b></h3>
+				<?php
+				foreach ( $items as $e ) {
+					echo pio_gazeta_render( 'partials/event-row', [ 'e' => $e, 'context' => 'home', 'i' => $i, 'mhide' => $i >= $limit ] ); // phpcs:ignore
+					$i++;
+				}
+				?>
+			</div>
+		<?php endforeach; ?>
+
+		<a class="pio-events__more" href="<?php echo esc_url( $calendar_url ); ?>">
+			<span class="pio-events__more-t">Pełny kalendarz parafii</span>
+			<span class="pio-events__more-s">Wszystkie wydarzenia, wyszukiwarka, widok miesiąca</span>
+			<?php echo pio_gazeta_icon( 'arrow' ); // phpcs:ignore ?>
+		</a>
 	</div>
 </section>

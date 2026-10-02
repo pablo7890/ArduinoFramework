@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name:       Pio Gazeta – aktualności i kalendarz
+ * Plugin Name:       Parafia: PioDesign
  * Description:       Nowa strona główna parafii: redakcyjny układ aktualności, oś wydarzeń The Events Calendar, widok pojedynczego wydarzenia i listy wydarzeń. Shortcode'y: [pio_aktualnosci], [pio_wydarzenia].
- * Version:           1.0.0
+ * Version:           1.0
  * Requires at least: 6.2
  * Requires PHP:      7.4
- * Author:            Parafia pw. św. Ojca Pio w Gdańsku
+ * Author:            cruzLabs
  * Text Domain:       pio-gazeta
  *
  * @package PioGazeta
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PIO_GAZETA_VERSION', '1.0.0' );
+define( 'PIO_GAZETA_VERSION', '1.0' );
 define( 'PIO_GAZETA_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PIO_GAZETA_URL', plugin_dir_url( __FILE__ ) );
 
@@ -29,13 +29,10 @@ add_action(
 	'wp_enqueue_scripts',
 	static function () {
 		$deps = [];
+		// Fonts ship with the plugin (no requests to Google). Turn off when
+		// the theme already provides Bricolage Grotesque and Newsreader.
 		if ( apply_filters( 'pio_gazeta_load_fonts', true ) ) {
-			wp_register_style(
-				'pio-gazeta-fonts',
-				'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&display=swap',
-				[],
-				null
-			);
+			wp_register_style( 'pio-gazeta-fonts', PIO_GAZETA_URL . 'assets/pio-gazeta-fonts.css', [], PIO_GAZETA_VERSION );
 			$deps[] = 'pio-gazeta-fonts';
 		}
 		wp_register_style( 'pio-gazeta', PIO_GAZETA_URL . 'assets/pio-gazeta.css', $deps, PIO_GAZETA_VERSION );
@@ -46,6 +43,19 @@ add_action(
 			wp_enqueue_script( 'pio-gazeta' );
 		}
 	}
+);
+
+add_action(
+	'wp_head',
+	static function () {
+		if ( ! apply_filters( 'pio_gazeta_load_fonts', true ) || ! pio_gazeta_should_enqueue() ) {
+			return;
+		}
+		foreach ( [ 'bricolage-grotesque-latin', 'newsreader-latin' ] as $font ) {
+			printf( '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url( PIO_GAZETA_URL . 'assets/fonts/' . $font . '.woff2' ) );
+		}
+	},
+	2
 );
 
 function pio_gazeta_should_enqueue() {
@@ -98,6 +108,7 @@ add_shortcode(
 		$atts = shortcode_atts(
 			[
 				'count'       => 15,
+				'mobile'      => 5,
 				'category'    => '',
 				'title'       => 'Aktualności',
 				'kicker'      => 'Z życia parafii',
@@ -121,8 +132,8 @@ add_shortcode(
 					'news',
 					[
 						'posts'       => pio_gazeta_get_posts( $atts ),
-						'liturgy'     => pio_gazeta_liturgy( $now ),
-						'today'       => pio_gazeta_date( $now, true, true ),
+						'day'         => pio_gazeta_wp_day( $now ),
+						'mobile'      => max( 1, (int) $atts['mobile'] ),
 						'archive_url' => $archive_url,
 						'title'       => $atts['title'],
 						'kicker'      => $atts['kicker'],
@@ -139,6 +150,7 @@ add_shortcode(
 		$atts = shortcode_atts(
 			[
 				'count'        => 10,
+				'mobile'       => 5,
 				'category'     => '',
 				'title'        => 'Wydarzenia',
 				'kicker'       => 'Nadchodzące',
@@ -164,6 +176,7 @@ add_shortcode(
 					[
 						'events'       => $events,
 						'grouped'      => pio_gazeta_group_events( $events, $now ),
+						'mobile'       => max( 1, (int) $atts['mobile'] ),
 						'timeline'     => pio_gazeta_get_timeline( max( 2, min( 8, (int) $atts['weeks'] ) ) ),
 						'calendar_url' => $atts['calendar_url'] ?: tribe_get_events_link(),
 						'title'        => $atts['title'],

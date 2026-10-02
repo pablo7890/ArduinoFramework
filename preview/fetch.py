@@ -11,6 +11,7 @@ import json
 import os
 import re
 import urllib.request
+from datetime import date, timedelta
 
 SITE = "https://parafiapio.pl"
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -64,7 +65,9 @@ def main():
             "words": len(text(p["content"]["rendered"]).split()),
         })
 
-    events = get(f"{SITE}/wp-json/tribe/events/v1/events?per_page=50&start_date=2026-09-01&end_date=2026-12-31")["events"]
+    today = date.today()
+    monday = today - timedelta(days=today.weekday())
+    events = get(f"{SITE}/wp-json/tribe/events/v1/events?per_page=50&start_date={monday - timedelta(days=35)}&end_date={today + timedelta(days=120)}")["events"]
     out_events = []
     for e in events:
         venue = e.get("venue") or {}

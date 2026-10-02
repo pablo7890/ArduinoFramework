@@ -39,7 +39,29 @@ $GLOBALS['pio_demo_colors'] = [
 	'caritas'     => '#b3261e',
 	'ogloszenia'  => '#3f7a4f',
 ];
+// Stand-in for the "Parafia: Kalendarz liturgiczny" plugin: same filter, same
+// fields, sample values. On the live site the parish's own data is used.
+$GLOBALS['pio_demo_liturgy'] = [
+	'2026-10-01' => [ 'Św. Teresy od Dzieciątka Jezus, dziewicy i doktora Kościoła', 'wspomnienie obowiązkowe', 'biały', '#ffffff', [ 'Dni Eucharystyczne' ] ],
+	'2026-10-02' => [ 'Świętych Aniołów Stróżów', 'wspomnienie obowiązkowe', 'biały', '#ffffff', [ 'Dni Eucharystyczne' ] ],
+	'2026-10-03' => [ 'Sobota XXVI tygodnia zwykłego', 'dzień powszedni', 'zielony', '#2e7d32', [ 'Dni Eucharystyczne' ] ],
+	'2026-10-04' => [ 'XXVII Niedziela zwykła', 'niedziela', 'zielony', '#2e7d32', [] ],
+	'2026-10-05' => [ 'Św. Faustyny Kowalskiej, dziewicy', 'wspomnienie obowiązkowe', 'biały', '#ffffff', [] ],
+];
 function apply_filters( $hook, $value, ...$args ) {
+	if ( 'kalendarz_liturgiczny_day' === $hook ) {
+		$d = $GLOBALS['pio_demo_liturgy'][ $args[0] ] ?? null;
+		return $d ? [
+			'title'              => $d[0],
+			'rank_label'         => $d[1],
+			'color_label'        => $d[2],
+			'color_hex'          => $d[3],
+			'parish'             => $d[4],
+			'optional_memorials' => [],
+			'occasional'         => [],
+			'readings'           => '',
+		] : $value;
+	}
 	if ( 'pio_gazeta_category_color' === $hook && isset( $GLOBALS['pio_demo_colors'][ $args[0] ] ) ) {
 		return $GLOBALS['pio_demo_colors'][ $args[0] ];
 	}
@@ -126,8 +148,8 @@ usort( $events, static fn( $a, $b ) => $a['start_ts'] <=> $b['start_ts'] );
 $upcoming = array_values( array_filter( $events, static fn( $e ) => 'past' !== $e['status'] ) );
 $home_ev  = array_slice( $upcoming, 0, 10 );
 
-$liturgy = pio_gazeta_liturgy( $now );
-$today   = pio_gazeta_date( $now, true, true );
+$day   = pio_gazeta_day( $now, apply_filters( 'kalendarz_liturgiczny_day', null, $now->format( 'Y-m-d' ) ) );
+$today = pio_gazeta_date( $now, true, true );
 
 /* ------------------------------------------------------------ views */
 
@@ -135,8 +157,8 @@ $home = pio_gazeta_render(
 	'news',
 	[
 		'posts'       => $posts,
-		'liturgy'     => $liturgy,
-		'today'       => $today,
+		'day'         => $day,
+		'mobile'      => 5,
 		'archive_url' => 'https://parafiapio.pl/aktualnosci/',
 		'title'       => 'Aktualności',
 		'kicker'      => 'Z życia parafii',
@@ -146,6 +168,7 @@ $home = pio_gazeta_render(
 	[
 		'events'       => $home_ev,
 		'grouped'      => pio_gazeta_group_events( $home_ev, $now ),
+		'mobile'       => 5,
 		'timeline'     => pio_gazeta_timeline( $events, $now ),
 		'calendar_url' => '#kalendarz',
 		'title'        => 'Wydarzenia',
@@ -186,8 +209,7 @@ foreach ( array_slice( $upcoming, 0, 12 ) as $k => $e ) {
 $archive = pio_gazeta_render(
 	'archive-hero',
 	[
-		'liturgy'  => $liturgy,
-		'today'    => $today,
+		'day'      => $day,
 		'timeline' => pio_gazeta_timeline( $events, $now ),
 	]
 );
@@ -201,7 +223,7 @@ $shell = file_get_contents( __DIR__ . '/shell.html' );
 $html  = strtr(
 	$shell,
 	[
-		'{{CSS}}'      => file_get_contents( PIO_GAZETA_DIR . 'assets/pio-gazeta.css' ) . "\n" . file_get_contents( __DIR__ . '/preview.css' ),
+		'{{CSS}}'      => pio_inline_fonts() . "\n" . file_get_contents( PIO_GAZETA_DIR . 'assets/pio-gazeta.css' ) . "\n" . file_get_contents( __DIR__ . '/preview.css' ),
 		'{{JS}}'       => file_get_contents( PIO_GAZETA_DIR . 'assets/pio-gazeta.js' ),
 		'{{HOME}}'     => $home,
 		'{{SINGLE}}'   => $single,
@@ -212,7 +234,17 @@ $html  = strtr(
 	]
 );
 
-/* ------------------------------------------------------------ embed images */
+/* ------------------------------------------------------------ embed fonts & images */
+
+function pio_inline_fonts() {
+	$css = file_get_contents( PIO_GAZETA_DIR . 'assets/pio-gazeta-fonts.css' );
+	return preg_replace_callback(
+		'#url\("fonts/([^"]+)"\)#',
+		static fn( $m ) => 'url("data:font/woff2;base64,' . base64_encode( file_get_contents( PIO_GAZETA_DIR . 'assets/fonts/' . $m[1] ) ) . '")',
+		$css
+	);
+}
+
 
 function pio_fetch_image( $url, $max_w, $cache_dir ) {
 	$file = $cache_dir . '/' . md5( $url . $max_w ) . '.webp';

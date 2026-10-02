@@ -5,6 +5,7 @@
  * @var array  $p       Normalised post (pio_gazeta_post()).
  * @var string $variant lead | side | card | brief.
  * @var int    $i       Position, used for the stagger.
+ * @var bool   $mhide   Hidden on phones (beyond the mobile limit).
  */
 
 $heading = 'lead' === $variant ? 'h3' : 'h4';
@@ -23,7 +24,7 @@ if ( $p['gallery'] && 'brief' !== $variant ) {
 	$badge .= '<span class="pio-frame__dots" aria-hidden="true">' . str_repeat( '<i></i>', count( $p['gallery'] ) + 1 ) . '</span>';
 }
 ?>
-<article class="pio-story pio-story--<?php echo esc_attr( $variant ); ?>"
+<article class="pio-story pio-story--<?php echo esc_attr( $variant ); ?><?php echo ! empty( $mhide ) ? ' pio-mhide' : ''; ?>"
 	style="--cat: <?php echo esc_attr( $p['category']['color'] ); ?>; --i: <?php echo (int) $i; ?>; view-transition-name: pio-post-<?php echo (int) $p['id']; ?>;"
 	data-cat="<?php echo esc_attr( $p['category']['slug'] ); ?>">
 	<a class="pio-story__link" href="<?php echo esc_url( $p['url'] ); ?>">
