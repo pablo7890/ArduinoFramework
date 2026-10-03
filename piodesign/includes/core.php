@@ -39,6 +39,35 @@ function piodesign_date( DateTimeInterface $d, $with_year = false, $with_weekday
 	return $out;
 }
 
+/** Defaults for the newsroom display options (settings → news tab). */
+function piodesign_news_opts_defaults() {
+	return [
+		'excerpt_lead'  => 260,
+		'excerpt_side'  => 120,
+		'excerpt_card'  => 150,
+		'excerpt_brief' => 0,
+		'show_day'      => 1,
+		'show_chips'    => 1,
+		'show_photos'   => 1,
+		'gallery_hover' => 1,
+		'new_days'      => 3,
+	];
+}
+
+/** Cut text to about $max characters at a word boundary, with an ellipsis. 0 → ''. */
+function piodesign_trim_text( $text, $max ) {
+	$text = trim( (string) $text );
+	$max  = (int) $max;
+	if ( $max <= 0 || '' === $text ) {
+		return '';
+	}
+	if ( mb_strlen( $text ) <= $max ) {
+		return $text;
+	}
+	$cut = preg_replace( '/\s+\S*$/u', '', mb_substr( $text, 0, $max ) );
+	return rtrim( $cut, " ,;:–-" ) . '…';
+}
+
 function piodesign_ucfirst( $s ) {
 	return mb_strtoupper( mb_substr( $s, 0, 1 ) ) . mb_substr( $s, 1 );
 }
@@ -268,13 +297,9 @@ function piodesign_post( array $raw, DateTimeImmutable $now ) {
 	$age  = $now->getTimestamp() - $date->getTimestamp();
 	$cat  = $raw['category'] ?? [ 'name' => 'Aktualności', 'slug' => 'aktualnosci' ];
 
-	$excerpt = trim( preg_replace( '/\s+/u', ' ', $raw['excerpt'] ?? '' ) );
-	$excerpt = preg_replace( '/\s*(\[(…|\.\.\.|&hellip;)\]|\[\s*…\s*\]|…)\s*$/u', '', $excerpt );
-	if ( mb_strlen( $excerpt ) > 190 ) {
-		$excerpt = mb_substr( $excerpt, 0, 190 );
-		$excerpt = preg_replace( '/\s+\S*$/u', '', $excerpt );
-	}
-	$excerpt = rtrim( $excerpt, " ,;:–-" ) . '…';
+	$full    = trim( preg_replace( '/\s+/u', ' ', $raw['excerpt'] ?? '' ) );
+	$full    = trim( preg_replace( '/\s*(\[(…|\.\.\.|&hellip;)\]|\[\s*…\s*\]|…)\s*/u', ' ', $full ) );
+	$excerpt = piodesign_trim_text( $full, 190 );
 
 	$days_ago = (int) floor( ( $now->setTime( 0, 0 )->getTimestamp() - $date->setTime( 0, 0 )->getTimestamp() ) / 86400 );
 	if ( 0 === $days_ago ) {
@@ -301,7 +326,9 @@ function piodesign_post( array $raw, DateTimeImmutable $now ) {
 		'date_long'   => piodesign_date( $date, true, true ),
 		'relative'    => $rel,
 		'is_new'      => $age >= 0 && $age < 3 * 86400,
+		'age_days'    => $age / 86400,
 		'excerpt'     => $excerpt,
+		'excerpt_full' => $full,
 		'category'    => [
 			'name'  => $cat['name'],
 			'slug'  => $cat['slug'],
@@ -411,10 +438,7 @@ function piodesign_event( array $raw, DateTimeImmutable $now ) {
 		PHP_QUERY_RFC3986
 	);
 
-	$excerpt = trim( preg_replace( '/\s+/u', ' ', $raw['excerpt'] ?? '' ) );
-	if ( mb_strlen( $excerpt ) > 170 ) {
-		$excerpt = preg_replace( '/\s+\S*$/u', '', mb_substr( $excerpt, 0, 170 ) ) . '…';
-	}
+	$excerpt = piodesign_trim_text( trim( preg_replace( '/\s+/u', ' ', $raw['excerpt'] ?? '' ) ), (int) ( $raw['excerpt_len'] ?? 170 ) );
 
 	return [
 		'id'        => $raw['id'],
@@ -647,6 +671,8 @@ function piodesign_icon( $name ) {
 		'facebook' => '<path d="M14.5 8.5H17V5h-2.5A3.5 3.5 0 0 0 11 8.5V11H8.5v3.5H11V21h3.5v-6.5H17l.5-3.5h-3V8.5z"/>',
 		'youtube'  => '<rect x="3" y="6" width="18" height="12" rx="4"/><path d="M10.5 9.5v5l4-2.5z"/>',
 		'cross'    => '<path d="M12 3v18M7 8h10"/>',
+		'list'     => '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>',
+		'headphones' => '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3.5" y="14" width="4.5" height="6.5" rx="1.5"/><rect x="16" y="14" width="4.5" height="6.5" rx="1.5"/>',
 	];
 	if ( ! isset( $paths[ $name ] ) ) {
 		return '';

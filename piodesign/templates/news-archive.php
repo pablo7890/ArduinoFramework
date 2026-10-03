@@ -16,7 +16,10 @@
  * @var int     $total
  * @var array[] $pager       piodesign_pager().
  * @var array   $search      [ action, value ].
+ * @var array   $opts        Card options (excerpt lengths…).
  */
+
+$opts = ( $opts ?? [] ) + piodesign_news_opts_defaults();
 
 $lead   = [];
 $rest   = $posts;
@@ -73,7 +76,7 @@ $i      = 0;
 			<?php
 			foreach ( $lead as $k => $p ) {
 				$variant = 0 === $k ? 'lead' : 'side';
-				echo piodesign_render( 'partials/post-card', [ 'p' => $p, 'variant' => $variant, 'i' => $i++ ] ); // phpcs:ignore
+				echo piodesign_render( 'partials/post-card', [ 'p' => $p, 'variant' => $variant, 'i' => $i++, 'opts' => $opts ] ); // phpcs:ignore
 			}
 			?>
 		</div>
@@ -85,7 +88,7 @@ $i      = 0;
 			<div class="pio-newsroom pio-archive__grid">
 				<?php
 				foreach ( $g['posts'] as $p ) {
-					echo piodesign_render( 'partials/post-card', [ 'p' => $p, 'variant' => 'card', 'i' => $i++ ] ); // phpcs:ignore
+					echo piodesign_render( 'partials/post-card', [ 'p' => $p, 'variant' => 'card', 'i' => $i++, 'opts' => $opts ] ); // phpcs:ignore
 				}
 				?>
 			</div>

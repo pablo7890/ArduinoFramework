@@ -10,12 +10,14 @@
  * @var array  $partners piodesign_partners().
  * @var bool   $advent
  * @var int    $today    1–7.
+ * @var array  $slots    Upcoming Masses "Y-m-dTH:i" from the intentions plugin (may be empty).
  * @var string $title
  * @var string $kicker
  */
 
 $now    = piodesign_now();
-$next   = piodesign_next_mass( $masses, $now, $advent );
+$slots  = $slots ?? [];
+$next   = ( $slots ? piodesign_next_mass_from_slots( $slots, $now ) : null ) ?: piodesign_next_mass( $masses, $now, $advent );
 $status = piodesign_office_status( $office, $now, ! empty( $o['kancelaria_i_piatek'] ) );
 $cols   = [
 	[ 'key' => 'sun', 'name' => 'Niedziele i święta', 'days' => [ 7 ] ],
@@ -32,6 +34,7 @@ $data   = [
 	'office'      => $office,
 	'advent'      => (bool) $advent,
 	'firstFriday' => ! empty( $o['kancelaria_i_piatek'] ),
+	'slots'       => array_values( $slots ),
 ];
 ?>
 <section class="pio pio-info" aria-labelledby="pio-info-h" data-pio-info="<?php echo esc_attr( wp_json_encode( $data ) ); ?>">

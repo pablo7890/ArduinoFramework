@@ -6,7 +6,13 @@
  * @var string $variant lead | side | card | brief.
  * @var int    $i       Position, used for the stagger.
  * @var bool   $mhide   Hidden on phones (beyond the mobile limit).
+ * @var array  $opts    Display options, see piodesign_news_opts().
  */
+
+$opts    = ( $opts ?? [] ) + piodesign_news_opts_defaults();
+$excerpt = piodesign_trim_text( $p['excerpt_full'] ?? $p['excerpt'], (int) ( $opts[ 'excerpt_' . $variant ] ?? 0 ) );
+$is_new  = $opts['new_days'] > 0 && $p['age_days'] >= 0 && $p['age_days'] < $opts['new_days'];
+$gallery = $opts['gallery_hover'] ? $p['gallery'] : [];
 
 $heading = 'lead' === $variant ? 'h3' : 'h4';
 $sizes   = [
@@ -17,11 +23,11 @@ $sizes   = [
 ][ $variant ];
 
 $badge = '';
-if ( $p['photo_label'] && 'brief' !== $variant ) {
+if ( $p['photo_label'] && 'brief' !== $variant && $opts['show_photos'] ) {
 	$badge .= '<span class="pio-photos">' . piodesign_icon( 'camera' ) . esc_html( $p['photo_label'] ) . '</span>';
 }
-if ( $p['gallery'] && 'brief' !== $variant ) {
-	$badge .= '<span class="pio-frame__dots" aria-hidden="true">' . str_repeat( '<i></i>', count( $p['gallery'] ) + 1 ) . '</span>';
+if ( $gallery && 'brief' !== $variant ) {
+	$badge .= '<span class="pio-frame__dots" aria-hidden="true">' . str_repeat( '<i></i>', count( $gallery ) + 1 ) . '</span>';
 }
 ?>
 <article class="pio-story pio-story--<?php echo esc_attr( $variant ); ?><?php echo ! empty( $mhide ) ? ' pio-mhide' : ''; ?>"
@@ -35,7 +41,7 @@ if ( $p['gallery'] && 'brief' !== $variant ) {
 				'img'     => $p['image'],
 				'sizes'   => $sizes,
 				'eager'   => 'lead' === $variant,
-				'gallery' => 'brief' === $variant ? [] : $p['gallery'],
+				'gallery' => 'brief' === $variant ? [] : $gallery,
 				'badge'   => $badge,
 				'class'   => 'pio-story__media',
 			]
@@ -45,11 +51,11 @@ if ( $p['gallery'] && 'brief' !== $variant ) {
 			<p class="pio-meta">
 				<span class="pio-cat"><?php echo esc_html( $p['category']['name'] ); ?></span>
 				<time datetime="<?php echo esc_attr( $p['iso'] ); ?>" title="<?php echo esc_attr( $p['date_long'] ); ?>"><?php echo esc_html( 'lead' === $variant ? $p['date_long'] : $p['date'] ); ?></time>
-				<?php if ( $p['is_new'] ) : ?><span class="pio-new">Nowe</span><?php endif; ?>
+				<?php if ( $is_new ) : ?><span class="pio-new">Nowe</span><?php endif; ?>
 			</p>
 			<<?php echo $heading; // phpcs:ignore ?> class="pio-story__title"><span><?php echo esc_html( $p['title'] ); ?></span></<?php echo $heading; // phpcs:ignore ?>>
-			<?php if ( 'brief' !== $variant ) : ?>
-				<p class="pio-story__excerpt"><?php echo esc_html( $p['excerpt'] ); ?></p>
+			<?php if ( 'brief' !== $variant && $excerpt ) : ?>
+				<p class="pio-story__excerpt"><?php echo esc_html( $excerpt ); ?></p>
 			<?php endif; ?>
 			<?php if ( 'lead' === $variant ) : ?>
 				<span class="pio-more">Czytaj dalej <?php echo piodesign_icon( 'arrow' ); // phpcs:ignore ?></span>

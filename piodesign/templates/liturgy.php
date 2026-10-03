@@ -6,7 +6,10 @@
  * @var array[] $days   piodesign_liturgy_day() for today and the next days.
  * @var string  $title
  * @var string  $kicker
+ * @var array|null $podcast piodesign_podcast(): today's Gospel reflection.
  */
+
+$podcast = $podcast ?? null;
 
 if ( ! $days ) {
 	return;
@@ -22,7 +25,7 @@ $uid = 'pio-lit-' . substr( md5( $days[0]['iso'] ), 0, 6 );
 	</header>
 
 	<div class="pio-liturgy__card">
-		<div class="pio-liturgy__stole" aria-hidden="true"><i class="pio-liturgy__cross"><?php echo piodesign_icon( 'cross' ); // phpcs:ignore ?></i></div>
+		<div class="pio-liturgy__stole" aria-hidden="true"></div>
 		<div class="pio-liturgy__panels">
 			<?php foreach ( $days as $k => $d ) : ?>
 				<?php $light = piodesign_is_light( $d['color'] ); ?>
@@ -50,8 +53,22 @@ $uid = 'pio-lit-' . substr( md5( $days[0]['iso'] ), 0, 6 );
 							<p class="pio-liturgy__empty">Szczegóły dnia pojawią się po zatwierdzeniu kalendarza liturgicznego na ten rok.</p>
 						<?php endif; ?>
 					</div>
-					<?php if ( $d['parish'] || $d['optional'] || $d['occasional'] ) : ?>
+					<?php $has_pod = 0 === $k && $podcast; ?>
+					<?php if ( $d['parish'] || $d['optional'] || $d['occasional'] || $has_pod ) : ?>
 						<div class="pio-liturgy__side">
+							<?php if ( $has_pod ) : ?>
+								<div class="pio-pod">
+									<p class="pio-pod__label"><?php echo piodesign_icon( 'headphones' ); // phpcs:ignore ?><?php echo esc_html( $podcast['label'] ?: 'Ewangelia na dziś' ); ?></p>
+									<?php if ( ! empty( $podcast['title'] ) ) : ?><p class="pio-pod__title"><?php echo esc_html( $podcast['title'] ); ?></p><?php endif; ?>
+									<?php if ( ! empty( $podcast['embed'] ) ) : ?>
+										<div class="pio-pod__player">
+											<iframe src="<?php echo esc_url( $podcast['embed'] ); ?>" title="<?php echo esc_attr( 'Odtwarzacz: ' . ( $podcast['title'] ?: $podcast['label'] ) ); ?>" height="152" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+										</div>
+									<?php else : ?>
+										<a class="pio-pod__link" href="<?php echo esc_url( $podcast['url'] ); ?>" target="_blank" rel="noopener"><span class="pio-pod__play" aria-hidden="true"></span>Posłuchaj rozważania w Spotify</a>
+									<?php endif; ?>
+								</div>
+							<?php endif; ?>
 							<?php if ( $d['parish'] ) : ?>
 								<div class="pio-liturgy__group is-parish">
 									<p class="pio-liturgy__label">Święto parafialne</p>

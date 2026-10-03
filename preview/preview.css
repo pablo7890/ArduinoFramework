@@ -102,3 +102,7 @@ body { margin: 0; background: #ffffff; color: #1c1d21; }
 }
 .tec-mock-nav .is-on { color: var(--pv-rust); }
 .pio-tec .screen-reader-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); }
+
+.pv-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.pv-gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; }
+.pv-gallery figcaption { grid-column: 1 / -1; }

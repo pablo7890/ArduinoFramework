@@ -95,12 +95,13 @@ add_shortcode(
 	static function ( $atts ) {
 		$atts = shortcode_atts(
 			[
-				'parent'   => 'sakramenty-i-sakramentalia',
+				'parent'   => piodesign_option( 'sac_parent' ),
 				'ids'      => '',
-				'exclude'  => '',
-				'title'    => 'Sakramenty',
-				'kicker'   => 'Droga wiary',
-				'autoplay' => 7,
+				'exclude'  => piodesign_option( 'sac_exclude' ),
+				'title'    => piodesign_option( 'sac_title' ),
+				'kicker'   => piodesign_option( 'sac_kicker' ),
+				'autoplay' => piodesign_option( 'sac_autoplay' ),
+				'button'   => piodesign_option( 'sac_button' ),
 			],
 			$atts,
 			'pio_sakramenty'
@@ -116,7 +117,7 @@ add_shortcode(
 					'title'    => $atts['title'],
 					'kicker'   => $atts['kicker'],
 					'autoplay' => max( 0, (int) $atts['autoplay'] ),
-					'more_url' => ( $p = get_page_by_path( $atts['parent'] ) ) ? get_permalink( $p ) : '',
+					'button'   => $atts['button'],
 				]
 			)
 		);
@@ -132,10 +133,10 @@ add_shortcode(
 	static function ( $atts, $content = '' ) {
 		$atts = shortcode_atts(
 			[
-				'title'    => 'Słowa na dziś',
-				'autor'    => 'św. Ojciec Pio',
-				'zdjecie'  => '',
-				'autoplay' => 9,
+				'title'    => piodesign_option( 'q_title' ),
+				'autor'    => piodesign_option( 'q_author' ),
+				'zdjecie'  => piodesign_option( 'q_photo' ),
+				'autoplay' => piodesign_option( 'q_autoplay' ),
 			],
 			$atts,
 			'pio_cytaty'
@@ -183,14 +184,15 @@ add_shortcode(
 	static function ( $atts ) {
 		$atts = shortcode_atts(
 			[
-				'title'  => 'Zapraszamy',
-				'kicker' => 'Parafia św. Ojca Pio',
+				'title'  => piodesign_option( 'info_title' ),
+				'kicker' => piodesign_option( 'info_kicker' ),
 			],
 			$atts,
 			'pio_informacje'
 		);
 		piodesign_enqueue_late();
-		return piodesign_render( 'info', piodesign_info_data( piodesign_now(), piodesign_options() ) + $atts );
+		$now = piodesign_now();
+		return piodesign_render( 'info', piodesign_info_data( $now, piodesign_options() ) + [ 'slots' => piodesign_mass_slots( $now ) ] + $atts );
 	}
 );
 
@@ -218,9 +220,10 @@ add_shortcode(
 	static function ( $atts ) {
 		$atts = shortcode_atts(
 			[
-				'dni'    => 7,
-				'title'  => 'Liturgia dnia',
-				'kicker' => 'Kalendarz liturgiczny',
+				'dni'     => piodesign_option( 'lit_days' ),
+				'title'   => piodesign_option( 'lit_title' ),
+				'kicker'  => piodesign_option( 'lit_kicker' ),
+				'podcast' => piodesign_option( 'lit_podcast_url' ),
 			],
 			$atts,
 			'pio_liturgia'
@@ -232,11 +235,135 @@ add_shortcode(
 			static fn() => piodesign_render(
 				'liturgy',
 				[
-					'days'   => piodesign_wp_liturgy_days( max( 1, min( 14, (int) $atts['dni'] ) ) ),
-					'title'  => $atts['title'],
-					'kicker' => $atts['kicker'],
+					'days'    => piodesign_wp_liturgy_days( max( 1, min( 14, (int) $atts['dni'] ) ) ),
+					'title'   => $atts['title'],
+					'kicker'  => $atts['kicker'],
+					'podcast' => piodesign_podcast( $atts['podcast'] ),
 				]
 			)
 		);
 	}
 );
+
+/* ---------------------------------------------------------------------------
+ * Gospel reflection podcast (Spotify) for [pio_liturgia]
+ * ------------------------------------------------------------------------ */
+
+/**
+ * Spotify show/episode → embed URL and today's episode title (oEmbed, cached).
+ *
+ * @return array|null [ embed, title, label, url ]
+ */
+function piodesign_podcast( $url ) {
+	$url = trim( (string) $url );
+	if ( ! preg_match( '#open\.spotify\.com/(?:embed(?:-podcast)?/)?(show|episode)/([A-Za-z0-9]+)#', $url, $m ) ) {
+		return null;
+	}
+	$page  = 'https://open.spotify.com/' . $m[1] . '/' . $m[2];
+	$key   = 'piodesign_pod_' . md5( $page ) . '_' . wp_date( 'Ymd' );
+	$title = get_transient( $key );
+	if ( false === $title ) {
+		$title = '';
+		$res   = wp_remote_get( 'https://open.spotify.com/oembed?url=' . rawurlencode( $page ), [ 'timeout' => 4 ] );
+		if ( ! is_wp_error( $res ) && 200 === wp_remote_retrieve_response_code( $res ) ) {
+			$data  = json_decode( wp_remote_retrieve_body( $res ), true );
+			$title = isset( $data['title'] ) ? sanitize_text_field( $data['title'] ) : '';
+		}
+		set_transient( $key, $title, HOUR_IN_SECONDS );
+	}
+	return [
+		'embed' => 'https://open.spotify.com/embed/' . $m[1] . '/' . $m[2] . '?utm_source=generator&theme=0',
+		'title' => $title,
+		'label' => (string) piodesign_option( 'lit_podcast_title' ),
+		'url'   => $page,
+	];
+}
+
+/* ---------------------------------------------------------------------------
+ * Mass times from the parish's Mass intentions plugin
+ * ------------------------------------------------------------------------ */
+
+/**
+ * Upcoming Mass times for the live "next Mass" counter, as "Y-m-dTH:i"
+ * strings, from today for about two weeks.
+ *
+ * Order of sources:
+ *  1. filter `piodesign_mass_slots` (any plugin can hand over the list),
+ *  2. the intentions page (Settings → PioDesign → Informacje): the
+ *     intentions plugin's shortcode is rendered for this week and the next
+ *     and the times are read from its markup (.ki-dzien-item / .ki-godzina),
+ *  3. empty – the counter then uses the weekly schedule from the settings.
+ */
+function piodesign_mass_slots( DateTimeImmutable $now ) {
+	$slots = apply_filters( 'piodesign_mass_slots', null, $now );
+	if ( is_array( $slots ) ) {
+		return array_values( $slots );
+	}
+	if ( 'auto' !== piodesign_option( 'mass_source' ) ) {
+		return [];
+	}
+	$page = piodesign_page_option( 'intencje_page', 'intencje-mszalne' );
+	if ( ! $page ) {
+		return [];
+	}
+	$key    = 'piodesign_slots_' . $page . '_' . (int) get_option( 'piodesign_cache_v', 1 ) . '_' . $now->format( 'YmdH' );
+	$cached = get_transient( $key );
+	if ( is_array( $cached ) ) {
+		return $cached;
+	}
+
+	$content = (string) get_post_field( 'post_content', $page );
+	$code    = piodesign_intentions_shortcode( $content );
+	if ( '' === $code ) {
+		$code = $content; // Unknown tag name: render the whole page (guarded against recursion below).
+	}
+
+	// The intentions plugin shows the week chosen by ?tydzien=Y-m-d (weeks start on Sunday).
+	$today    = $now->setTime( 0, 0 );
+	$n        = (int) $today->format( 'N' );
+	$sunday   = 7 === $n ? $today : $today->modify( '-' . $n . ' days' );
+	$weeks    = [ $sunday, $sunday->modify( '+7 days' ) ];
+	$saved    = $_GET['tydzien'] ?? null; // phpcs:ignore WordPress.Security.NonceVerification
+	$saved_r  = $_REQUEST['tydzien'] ?? null; // phpcs:ignore WordPress.Security.NonceVerification
+	$times    = [];
+	static $running = false;
+	if ( $running ) {
+		return [];
+	}
+	$running = true;
+	foreach ( $weeks as $w ) {
+		$_GET['tydzien']     = $w->format( 'Y-m-d' );
+		$_REQUEST['tydzien'] = $_GET['tydzien'];
+		$times               = array_merge( $times, piodesign_parse_intentions( do_shortcode( $code ) ) );
+	}
+	$running = false;
+	if ( null === $saved ) {
+		unset( $_GET['tydzien'] );
+	} else {
+		$_GET['tydzien'] = $saved;
+	}
+	if ( null === $saved_r ) {
+		unset( $_REQUEST['tydzien'] );
+	} else {
+		$_REQUEST['tydzien'] = $saved_r;
+	}
+
+	$times = array_values( array_unique( array_filter( $times, static fn( $t ) => $t >= $today->format( 'Y-m-d' ) ) ) );
+	sort( $times );
+	set_transient( $key, $times, HOUR_IN_SECONDS );
+	return $times;
+}
+
+/** The intentions plugin's shortcode on the page (a tag containing "intenc"). */
+function piodesign_intentions_shortcode( $content ) {
+	global $shortcode_tags;
+	foreach ( array_keys( (array) $shortcode_tags ) as $tag ) {
+		if ( false === stripos( $tag, 'intenc' ) ) {
+			continue;
+		}
+		if ( preg_match( '/\[' . preg_quote( $tag, '/' ) . '\b[^\]]*\]/', $content, $m ) ) {
+			return $m[0];
+		}
+	}
+	return '';
+}

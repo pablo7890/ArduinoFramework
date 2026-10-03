@@ -103,8 +103,26 @@ def main():
         for p in get(f"{SITE}/wp-json/wp/v2/pages?parent={parent}&per_page=20&orderby=menu_order&order=asc&_fields=slug,title,link,excerpt")
     ]
 
+    # Mass times from the intentions page (this week and the next), for the "next Mass" counter.
+    sunday = today - timedelta(days=(today.weekday() + 1) % 7)
+    slots = []
+    for week in (sunday, sunday + timedelta(days=7)):
+        req = urllib.request.Request(f"{SITE}/intencje-mszalne/?tydzien={week}", headers={"User-Agent": "piodesign-preview/1.0"})
+        page = urllib.request.urlopen(req, timeout=60).read().decode("utf-8")
+        for block in re.split(r'class="[^"]*\bki-dzien-item\b[^"]*"', page)[1:]:
+            d = re.search(r'class="[^"]*\bki-data\b[^"]*"[^>]*>\s*(\d{1,2})\.(\d{1,2})\.(\d{4})', block)
+            if not d:
+                continue
+            for h, m in re.findall(r'class="[^"]*\bki-godzina\b[^"]*"[^>]*>\s*(\d{1,2})[:.](\d{2})', block):
+                slots.append(f"{d.group(3)}-{int(d.group(2)):02d}-{int(d.group(1)):02d}T{int(h):02d}:{m}")
+    slots = sorted(set(slots))
+
+    # One full post for the single post view.
+    full = get(f"{SITE}/wp-json/wp/v2/posts/{out_posts[1]['id']}")
+    single_post = {"id": full["id"], "content": full["content"]["rendered"], "excerpt": text(full["excerpt"]["rendered"])}
+
     with open(os.path.join(HERE, "data.json"), "w", encoding="utf-8") as f:
-        json.dump({"posts": out_posts, "total_posts": total_posts, "events": out_events, "sacraments": sacraments}, f, ensure_ascii=False, indent=1)
+        json.dump({"posts": out_posts, "total_posts": total_posts, "events": out_events, "sacraments": sacraments, "mass_slots": slots, "single_post": single_post}, f, ensure_ascii=False, indent=1)
     print(f"{len(out_posts)} posts, {len(out_events)} events")
 
 

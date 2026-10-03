@@ -8,8 +8,10 @@
  * @var string  $title
  * @var string  $kicker
  * @var int     $autoplay Seconds per slide, 0 = off.
- * @var string  $more_url
+ * @var string  $button   Link label.
  */
+
+$button = $button ?? 'Dowiedz się więcej';
 
 if ( ! $slides ) {
 	return;
@@ -53,7 +55,7 @@ $n   = count( $slides );
 					<div class="pio-sac__card">
 						<h3 class="pio-sac__title"><?php echo esc_html( $s['title'] ); ?></h3>
 						<?php if ( $s['text'] ) : ?><p class="pio-sac__text"><?php echo esc_html( $s['text'] ); ?></p><?php endif; ?>
-						<a class="pio-sac__more" href="<?php echo esc_url( $s['url'] ); ?>">Dowiedz się więcej <span class="screen-reader-text">– <?php echo esc_html( $s['title'] ); ?></span><?php echo piodesign_icon( 'arrow' ); // phpcs:ignore ?></a>
+						<a class="pio-sac__more" href="<?php echo esc_url( $s['url'] ); ?>"><?php echo esc_html( $button ); ?> <span class="screen-reader-text">– <?php echo esc_html( $s['title'] ); ?></span><?php echo piodesign_icon( 'arrow' ); // phpcs:ignore ?></a>
 					</div>
 				</article>
 			<?php endforeach; ?>

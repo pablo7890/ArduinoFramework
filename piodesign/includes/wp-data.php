@@ -151,7 +151,7 @@ function piodesign_wp_posts( array $wp_posts ) {
 		$preview = array_slice( array_values( array_diff( $gallery, [ $thumb ] ) ), 0, 3 );
 
 		$excerpt = has_excerpt( $post ) ? $post->post_excerpt : wp_strip_all_tags( strip_shortcodes( $post->post_content ) );
-		$excerpt = html_entity_decode( wp_trim_words( $excerpt, 40, '' ), ENT_QUOTES, 'UTF-8' );
+		$excerpt = html_entity_decode( wp_trim_words( $excerpt, 110, '' ), ENT_QUOTES, 'UTF-8' );
 
 		$posts[] = piodesign_post(
 			[
@@ -206,7 +206,8 @@ function piodesign_wp_event_raw( $event ) {
 		'start'     => new DateTimeImmutable( get_post_meta( $id, '_EventStartDate', true ), $tz ),
 		'end'       => new DateTimeImmutable( get_post_meta( $id, '_EventEndDate', true ), $tz ),
 		'all_day'   => function_exists( 'tribe_event_is_all_day' ) && tribe_event_is_all_day( $id ),
-		'excerpt'   => html_entity_decode( wp_trim_words( $excerpt, 32, '…' ), ENT_QUOTES, 'UTF-8' ),
+		'excerpt'     => html_entity_decode( wp_trim_words( $excerpt, 80, '' ), ENT_QUOTES, 'UTF-8' ),
+		'excerpt_len' => (int) piodesign_option( 'events_excerpt' ),
 		'image'     => piodesign_wp_image( get_post_thumbnail_id( $post ) ),
 		'venue'     => $venue,
 		'organizer' => $organizer,

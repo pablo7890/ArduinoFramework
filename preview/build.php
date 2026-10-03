@@ -195,7 +195,7 @@ foreach ( $data['sacraments'] as $sp ) {
 		'image' => $def[1] ? piodesign_frame( [ 'src' => 'https://parafiapio.pl/wp-content/uploads/' . $def[1], 'w' => 1280, 'h' => 853 ], 'post' ) : null,
 	];
 }
-$sacraments = piodesign_render( 'sacraments', [ 'slides' => $sac, 'title' => 'Sakramenty', 'kicker' => 'Droga wiary', 'autoplay' => 7, 'more_url' => '' ] );
+$sacraments = piodesign_render( 'sacraments', [ 'slides' => $sac, 'title' => 'Droga wiary', 'kicker' => 'Sakramenty i sakramentalia', 'autoplay' => 7, 'button' => 'Dowiedz się więcej' ] );
 $opts       = piodesign_info_defaults();
 $quotes     = piodesign_render( 'quotes', [ 'quotes' => piodesign_quotes( $opts['cytaty'] ), 'title' => 'Słowa na dziś', 'author' => 'św. Ojciec Pio', 'photo' => '', 'autoplay' => 9 ] );
 $lit        = piodesign_liturgy( $now );
@@ -210,6 +210,7 @@ $info       = piodesign_render(
 		'today'    => (int) $now->format( 'N' ),
 		'title'    => 'Zapraszamy',
 		'kicker'   => 'Parafia św. Ojca Pio',
+		'slots'    => $data['mass_slots'] ?? [],
 	]
 );
 $lit_days = [];
@@ -217,7 +218,22 @@ for ( $k = 0; $k < 7; $k++ ) {
 	$d          = $now->setTime( 0, 0 )->modify( '+' . $k . ' days' );
 	$lit_days[] = piodesign_liturgy_day( $d, pio_demo_day( $d->format( 'Y-m-d' ) ), $now );
 }
-$liturgy = piodesign_render( 'liturgy', [ 'days' => $lit_days, 'title' => 'Liturgia dnia', 'kicker' => 'Kalendarz liturgiczny' ] );
+// Today's episode of the parish's Gospel podcast (Spotify oEmbed). The preview
+// cannot embed Spotify, so it shows the link card the template falls back to.
+$pod_title = '';
+$pod_json  = shell_exec( 'curl -sS -m 20 ' . escapeshellarg( 'https://open.spotify.com/oembed?url=https://open.spotify.com/show/2F5tOicGHhqpSH9NuKTqLz' ) );
+if ( $pod_json && ( $pj = json_decode( $pod_json, true ) ) && ! empty( $pj['title'] ) ) {
+	$pod_title = $pj['title'];
+}
+$liturgy = piodesign_render(
+	'liturgy',
+	[
+		'days'    => $lit_days,
+		'title'   => 'Liturgia dnia',
+		'kicker'  => 'Kalendarz liturgiczny',
+		'podcast' => [ 'embed' => '', 'title' => $pod_title, 'label' => 'Ewangelia na dziś', 'url' => 'https://open.spotify.com/show/2F5tOicGHhqpSH9NuKTqLz' ],
+	]
+);
 
 $home = piodesign_render(
 	'news',
@@ -228,6 +244,7 @@ $home = piodesign_render(
 		'archive_url' => 'https://parafiapio.pl/aktualnosci/',
 		'title'       => 'Aktualności',
 		'kicker'      => 'Z życia parafii',
+		'opts'        => piodesign_news_opts_defaults(),
 	]
 ) . piodesign_render(
 	'events',
@@ -277,11 +294,43 @@ $archive = piodesign_render(
 	[
 		'day'      => $day,
 		'timeline' => piodesign_timeline( $events, $now ),
+		'search'   => [ 'action' => '#kalendarz', 'value' => '', 'month_url' => 'https://parafiapio.pl/wydarzenia/miesiac/' ],
 	]
 );
-$archive .= file_get_contents( __DIR__ . '/tec-bar.html' );
-$archive .= '<div class="tribe-events-calendar-list">' . $archive_rows . '</div>';
-$archive .= '<nav class="tec-mock-nav"><span>‹ Wcześniejsze wydarzenia</span><span>Dzisiaj</span><span class="is-on">Następne wydarzenia ›</span></nav>';
+// TEC's list container and its own prev / next links, as TEC renders them.
+$archive .= '<div class="tribe-events-view tribe-events-view--list"><div class="tribe-events-calendar-list">' . $archive_rows . '</div>'
+	. '<nav class="tribe-events-c-nav"><ul class="tribe-events-c-nav__list"><li><button class="tribe-events-c-nav__prev" disabled>‹ Poprzednie wydarzenia</button></li><li><a class="tribe-events-c-nav__next" href="#kalendarz">Następne wydarzenia ›</a></li></ul></nav></div>';
+
+// Single news post: the second story, with its FooGallery shown as a plain grid.
+$sp      = $data['single_post'];
+$sp_html = preg_replace( '#<(script|style)\b.*?</\1>#is', '', $sp['content'] );
+preg_match_all( '#<img[^>]+src="([^"]+/uploads/cache/[^"]+)"#', $sp_html, $fg );
+$sp_html = preg_replace( '#<div class="foogallery.*?</div>\s*</div>\s*</div>#is', '', $sp_html );
+$sp_html = preg_replace( '#<div[^>]*class="[^"]*fg-[^"]*"[^>]*>.*?</div>#is', '', $sp_html );
+$sp_html = preg_replace( '#<p>(\s|&nbsp;)*</p>#i', '', $sp_html );
+$sp_html = preg_replace( '#\s(srcset|sizes|data-srcset)="[^"]*"#i', '', $sp_html ); // the preview embeds one file per image
+$grid    = '';
+foreach ( array_slice( $fg[1], 0, 9 ) as $src ) {
+	$grid .= '<img src="' . esc_url( $src ) . '" alt="" loading="lazy">';
+}
+$sp_html .= $grid ? '<figure class="pv-gallery">' . $grid . '<figcaption>Galeria (w podglądzie uproszczona – na stronie zostaje FooGallery z powiększaniem).</figcaption></figure>' : '';
+$sp_post = $posts[1];
+$single_post = piodesign_render(
+	'single-post',
+	[
+		'p'        => $sp_post,
+		'content'  => $sp_html,
+		'lede'     => '',
+		'cat_url'  => '#aktualnosci',
+		'prev'     => [ 'title' => $posts[2]['title'], 'url' => $posts[2]['url'], 'date' => $posts[2]['date'] ],
+		'next'     => [ 'title' => $posts[0]['title'], 'url' => $posts[0]['url'], 'date' => $posts[0]['date'] ],
+		'related'  => array_slice( $posts, 3, 3 ),
+		'tags'     => [],
+		'back_url' => '#aktualnosci',
+		'share'    => true,
+		'image'    => $data['posts'][1]['image'],
+	]
+);
 
 // News archive, page 1 of the posts page.
 $per_page   = 18;
@@ -326,6 +375,7 @@ $html  = strtr(
 		'{{TODAY}}'    => esc_html( $today ),
 		'{{NPOSTS}}'   => 15,
 		'{{ARCHIVE_NEWS}}' => $news_archive,
+		'{{SINGLE_POST}}'  => $single_post,
 		'{{NEVENTS}}'  => count( $home_ev ),
 	]
 );

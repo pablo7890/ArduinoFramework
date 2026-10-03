@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Parafia: PioDesign
  * Description:       Nowoczesny wygląd parafii na Avadzie: aktualności i ich archiwum, oś wydarzeń The Events Calendar, sakramenty, cytaty, liturgia dnia i informacje parafialne. Ustawienia → PioDesign.
- * Version:           1.1
+ * Version:     1.2
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            cruzLabs
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PIODESIGN_VERSION', '1.1' );
+define( 'PIODESIGN_VERSION', '1.2' );
 define( 'PIODESIGN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PIODESIGN_URL', plugin_dir_url( __FILE__ ) );
 
@@ -24,6 +24,7 @@ require_once PIODESIGN_DIR . 'includes/tec.php';
 require_once PIODESIGN_DIR . 'includes/settings.php';
 require_once PIODESIGN_DIR . 'includes/archive.php';
 require_once PIODESIGN_DIR . 'includes/sections.php';
+require_once PIODESIGN_DIR . 'includes/single.php';
 
 /* ---------------------------------------------------------------------------
  * Assets
@@ -32,11 +33,19 @@ require_once PIODESIGN_DIR . 'includes/sections.php';
 add_action(
 	'wp_enqueue_scripts',
 	static function () {
-		// Typefaces come from Avada's Global Options; the plugin loads none.
-		$deps = [];
 		// File times in the version string bust browser and CDN caches on every update.
-		$ver = static fn( $f ) => PIODESIGN_VERSION . '.' . (int) @filemtime( PIODESIGN_DIR . $f );
+		$ver  = static fn( $f ) => PIODESIGN_VERSION . '.' . (int) @filemtime( PIODESIGN_DIR . $f );
+		$deps = [];
+		// Body text always uses Avada's body face. Titles use the bundled
+		// variable Bricolage (bold, condensed) unless set to Avada's heading face.
+		if ( 'bundled' === piodesign_option( 'display_font' ) ) {
+			wp_register_style( 'piodesign-fonts', PIODESIGN_URL . 'assets/piodesign-fonts.css', [], $ver( 'assets/piodesign-fonts.css' ) );
+			$deps[] = 'piodesign-fonts';
+		}
 		wp_register_style( 'piodesign', PIODESIGN_URL . 'assets/piodesign.css', $deps, $ver( 'assets/piodesign.css' ) );
+		if ( 'bundled' === piodesign_option( 'display_font' ) ) {
+			wp_add_inline_style( 'piodesign', '.pio.pio.pio,.pio-tec.pio-tec.pio-tec{--pio-display:"PioDesign Display",var(--h1_typography-font-family,system-ui),sans-serif}' );
+		}
 		wp_register_script( 'piodesign', PIODESIGN_URL . 'assets/piodesign.js', [], $ver( 'assets/piodesign.js' ), [ 'in_footer' => true, 'strategy' => 'defer' ] );
 
 		if ( piodesign_should_enqueue() ) {
@@ -46,8 +55,18 @@ add_action(
 	}
 );
 
+add_action(
+	'wp_head',
+	static function () {
+		if ( 'bundled' === piodesign_option( 'display_font' ) && piodesign_should_enqueue() ) {
+			printf( '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url( PIODESIGN_URL . 'assets/fonts/bricolage-grotesque-latin.woff2' ) );
+		}
+	},
+	2
+);
+
 function piodesign_should_enqueue() {
-	if ( is_front_page() || piodesign_is_news_archive() || ( function_exists( 'tribe_is_event_query' ) && tribe_is_event_query() ) ) {
+	if ( is_front_page() || piodesign_is_news_archive() || piodesign_is_single_post() || ( function_exists( 'tribe_is_event_query' ) && tribe_is_event_query() ) ) {
 		return true;
 	}
 	$post = get_post();
@@ -99,16 +118,31 @@ add_action( 'update_option_piodesign_settings', static fn() => update_option( 'p
  * Shortcodes
  * ------------------------------------------------------------------------ */
 
+/** Newsroom display options from the settings. */
+function piodesign_news_opts() {
+	return [
+		'excerpt_lead'  => (int) piodesign_option( 'news_excerpt_lead' ),
+		'excerpt_side'  => (int) piodesign_option( 'news_excerpt_side' ),
+		'excerpt_card'  => (int) piodesign_option( 'news_excerpt_card' ),
+		'excerpt_brief' => 0,
+		'show_day'      => (int) piodesign_option( 'news_show_day' ),
+		'show_chips'    => (int) piodesign_option( 'news_show_chips' ),
+		'show_photos'   => (int) piodesign_option( 'news_show_photos' ),
+		'gallery_hover' => (int) piodesign_option( 'news_gallery_hover' ),
+		'new_days'      => (int) piodesign_option( 'news_new_days' ),
+	];
+}
+
 add_shortcode(
 	'pio_aktualnosci',
 	static function ( $atts ) {
 		$atts = shortcode_atts(
 			[
-				'count'       => 15,
-				'mobile'      => 5,
+				'count'       => piodesign_option( 'news_count' ),
+				'mobile'      => piodesign_option( 'news_mobile' ),
 				'category'    => '',
-				'title'       => 'Aktualności',
-				'kicker'      => 'Z życia parafii',
+				'title'       => piodesign_option( 'news_title' ),
+				'kicker'      => piodesign_option( 'news_kicker' ),
 				'archive_url' => '',
 			],
 			$atts,
@@ -133,6 +167,7 @@ add_shortcode(
 						'archive_url' => $archive_url,
 						'title'       => $atts['title'],
 						'kicker'      => $atts['kicker'],
+						'opts'        => piodesign_news_opts(),
 					]
 				);
 			}
@@ -145,13 +180,13 @@ add_shortcode(
 	static function ( $atts ) {
 		$atts = shortcode_atts(
 			[
-				'count'        => 10,
-				'mobile'       => 5,
+				'count'        => piodesign_option( 'events_count' ),
+				'mobile'       => piodesign_option( 'events_mobile' ),
 				'category'     => '',
-				'title'        => 'Wydarzenia',
-				'kicker'       => 'Nadchodzące',
+				'title'        => piodesign_option( 'events_title' ),
+				'kicker'       => piodesign_option( 'events_kicker' ),
 				'calendar_url' => '',
-				'weeks'        => 5,
+				'weeks'        => piodesign_option( 'events_weeks' ),
 			],
 			$atts,
 			'pio_wydarzenia'

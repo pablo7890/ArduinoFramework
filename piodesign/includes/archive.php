@@ -144,6 +144,7 @@ function piodesign_news_archive_html( array $args = [] ) {
 			'pages'       => $pages,
 			'total'       => (int) $query->found_posts,
 			'pager'       => piodesign_pager( $page, $pages, static fn( $n ) => get_pagenum_link( $n ) ),
+			'opts'        => [ 'excerpt_card' => (int) piodesign_option( 'archive_excerpt' ) ] + piodesign_news_opts(),
 			'search'      => [
 				'action' => home_url( '/' ),
 				'value'  => get_search_query( false ),

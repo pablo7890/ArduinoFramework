@@ -372,3 +372,45 @@ function piodesign_office_status( array $hours, DateTimeImmutable $now, $first_f
 function piodesign_weekday_acc( $n ) {
 	return [ 1 => 'poniedziałek', 'wtorek', 'środę', 'czwartek', 'piątek', 'sobotę', 'niedzielę' ][ (int) $n ];
 }
+
+/**
+ * Mass times from the Mass intentions plugin's markup: every .ki-dzien-item
+ * has a date (.ki-data, "dd.mm.yyyy") and times (.ki-godzina, "HH:MM").
+ *
+ * @return string[] "Y-m-dTH:i"
+ */
+function piodesign_parse_intentions( $html ) {
+	$out    = [];
+	$blocks = preg_split( '/class="[^"]*\bki-dzien-item\b[^"]*"/', (string) $html );
+	array_shift( $blocks );
+	foreach ( $blocks as $b ) {
+		if ( ! preg_match( '/class="[^"]*\bki-data\b[^"]*"[^>]*>\s*(\d{1,2})\.(\d{1,2})\.(\d{4})/', $b, $d ) ) {
+			continue;
+		}
+		$date = sprintf( '%04d-%02d-%02d', $d[3], $d[2], $d[1] );
+		if ( preg_match_all( '/class="[^"]*\bki-godzina\b[^"]*"[^>]*>\s*(\d{1,2})[:.](\d{2})/', $b, $t, PREG_SET_ORDER ) ) {
+			foreach ( $t as $x ) {
+				$out[] = $date . 'T' . sprintf( '%02d:%s', $x[1], $x[2] );
+			}
+		}
+	}
+	return $out;
+}
+
+/** Next Mass from explicit slots ("Y-m-dTH:i"), or null. */
+function piodesign_next_mass_from_slots( array $slots, DateTimeImmutable $now ) {
+	foreach ( $slots as $slot ) {
+		$at = DateTimeImmutable::createFromFormat( 'Y-m-d\TH:i', $slot, $now->getTimezone() );
+		if ( $at && $at > $now ) {
+			$days = (int) round( ( $at->setTime( 0, 0 )->getTimestamp() - $now->setTime( 0, 0 )->getTimestamp() ) / 86400 );
+			$n    = (int) $at->format( 'N' );
+			return [
+				'time'  => $at->format( 'H:i' ),
+				'label' => 0 === $days ? 'dziś' : ( 1 === $days ? 'jutro' : piodesign_weekdays()[ $n ] ),
+				'in'    => piodesign_in_label( (int) floor( ( $at->getTimestamp() - $now->getTimestamp() ) / 60 ) ),
+				'n'     => $n,
+			];
+		}
+	}
+	return null;
+}

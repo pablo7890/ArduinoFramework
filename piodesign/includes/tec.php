@@ -57,7 +57,12 @@ add_action(
 			'archive-hero',
 			[
 				'day'      => piodesign_wp_day( $now ),
-				'timeline' => piodesign_get_timeline(),
+				'timeline' => piodesign_get_timeline( (int) piodesign_option( 'events_weeks' ) ),
+				'search'   => [
+					'action'    => function_exists( 'tribe_get_listview_link' ) ? tribe_get_listview_link() : tribe_get_events_link(),
+					'value'     => isset( $_GET['tribe-bar-search'] ) ? sanitize_text_field( wp_unslash( $_GET['tribe-bar-search'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification
+					'month_url' => function_exists( 'tribe_get_gridview_link' ) ? tribe_get_gridview_link() : '',
+				],
 			]
 		);
 	},
@@ -86,6 +91,9 @@ add_filter(
 	static function ( $classes ) {
 		if ( function_exists( 'tribe_is_event_query' ) && tribe_is_event_query() ) {
 			$classes[] = 'pio-tec';
+			if ( piodesign_option( 'tec_subscribe' ) ) {
+				$classes[] = 'pio-tec-subscribe';
+			}
 			if ( is_singular( 'tribe_events' ) && apply_filters( 'piodesign_tec_single', true ) ) {
 				$classes   = array_diff( $classes, [ 'has-sidebar', 'double-sidebars', 'avada-ec-meta-layout-sidebar' ] );
 				$classes[] = 'pio-tec-single';

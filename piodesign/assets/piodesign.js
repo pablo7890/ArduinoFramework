@@ -471,6 +471,20 @@
 				if (mins > 0) { found = { add: add, n: n, time: times[k], mins: mins }; break; }
 			}
 		}
+		// Exact Mass times from the intentions plugin win over the weekly schedule.
+		if (data.slots && data.slots.length) {
+			var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+			for (var si = 0; si < data.slots.length; si++) {
+				var sl = data.slots[si];
+				var at = new Date(+sl.slice(0, 4), +sl.slice(5, 7) - 1, +sl.slice(8, 10), +sl.slice(11, 13), +sl.slice(14, 16));
+				var diff = Math.floor((at - now) / 60000);
+				if (diff > 0) {
+					var dAdd = Math.round((new Date(at.getFullYear(), at.getMonth(), at.getDate()) - todayStart) / 86400000);
+					found = { add: dAdd, n: isoDay(at), time: sl.slice(11, 16), mins: diff };
+					break;
+				}
+			}
+		}
 		var box = el.querySelector('[data-next-mass]');
 		if (box && found) {
 			box.querySelector('[data-nm-day]').textContent = found.add === 0 ? 'dziś' : (found.add === 1 ? 'jutro' : WD[found.n]);

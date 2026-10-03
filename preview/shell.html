@@ -18,6 +18,7 @@
 				<a href="#wydarzenie" role="tab" id="tab-wydarzenie" aria-controls="wydarzenie" aria-selected="false">Wydarzenie</a>
 				<a href="#kalendarz" role="tab" id="tab-kalendarz" aria-controls="kalendarz" aria-selected="false">Kalendarz</a>
 				<a href="#aktualnosci" role="tab" id="tab-aktualnosci" aria-controls="aktualnosci" aria-selected="false">Archiwum aktualności</a>
+				<a href="#wpis" role="tab" id="tab-wpis" aria-controls="wpis" aria-selected="false">Wpis</a>
 			</nav>
 		</div>
 	</header>
@@ -46,10 +47,14 @@
 		<section class="pv-view" id="aktualnosci" role="tabpanel" aria-labelledby="tab-aktualnosci" hidden>
 			{{ARCHIVE_NEWS}}
 		</section>
+
+		<section class="pv-view" id="wpis" role="tabpanel" aria-labelledby="tab-wpis" hidden>
+			{{SINGLE_POST}}
+		</section>
 	</main>
 
 	<footer class="pv-foot">
-		<p>Podgląd zbudowany z szablonów wtyczki na treściach z parafiapio.pl ({{NPOSTS}} wpisów, {{NEVENTS}} wydarzeń), stan na {{TODAY}}. Kategorie wpisów w podglądzie to propozycja – dziś prawie wszystkie wpisy mają kategorię „Aktualności”. Dzień liturgiczny, czytania i święta parafialne to przykładowe dane; na stronie pochodzą z wtyczki „Parafia: Kalendarz liturgiczny”. Godziny Mszy, kancelaria i kontakt pochodzą z parafiapio.pl i można je zmienić w Ustawienia → PioDesign. Na telefonie widać 5 aktualności i 5 wydarzeń. Archiwum pokazuje pierwszą stronę z 18 wpisami; numery stron prowadzą na parafiapio.pl.</p>
+		<p>Podgląd zbudowany z szablonów wtyczki na treściach z parafiapio.pl ({{NPOSTS}} wpisów, {{NEVENTS}} wydarzeń), stan na {{TODAY}}. Kategorie wpisów w podglądzie to propozycja – dziś prawie wszystkie wpisy mają kategorię „Aktualności”. Dzień liturgiczny, czytania i święta parafialne to przykładowe dane; na stronie pochodzą z wtyczki „Parafia: Kalendarz liturgiczny”. Godziny Mszy, kancelaria i kontakt pochodzą z parafiapio.pl i można je zmienić w Ustawienia → PioDesign. Na telefonie widać 5 aktualności i 5 wydarzeń. „Najbliższa Msza” liczy z intencji mszalnych parafiapio.pl. Odtwarzacz Spotify działa na stronie; w podglądzie zastępuje go przycisk. Archiwum pokazuje pierwszą stronę z 18 wpisami; numery stron prowadzą na parafiapio.pl.</p>
 	</footer>
 </div>
 
@@ -74,7 +79,7 @@
 		});
 	});
 
-	var views = ['home', 'wydarzenie', 'kalendarz', 'aktualnosci'];
+	var views = ['home', 'wydarzenie', 'kalendarz', 'aktualnosci', 'wpis'];
 	function show(id, scroll) {
 		if (views.indexOf(id) < 0) { id = 'home'; }
 		views.forEach(function (v) {
@@ -87,7 +92,7 @@
 		var a = e.target.closest && e.target.closest('a[href]');
 		if (!a) { return; }
 		var href = a.getAttribute('href');
-		if (href === '#home' || href === '#wydarzenie' || href === '#kalendarz' || href === '#aktualnosci') {
+		if (href === '#home' || href === '#wydarzenie' || href === '#kalendarz' || href === '#aktualnosci' || href === '#wpis') {
 			e.preventDefault();
 			history.replaceState(null, '', href);
 			show(href.slice(1), true);
@@ -98,6 +103,13 @@
 			e.preventDefault();
 			history.replaceState(null, '', '#aktualnosci');
 			show('aktualnosci', true);
+			return;
+		}
+		// The post rendered as a single view opens in-page.
+		if (a.href.indexOf('/imieniny-naszej-parafii-odpust-sw-ojca-pio') > -1) {
+			e.preventDefault();
+			history.replaceState(null, '', '#wpis');
+			show('wpis', true);
 			return;
 		}
 		// The one event rendered as a single view opens in-page.

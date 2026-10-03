@@ -221,15 +221,16 @@
 
 /* ---------------------------------------------------------------- masthead */
 
-.pio-news.pio-news { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(24px, 3vw, 40px); }
-.pio-mast.pio-mast { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.pio-news.pio-news { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(18px, 2vw, 24px); }
+.pio-news.pio-news > .pio-news__foot { margin-top: clamp(6px, 1.5vw, 16px); }
+.pio-mast.pio-mast { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 /* Title on the left, the day's "ear" on the right, like a newspaper masthead. */
 .pio-mast__top.pio-mast__top {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) auto;
 	align-items: end;
-	gap: 16px clamp(24px, 4vw, 56px);
-	padding-bottom: 16px;
+	gap: 14px clamp(24px, 4vw, 56px);
+	padding-bottom: 14px;
 	border-bottom: 1px solid var(--c-line);
 }
 .pio-mast__day.pio-mast__day {
@@ -444,7 +445,7 @@ a:focus-visible .pio-frame > .pio-frame__img { transform: scale(1.045); }
 	font-size: 1rem;
 	line-height: 1.55;
 	display: -webkit-box;
-	-webkit-line-clamp: 3;
+	-webkit-line-clamp: 6;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 }
@@ -459,7 +460,7 @@ a:focus-visible .pio-frame > .pio-frame__img { transform: scale(1.045); }
 	line-height: 1.02;
 	letter-spacing: var(--pio-track-xl);
 }
-.pio-story--lead.pio-story--lead .pio-story__excerpt { font-size: 1.18rem; -webkit-line-clamp: 4; max-width: 62ch; }
+.pio-story--lead.pio-story--lead .pio-story__excerpt { font-size: 1.18rem; -webkit-line-clamp: 7; max-width: 62ch; }
 .pio-story--lead.pio-story--lead .pio-frame { animation: pio-unveil 1.3s .15s var(--pio-ease) both; }
 .pio-more.pio-more {
 	display: inline-flex;
@@ -474,7 +475,7 @@ a:focus-visible .pio-frame > .pio-frame__img { transform: scale(1.045); }
 
 /* seconds */
 .pio-story--side.pio-story--side .pio-story__title { font-size: 1.35rem; }
-.pio-story--side.pio-story--side .pio-story__excerpt { -webkit-line-clamp: 2; }
+.pio-story--side.pio-story--side .pio-story__excerpt { -webkit-line-clamp: 4; }
 
 /* briefs */
 .pio-briefs-h.pio-briefs-h {
@@ -540,7 +541,8 @@ a:focus-visible .pio-frame > .pio-frame__img { transform: scale(1.045); }
 /* ---------------------------------------------------------------- news archive */
 
 .pio-archive.pio-archive { gap: clamp(28px, 3.5vw, 48px); }
-.pio-archive__tools.pio-archive__tools { display: grid; gap: 10px; min-width: min(100%, 320px); }
+.pio-archive__tools.pio-archive__tools { display: grid; gap: 10px; width: min(100%, 360px); min-width: 0; box-sizing: border-box; }
+.pio-search.pio-search { min-width: 0; max-width: 100%; box-sizing: border-box; }
 .pio-search.pio-search {
 	display: flex;
 	align-items: center;
@@ -1394,7 +1396,9 @@ body.pio-tec-single #content {
 	align-items: flex-end;
 	justify-content: space-between;
 	gap: 14px 24px;
-	margin-bottom: clamp(20px, 2.6vw, 32px);
+	margin-bottom: clamp(18px, 2vw, 24px);
+	padding-bottom: 14px;
+	border-bottom: 1px solid var(--c-line);
 }
 .pio-sec-head__title.pio-sec-head__title { display: grid; gap: 6px; }
 .pio-sec-head__word.pio-sec-head__word {
@@ -2052,7 +2056,7 @@ body.pio-tec-single #content {
 	--lit-edge: color-mix(in srgb, var(--lit) 82%, #1c1d21);
 	position: relative;
 	display: grid;
-	grid-template-columns: 20px minmax(0, 1fr);
+	grid-template-columns: 14px minmax(0, 1fr);
 	border: 1px solid var(--c-line);
 	border-radius: 8px;
 	overflow: hidden;
@@ -2063,23 +2067,13 @@ body.pio-tec-single #content {
 }
 .pio-liturgy__stole.pio-liturgy__stole {
 	position: relative;
-	background:
-		linear-gradient(90deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, .14)),
-		repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 2px, transparent 2px 5px);
+	z-index: 1;
 	background-color: var(--lit);
-	box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1), 1px 0 0 rgba(0, 0, 0, .04);
-	transition: background-color .6s var(--pio-ease);
+	box-shadow:
+		inset -1px 0 0 rgba(0, 0, 0, .1),
+		6px 0 22px -8px color-mix(in srgb, var(--lit) 55%, rgba(20, 22, 27, .45));
+	transition: background-color .6s var(--pio-ease), box-shadow .6s var(--pio-ease);
 }
-.pio-liturgy__stole.pio-liturgy__stole::after {
-	content: "";
-	position: absolute;
-	left: 0; right: 0; bottom: 0;
-	height: 34px;
-	background: repeating-linear-gradient(90deg, var(--pio-gold) 0 2px, transparent 2px 4px);
-	opacity: .7;
-}
-.pio-liturgy__cross.pio-liturgy__cross { position: absolute; left: 50%; top: 22px; transform: translateX(-50%); color: var(--pio-gold); }
-.pio-liturgy__cross.pio-liturgy__cross .pio-i { width: 14px; height: 14px; stroke-width: 2.4; }
 .pio-liturgy__panels.pio-liturgy__panels { display: grid; min-width: 0; }
 .pio-liturgy__panel.pio-liturgy__panel {
 	display: grid;
@@ -2089,7 +2083,7 @@ body.pio-tec-single #content {
 	animation: pio-up .55s var(--pio-ease) both;
 }
 @container lit (min-width: 760px) {
-	.pio-liturgy__panel.pio-liturgy__panel { grid-template-columns: minmax(0, 1fr) minmax(220px, 300px); }
+	.pio-liturgy__panel.pio-liturgy__panel { grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); }
 }
 .pio-liturgy__main.pio-liturgy__main { display: grid; gap: 14px; align-content: start; min-width: 0; }
 .pio-liturgy__date.pio-liturgy__date { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; font-family: var(--pio-display); }
@@ -2211,6 +2205,209 @@ body.pio-tec-single #content {
 		animation-range: entry 0% entry 55%;
 	}
 }
+
+
+/* ---------------------------------------------------------------- liturgy: Gospel reflection podcast */
+
+.pio-pod.pio-pod {
+	display: grid;
+	gap: 10px;
+	padding: 16px;
+	border-radius: 10px;
+	background:
+		radial-gradient(90% 80% at 100% 0%, rgba(219, 165, 98, .22), transparent 70%),
+		var(--pio-night);
+	color: #f4f1ea;
+	box-shadow: 0 18px 36px -24px rgba(20, 22, 27, .7);
+}
+.pio-pod__label.pio-pod__label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--pio-gold);
+	font: 700 11.5px/1.2 var(--pio-display);
+	letter-spacing: .12em;
+	text-transform: uppercase;
+}
+.pio-pod__label.pio-pod__label .pio-i { width: 16px; height: 16px; }
+.pio-pod__title.pio-pod__title { font: 700 1.05rem/1.25 var(--pio-display); }
+.pio-pod__player.pio-pod__player { overflow: hidden; border-radius: 12px; background: #282828; }
+.pio-pod__player.pio-pod__player iframe { display: block; width: 100%; height: 152px; border: 0; }
+.pio-pod__link.pio-pod__link {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 14px;
+	border-radius: 999px;
+	background: #1db954;
+	color: #0b1a10;
+	font: 750 14px/1 var(--pio-display);
+	justify-self: start;
+}
+.pio-pod__play.pio-pod__play { width: 0; height: 0; border-left: 9px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+.pio-liturgy__side.pio-liturgy__side .pio-pod + .pio-liturgy__group { padding-top: 4px; border-top: 0; }
+
+/* ---------------------------------------------------------------- calendar: own search and views (TEC bar hidden) */
+
+.pio-calbar.pio-calbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px 16px;
+}
+.pio-calbar__search.pio-calbar__search { flex: 1 1 340px; max-width: 560px; }
+.pio-calbar__views.pio-calbar__views { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--c-line); border-radius: 999px; }
+.pio-calbar__views.pio-calbar__views a {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 8px 14px;
+	border-radius: 999px;
+	color: var(--c-muted);
+	font: 650 14px/1 var(--pio-display);
+	transition: background-color .25s, color .25s;
+}
+.pio-calbar__views.pio-calbar__views a .pio-i { width: 16px; height: 16px; }
+.pio-calbar__views.pio-calbar__views a:hover { color: var(--c-fg); }
+.pio-calbar__views.pio-calbar__views a.is-active { background: var(--c-fg); color: var(--pio-paper); }
+.pio-calbar__result.pio-calbar__result { flex-basis: 100%; color: var(--c-muted); font: 500 14.5px/1.4 var(--pio-display); }
+.pio-calbar__result.pio-calbar__result a { color: var(--pio-rust); text-decoration: underline; }
+
+/* TEC's own bar, date navigation and subscribe button: replaced by the hero above. */
+.pio-tec.pio-tec .tribe-events-view--list .tribe-events-c-events-bar,
+.pio-tec.pio-tec .tribe-events-view--list .tribe-events-c-top-bar,
+.pio-tec.pio-tec .tribe-events-view--list .tribe-events-header__events-bar,
+.pio-tec.pio-tec .tribe-events-view--list .tribe-events-header__top-bar,
+.pio-tec.pio-tec:not(.pio-tec-subscribe) .tribe-events-c-subscribe-dropdown__container,
+.pio-tec.pio-tec:not(.pio-tec-subscribe) .tribe-events-c-ical { display: none !important; }
+.pio-tec.pio-tec .tribe-events-view--list .tribe-events-header { padding: 0 !important; margin: 0 !important; min-height: 0 !important; }
+.pio-tec.pio-tec .tribe-events-view--list .tribe-events-c-nav__list {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	margin: 28px 0 0;
+	padding: 18px 0 0;
+	border-top: 1px solid var(--pio-line);
+	list-style: none;
+}
+.pio-tec.pio-tec .tribe-events-view--list .tribe-events-c-nav__prev,
+.pio-tec.pio-tec .tribe-events-view--list .tribe-events-c-nav__next {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 46px;
+	padding: 0 18px;
+	border: 1px solid var(--pio-line);
+	border-radius: var(--pio-radius);
+	background: transparent;
+	color: var(--pio-ink);
+	font: 650 15px/1 var(--pio-display);
+	text-decoration: none;
+	transition: background-color .25s, color .25s, border-color .25s;
+}
+.pio-tec.pio-tec .tribe-events-view--list a.tribe-events-c-nav__prev:hover,
+.pio-tec.pio-tec .tribe-events-view--list a.tribe-events-c-nav__next:hover { background: var(--pio-ink); border-color: var(--pio-ink); color: #fff; }
+.pio-tec.pio-tec .tribe-events-view--list button.tribe-events-c-nav__prev[disabled],
+.pio-tec.pio-tec .tribe-events-view--list button.tribe-events-c-nav__next[disabled] { visibility: hidden; }
+
+/* ---------------------------------------------------------------- single news post */
+
+.pio-post.pio-post { display: grid; gap: clamp(18px, 2.6vw, 30px); }
+.pio-post__cat.pio-post__cat { color: var(--cat, var(--pio-rust)) !important; }
+.pio-post__head.pio-post__head { display: grid; gap: 14px; max-width: 980px; }
+.pio-post__title.pio-post__title {
+	font-size: clamp(2.1rem, 5.2vw, 4.4rem) !important;
+	font-weight: 800 !important;
+	font-stretch: 78%;
+	line-height: .98 !important;
+	letter-spacing: var(--pio-track-xl) !important;
+	animation: pio-rise .9s var(--pio-ease) both;
+}
+.pio-post__lede.pio-post__lede { max-width: 62ch; color: var(--c-muted); font-size: 1.28rem; line-height: 1.5; font-style: italic; }
+.pio-post__hero.pio-post__hero { border-radius: 8px; animation: pio-unveil 1.2s .1s var(--pio-ease) both; }
+.pio-post__grid.pio-post__grid {
+	display: grid;
+	grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
+	gap: clamp(24px, 4vw, 64px);
+	align-items: start;
+}
+.pio-post__rail.pio-post__rail {
+	position: sticky;
+	top: var(--pio-sticky-top);
+	display: grid;
+	gap: 18px;
+	padding-top: 6px;
+	font-family: var(--pio-display);
+}
+.pio-post__datetile.pio-post__datetile { display: grid; gap: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--c-line); }
+.pio-post__day.pio-post__day { font-size: 4.2rem; font-weight: 800; font-stretch: 75%; line-height: .85; letter-spacing: var(--pio-track-xl); color: var(--cat, var(--pio-rust)); }
+.pio-post__month.pio-post__month { color: var(--c-muted); font-size: 15px; font-weight: 650; }
+.pio-post__facts.pio-post__facts { display: grid; gap: 8px; list-style: none; }
+.pio-post__facts.pio-post__facts li { display: flex; align-items: center; gap: 8px; color: var(--c-muted); font-size: 14.5px; font-weight: 600; }
+.pio-post__facts.pio-post__facts .pio-i { width: 16px; height: 16px; color: var(--pio-rust); }
+.pio-post__share.pio-post__share { display: grid; gap: 8px; padding-top: 16px; border-top: 1px solid var(--c-line); }
+.pio-post__label.pio-post__label { color: var(--c-muted); font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.pio-share.pio-share {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	justify-self: start;
+	padding: 9px 14px;
+	border: 1px solid var(--c-line);
+	border-radius: 999px;
+	background: transparent;
+	color: var(--c-fg);
+	font: 650 14px/1 var(--pio-display);
+	cursor: pointer;
+	transition: border-color .25s, color .25s, background-color .25s;
+}
+.pio-share.pio-share .pio-i { width: 16px; height: 16px; }
+.pio-share.pio-share:hover { border-color: var(--c-fg); color: var(--pio-rust); }
+.pio-share.pio-share.is-done { border-color: #2f7a4b; background: #2f7a4b; color: #fff; }
+.pio-post__body.pio-post__body { min-width: 0; }
+.pio-post__tags.pio-post__tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2em !important; }
+.pio-post__tags.pio-post__tags a { padding: 6px 12px; border-radius: 999px; background: var(--pio-mist); color: var(--c-fg); font: 600 14px/1 var(--pio-display); text-decoration: none !important; }
+.pio-post__tags.pio-post__tags a:hover { color: var(--pio-rust); }
+.pio-post__related.pio-post__related { display: grid; gap: 14px; }
+.pio-post__comments.pio-post__comments { max-width: 760px; margin: 40px auto 0; }
+@media (max-width: 900px) {
+	.pio-post__grid.pio-post__grid { grid-template-columns: minmax(0, 1fr); }
+	.pio-post__rail.pio-post__rail {
+		position: static;
+		grid-template-columns: auto 1fr;
+		align-items: center;
+		gap: 10px 20px;
+		padding: 0 0 16px;
+		border-bottom: 1px solid var(--c-line);
+	}
+	.pio-post__datetile.pio-post__datetile { padding: 0; border: 0; }
+	.pio-post__day.pio-post__day { font-size: 3rem; }
+	.pio-post__share.pio-post__share { grid-column: 1 / -1; grid-auto-flow: column; justify-content: start; align-items: center; padding-top: 12px; }
+}
+
+/* Longer reading: text keeps a comfortable measure, galleries use the full column. */
+.pio-prose.pio-prose :where(p, ul, ol, blockquote, figure, h2, h3, h4, .wp-block-image, .foogallery) + :where(p, ul, ol, blockquote, figure, h2, h3, h4, .wp-block-image, .foogallery) { margin-top: 1em; }
+.pio-prose.pio-prose :where(div) > :where(p, ul, ol, blockquote, h2, h3, h4) { max-width: 72ch; }
+.pio-prose.pio-prose img { max-width: 100%; height: auto; }
+.pio-prose.pio-prose > :where(p, h2, h3, h4, ul, ol, blockquote) { max-width: 72ch; }
+.pio-prose.pio-prose h2,
+.pio-prose.pio-prose h3,
+.pio-prose.pio-prose h4 { margin-top: 1.6em !important; font-family: var(--pio-display); font-weight: 750; letter-spacing: var(--pio-track-l); }
+.pio-prose.pio-prose h2 { font-size: clamp(1.5rem, 2.6vw, 1.9rem) !important; }
+.pio-prose.pio-prose h3 { font-size: clamp(1.25rem, 2.2vw, 1.5rem) !important; }
+.pio-prose.pio-prose ul,
+.pio-prose.pio-prose ol { padding-left: 1.3em !important; }
+.pio-prose.pio-prose li { margin: .35em 0; }
+.pio-prose.pio-prose blockquote {
+	margin: 1.6em 0 !important;
+	padding: .2em 0 .2em 1.2em !important;
+	border-left: 3px solid var(--pio-rust) !important;
+	font-size: 1.25rem;
+	font-style: italic;
+}
+.pio-prose.pio-prose figure { margin: 1.6em 0 !important; }
+.pio-prose.pio-prose figcaption { margin-top: 8px; color: var(--c-muted); font: 500 13.5px/1.4 var(--pio-display); }
+.pio-prose.pio-prose hr { margin: 2em 0; border: 0; border-top: 1px solid var(--c-line); }
 
 /* ---------------------------------------------------------------- motion */
 
