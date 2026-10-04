@@ -10,21 +10,30 @@
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Two switches: `news_archive` takes over the "Aktualności" page and the posts
+ * page; `news_terms` takes over category, tag, date and author archives and
+ * the search in posts. The second one stays useful when "Aktualności" is an
+ * Avada page with [pio_archiwum] – its category chips lead here.
+ */
 function piodesign_is_news_archive() {
-	if ( is_admin() || ! piodesign_option( 'news_archive' ) || ! apply_filters( 'piodesign_news_archive', true ) ) {
+	if ( is_admin() || ! apply_filters( 'piodesign_news_archive', true ) ) {
 		return false;
-	}
-	if ( is_search() ) {
-		return 'post' === get_query_var( 'post_type' );
-	}
-	$page = piodesign_archive_page_id();
-	if ( $page && is_page( $page ) ) {
-		return true;
 	}
 	if ( function_exists( 'tribe_is_event_query' ) && tribe_is_event_query() ) {
 		return false;
 	}
-	return ( is_home() && ! is_front_page() ) || is_category() || is_tag() || is_date() || is_author();
+	if ( is_search() ) {
+		return piodesign_option( 'news_terms' ) && 'post' === get_query_var( 'post_type' );
+	}
+	$page = piodesign_archive_page_id();
+	if ( $page && is_page( $page ) ) {
+		return (bool) piodesign_option( 'news_archive' );
+	}
+	if ( is_home() && ! is_front_page() ) {
+		return (bool) piodesign_option( 'news_archive' );
+	}
+	return piodesign_option( 'news_terms' ) && ( is_category() || is_tag() || is_date() || is_author() );
 }
 
 /** Current page number on archives and on a static page (/aktualnosci/page/2/). */
@@ -35,11 +44,12 @@ function piodesign_paged() {
 add_action(
 	'pre_get_posts',
 	static function ( WP_Query $q ) {
-		if ( is_admin() || ! $q->is_main_query() || ! piodesign_option( 'news_archive' ) ) {
+		if ( is_admin() || ! $q->is_main_query() || 'tribe_events' === $q->get( 'post_type' ) ) {
 			return;
 		}
-		$is_search = $q->is_search() && 'post' === $q->get( 'post_type' );
-		if ( 'tribe_events' !== $q->get( 'post_type' ) && ( ( $q->is_home() && ! $q->is_front_page() ) || $q->is_category() || $q->is_tag() || $q->is_date() || $q->is_author() || $is_search ) ) {
+		$terms = piodesign_option( 'news_terms' ) && ( $q->is_category() || $q->is_tag() || $q->is_date() || $q->is_author() || ( $q->is_search() && 'post' === $q->get( 'post_type' ) ) );
+		$home  = piodesign_option( 'news_archive' ) && $q->is_home() && ! $q->is_front_page();
+		if ( $terms || $home ) {
 			$q->set( 'posts_per_page', (int) piodesign_option( 'archive_per_page' ) );
 		}
 	}
@@ -95,14 +105,19 @@ function piodesign_news_archive_html( array $args = [] ) {
 	$title   = $args['title'] ?? 'Aktualności';
 	$desc    = '';
 
-	if ( is_category() && ! $on_page ) {
-		$kicker = 'Kategoria';
-		$title  = single_cat_title( '', false );
-		$desc   = term_description();
-	} elseif ( is_tag() && ! $on_page ) {
-		$kicker = 'Temat';
-		$title  = single_tag_title( '', false );
-		$desc   = term_description();
+	$generic = apply_filters( 'piodesign_generic_categories', [ 'aktualnosci', 'bez-kategorii', 'uncategorized' ] );
+	$qo      = $on_page ? null : get_queried_object();
+	$is_all  = ! $qo || ! ( is_category() || is_tag() ) || ( is_category() && ( in_array( $qo->slug, $generic, true ) || (int) get_option( 'default_category' ) === (int) $qo->term_id ) );
+	$term    = null;
+
+	if ( ( is_category() || is_tag() ) && ! $on_page && ! $is_all ) {
+		$kicker = is_category() ? 'Kategoria' : 'Temat';
+		$title  = $qo->name;
+		$desc   = term_description( $qo );
+		$term   = piodesign_term_info( $qo, (int) $query->found_posts, $all_url );
+	} elseif ( is_category() && ! $on_page ) {
+		// "Aktualności" and other catch-all categories read as the whole archive.
+		$desc = term_description( $qo );
 	} elseif ( is_month() && ! $on_page ) {
 		$kicker = 'Archiwum';
 		$title  = piodesign_months( 'nom' )[ (int) get_query_var( 'monthnum' ) ] . ' ' . get_query_var( 'year' );
@@ -120,8 +135,7 @@ function piodesign_news_archive_html( array $args = [] ) {
 		$title  = '„' . get_search_query( false ) . '”';
 	}
 
-	$generic = apply_filters( 'piodesign_generic_categories', [ 'aktualnosci', 'bez-kategorii', 'uncategorized' ] );
-	$current = ( is_category() && ! $on_page ) ? (int) get_queried_object_id() : 0;
+	$current = ( is_category() && ! $on_page && ! $is_all ) ? (int) get_queried_object_id() : 0;
 	$cats    = [];
 	foreach ( get_categories( [ 'orderby' => 'count', 'order' => 'DESC', 'hide_empty' => true, 'number' => 12 ] ) as $t ) {
 		if ( in_array( $t->slug, $generic, true ) || (int) get_option( 'default_category' ) === $t->term_id ) {
@@ -136,6 +150,9 @@ function piodesign_news_archive_html( array $args = [] ) {
 		];
 	}
 
+	// The open category goes first, so on phones it isn't scrolled out of sight.
+	usort( $cats, static fn( $a, $b ) => (int) $b['active'] <=> (int) $a['active'] );
+
 	$page  = piodesign_paged();
 	$pages = (int) $query->max_num_pages;
 
@@ -148,7 +165,8 @@ function piodesign_news_archive_html( array $args = [] ) {
 			'description' => $desc ? wp_kses_post( $desc ) : '',
 			'cats'        => $cats,
 			'all_url'     => $all_url,
-			'all_active'  => ! is_category(),
+			'all_active'  => ! $current,
+			'term'        => $term,
 			'page'        => $page,
 			'pages'       => $pages,
 			'total'       => (int) $query->found_posts,
@@ -157,9 +175,42 @@ function piodesign_news_archive_html( array $args = [] ) {
 			'search'      => [
 				'action' => home_url( '/' ),
 				'value'  => get_search_query( false ),
+				'cat'    => $term && is_category() ? (int) $qo->term_id : (int) get_query_var( 'cat' ),
 			],
 		]
 	);
+}
+
+/**
+ * Header data for a category or tag: colour, post count and the span of
+ * years it covers ("od marca 2024").
+ */
+function piodesign_term_info( WP_Term $t, $count, $all_url ) {
+	$tax   = 'category' === $t->taxonomy ? 'cat' : 'tag_id';
+	$edges = [];
+	foreach ( [ 'ASC', 'DESC' ] as $order ) {
+		$q = get_posts(
+			[
+				'post_type'        => 'post',
+				'posts_per_page'   => 1,
+				'orderby'          => 'date',
+				'order'            => $order,
+				$tax               => $t->term_id,
+				'fields'           => 'ids',
+				'suppress_filters' => false,
+			]
+		);
+		$edges[] = $q ? new DateTimeImmutable( get_post_field( 'post_date', $q[0] ), wp_timezone() ) : null;
+	}
+	return [
+		'type'   => 'category' === $t->taxonomy ? 'Kategoria' : 'Temat',
+		'name'   => html_entity_decode( $t->name, ENT_QUOTES, 'UTF-8' ),
+		'color'  => 'category' === $t->taxonomy ? piodesign_category_color( $t->slug ) : 'var(--pio-rust)',
+		'count'  => $count,
+		'since'  => $edges[0] ? piodesign_months()[ (int) $edges[0]->format( 'n' ) ] . ' ' . $edges[0]->format( 'Y' ) : '',
+		'latest' => $edges[1] ? piodesign_date( $edges[1], true ) : '',
+		'back'   => $all_url,
+	];
 }
 
 add_shortcode(

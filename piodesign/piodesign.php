@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Parafia: PioDesign
  * Description:       Nowoczesny wygląd parafii na Avadzie: aktualności i ich archiwum, oś wydarzeń The Events Calendar, sakramenty, cytaty, liturgia dnia i informacje parafialne. Ustawienia → PioDesign.
- * Version:     1.3
+ * Version:     1.4
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            cruzLabs
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PIODESIGN_VERSION', '1.3' );
+define( 'PIODESIGN_VERSION', '1.4' );
 define( 'PIODESIGN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PIODESIGN_URL', plugin_dir_url( __FILE__ ) );
 

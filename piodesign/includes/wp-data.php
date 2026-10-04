@@ -90,6 +90,117 @@ function piodesign_wp_gallery_ids( WP_Post $post ) {
 	return $ids;
 }
 
+/** File key of an image URL: base name without size, "-scaled" and extension. */
+function piodesign_image_key( $url ) {
+	$name = basename( (string) wp_parse_url( (string) $url, PHP_URL_PATH ) );
+	return strtolower( (string) preg_replace( '/(-\d+x\d+)?(-scaled)?\.(jpe?g|png|webp|gif|avif)$/i', '', $name ) );
+}
+
+/** Inline images in raw post content, in order: [ id (0 if unknown), key ]. */
+function piodesign_content_images( $content ) {
+	$out = [];
+	if ( preg_match_all( '/<img\b[^>]*>/i', (string) $content, $m ) ) {
+		foreach ( $m[0] as $tag ) {
+			$id    = preg_match( '/wp-image-(\d+)/', $tag, $i ) ? (int) $i[1] : 0;
+			$src   = preg_match( '/\ssrc=["\']([^"\']+)/', $tag, $u ) ? $u[1] : '';
+			$out[] = [ $id, piodesign_image_key( $src ) ];
+		}
+	}
+	return $out;
+}
+
+/**
+ * The photo to show for a post. Prefers a horizontal image (wider than
+ * 1.2 : 1) from the featured image and the post's galleries, so a portrait
+ * featured image gives way to a landscape gallery photo.
+ *
+ * With $avoid_content (single post view) it also avoids the photo the text
+ * itself opens with, so the hero and the first picture are not the same.
+ *
+ * @return array{id:int, strip:bool} strip = the chosen photo opens the text
+ *                                    and should be removed from it.
+ */
+function piodesign_pick_image( WP_Post $post, $avoid_content = false ) {
+	$thumb = (int) get_post_thumbnail_id( $post );
+	$ids   = array_slice( array_values( array_unique( array_filter( array_merge( [ $thumb ], piodesign_wp_gallery_ids( $post ) ) ) ) ), 0, 16 );
+	if ( ! $ids ) {
+		return [ 'id' => 0, 'strip' => false ];
+	}
+
+	$inline = $avoid_content ? piodesign_content_images( $post->post_content ) : [];
+	$first  = $inline[0] ?? null;
+	$cands  = [];
+	foreach ( $ids as $id ) {
+		$meta = wp_get_attachment_metadata( $id );
+		$w    = (int) ( $meta['width'] ?? 0 );
+		$h    = (int) ( $meta['height'] ?? 0 );
+		$key  = piodesign_image_key( wp_get_attachment_url( $id ) );
+		$in   = false;
+		foreach ( $inline as $img ) {
+			if ( ( $img[0] && $img[0] === $id ) || ( '' !== $key && $img[1] === $key ) ) {
+				$in = true;
+				break;
+			}
+		}
+		$cands[] = [
+			'id'    => $id,
+			'wide'  => $w && $h && $w / $h >= 1.2,
+			'in'    => $in,
+			'first' => $first && ( ( $first[0] && $first[0] === $id ) || ( '' !== $key && $first[1] === $key ) ),
+		];
+	}
+
+	$passes = [
+		static fn( $c ) => $c['wide'] && ! $c['in'],   // landscape, not in the text
+		static fn( $c ) => $c['wide'] && $c['first'],  // landscape that opens the text (removed there)
+		static fn( $c ) => ! $c['in'],                 // anything not in the text
+		static fn( $c ) => $c['wide'],
+	];
+	foreach ( $passes as $k => $ok ) {
+		foreach ( $cands as $c ) {
+			if ( $ok( $c ) ) {
+				return [ 'id' => $c['id'], 'strip' => $avoid_content && $c['first'] ];
+			}
+		}
+	}
+	return [ 'id' => $thumb ?: $ids[0], 'strip' => $avoid_content && $cands[0]['first'] ];
+}
+
+/**
+ * Removes the first occurrence of an image (with its figure, paragraph or
+ * link wrapper) from rendered content.
+ */
+function piodesign_strip_image( $html, $id ) {
+	$key = piodesign_image_key( wp_get_attachment_url( $id ) );
+	if ( ! preg_match_all( '/<img\b[^>]*>/i', $html, $m ) ) {
+		return $html;
+	}
+	$tag = '';
+	foreach ( $m[0] as $t ) {
+		$src = preg_match( '/\ssrc=["\']([^"\']+)/', $t, $u ) ? $u[1] : '';
+		if ( preg_match( '/wp-image-' . (int) $id . '\b/', $t ) || ( '' !== $key && piodesign_image_key( $src ) === $key ) ) {
+			$tag = $t;
+			break;
+		}
+	}
+	if ( '' === $tag ) {
+		return $html;
+	}
+	$img      = preg_quote( $tag, '#' );
+	$patterns = [
+		'#<figure\b[^>]*>(?:(?!<figure\b|</figure>).)*?' . $img . '.*?</figure>#is',
+		'#<p\b[^>]*>\s*(?:<a\b[^>]*>\s*)?' . $img . '\s*(?:</a>\s*)?(?:<br\s*/?>\s*)?</p>#is',
+		'#(?:<a\b[^>]*>\s*)?' . $img . '(?:\s*</a>)?#is',
+	];
+	foreach ( $patterns as $re ) {
+		$out = preg_replace( $re, '', $html, 1, $n );
+		if ( $n ) {
+			return $out;
+		}
+	}
+	return $html;
+}
+
 /** Category shown on the card: Yoast primary, else the most specific one. */
 function piodesign_wp_category( $post_id ) {
 	$terms = get_the_category( $post_id );
@@ -146,7 +257,7 @@ function piodesign_wp_posts( array $wp_posts ) {
 	$posts = [];
 	foreach ( $wp_posts as $post ) {
 		$post    = get_post( $post );
-		$thumb   = get_post_thumbnail_id( $post );
+		$thumb   = piodesign_pick_image( $post )['id'];
 		$gallery = piodesign_wp_gallery_ids( $post );
 		$preview = array_slice( array_values( array_diff( $gallery, [ $thumb ] ) ), 0, 3 );
 
@@ -161,7 +272,7 @@ function piodesign_wp_posts( array $wp_posts ) {
 				'date'        => new DateTimeImmutable( $post->post_date, wp_timezone() ),
 				'excerpt'     => $excerpt,
 				'category'    => piodesign_wp_category( $post->ID ),
-				'image'       => piodesign_wp_image( $thumb ?: ( $gallery[0] ?? 0 ) ),
+				'image'       => piodesign_wp_image( $thumb ),
 				'gallery'     => array_filter( array_map( static fn( $id ) => wp_get_attachment_image_url( $id, 'medium_large' ), $preview ) ),
 				'photo_count' => count( $gallery ),
 				'words'       => str_word_count( wp_strip_all_tags( strip_shortcodes( $post->post_content ) ) ),

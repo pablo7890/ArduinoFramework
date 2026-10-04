@@ -15,7 +15,8 @@
  * @var int     $pages
  * @var int     $total
  * @var array[] $pager       piodesign_pager().
- * @var array   $search      [ action, value ].
+ * @var array   $search      [ action, value, cat ].
+ * @var array|null $term     Category / tag header: type, name, color, count, since, latest, back.
  * @var array   $opts        Card options (excerpt lengths…).
  */
 
@@ -30,7 +31,55 @@ if ( 1 === (int) $page && count( $posts ) >= 3 ) {
 $groups = piodesign_group_by_month( $rest );
 $i      = 0;
 ?>
-<section class="pio pio-news pio-archive" aria-labelledby="pio-archive-h">
+<?php $term = $term ?? null; ?>
+<section class="pio pio-news pio-archive<?php echo $term ? ' pio-archive--term' : ''; ?>" aria-labelledby="pio-archive-h"<?php echo $term ? ' style="--cat: ' . esc_attr( $term['color'] ) . ';"' : ''; ?>>
+	<?php if ( $term ) : ?>
+		<header class="pio-term">
+			<nav class="pio-crumbs" aria-label="Okruszki">
+				<a href="<?php echo esc_url( $term['back'] ); ?>"><?php echo piodesign_icon( 'arrow-l' ); // phpcs:ignore ?> Aktualności</a>
+				<span aria-hidden="true">/</span>
+				<span><?php echo esc_html( $term['type'] ); ?></span>
+			</nav>
+			<div class="pio-term__top">
+				<h1 class="pio-term__title" id="pio-archive-h">
+					<span class="pio-term__kicker"><i aria-hidden="true"></i><?php echo esc_html( $term['type'] ); ?></span>
+					<span class="pio-term__name"><?php echo esc_html( $term['name'] ); ?></span>
+				</h1>
+				<p class="pio-term__stat">
+					<b><?php echo (int) $term['count']; ?></b>
+					<span>
+						<?php echo esc_html( piodesign_plural( (int) $term['count'], 'wpis', 'wpisy', 'wpisów' ) ); ?>
+						<?php if ( $term['since'] ) : ?><small>od <?php echo esc_html( $term['since'] ); ?></small><?php endif; ?>
+						<?php if ( $term['latest'] ) : ?><small>ostatni <?php echo esc_html( $term['latest'] ); ?></small><?php endif; ?>
+					</span>
+				</p>
+			</div>
+			<?php if ( $description ) : ?>
+				<div class="pio-term__desc"><?php echo $description; // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
+			<?php endif; ?>
+			<div class="pio-term__tools">
+				<?php if ( $cats ) : ?>
+					<nav class="pio-mast__bar" aria-label="Kategorie">
+						<div class="pio-chips">
+							<a class="pio-chip" data-filter="*" href="<?php echo esc_url( $all_url ); ?>">Wszystko</a>
+							<?php foreach ( $cats as $c ) : ?>
+								<a class="pio-chip<?php echo $c['active'] ? ' is-active' : ''; ?>" href="<?php echo esc_url( $c['url'] ); ?>" style="--cat: <?php echo esc_attr( $c['color'] ); ?>;"<?php echo $c['active'] ? ' aria-current="page"' : ''; ?>>
+									<?php echo esc_html( $c['name'] ); ?> <b><?php echo (int) $c['count']; ?></b>
+								</a>
+							<?php endforeach; ?>
+						</div>
+					</nav>
+				<?php endif; ?>
+				<form class="pio-search" role="search" method="get" action="<?php echo esc_url( $search['action'] ); ?>">
+					<label for="pio-search-q" class="screen-reader-text">Szukaj w tej kategorii</label>
+					<input id="pio-search-q" type="search" name="s" value="<?php echo esc_attr( $search['value'] ); ?>" placeholder="<?php echo esc_attr( 'Szukaj: ' . $term['name'] ); ?>">
+					<input type="hidden" name="post_type" value="post">
+					<?php if ( ! empty( $search['cat'] ) ) : ?><input type="hidden" name="cat" value="<?php echo (int) $search['cat']; ?>"><?php endif; ?>
+					<button type="submit" aria-label="Szukaj"><svg class="pio-i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg></button>
+				</form>
+			</div>
+		</header>
+	<?php else : ?>
 	<header class="pio-mast">
 		<div class="pio-mast__top">
 			<h1 class="pio-mast__title" id="pio-archive-h">
@@ -66,6 +115,7 @@ $i      = 0;
 			<div class="pio-archive__desc"><?php echo $description; // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
 		<?php endif; ?>
 	</header>
+	<?php endif; ?>
 
 	<?php if ( ! $posts ) : ?>
 		<p class="pio-archive__empty">Nie znaleźliśmy tu żadnych wpisów. <a href="<?php echo esc_url( $all_url ); ?>">Wróć do wszystkich aktualności</a>.</p>

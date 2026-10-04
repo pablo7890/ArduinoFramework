@@ -135,3 +135,9 @@ it with the work. Keep entries short and concrete.
   compact grid + agenda on phones). TEC 6.18 answers out-of-range months/days
   with 404 – lift it on `send_headers` and send `noindex`. Sticky ticket hid
   under Avada's sticky header – measure the header in JS.
+- 1.4: One "archive" switch covered both the Aktualności page takeover and
+  categories; the user turned it off to keep an Avada page with
+  `[pio_archiwum]`, so category chips led to Avada's blog view. Keep separate
+  switches for "replace this page" and "style these archive types", and crawl
+  with the user's real settings. Prefer landscape photos (≥ 1.2:1) from
+  featured + gallery; never repeat the photo the text opens with.

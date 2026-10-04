@@ -379,6 +379,7 @@ foreach ( $posts as $p ) {
 	$cat_counts[ $slug ]['count']++;
 }
 uasort( $cat_counts, static fn( $a, $b ) => $b['count'] <=> $a['count'] );
+$cat_counts[ array_key_first( $cat_counts ) ]['url'] = '#kategoria'; // opens the category tab
 $pages        = (int) ceil( $total / $per_page );
 $news_archive = piodesign_render(
 	'news-archive',
@@ -398,6 +399,39 @@ $news_archive = piodesign_render(
 	]
 );
 
+// Category view: the most frequent proposed category, same template with the term header.
+$top_slug = array_key_first( $cat_counts );
+$cat_posts = array_values( array_filter( $posts, static fn( $p ) => ( $p['category']['slug'] ?? '' ) === $top_slug ) );
+$cat_list  = array_map( static fn( $c ) => [ 'active' => $c['name'] === $cat_counts[ $top_slug ]['name'], 'url' => '#kategoria' ] + $c, array_values( $cat_counts ) );
+usort( $cat_list, static fn( $a, $b ) => (int) $b['active'] <=> (int) $a['active'] );
+$oldest    = end( $cat_posts );
+$category_view = piodesign_render(
+	'news-archive',
+	[
+		'posts'       => $cat_posts,
+		'title'       => $cat_counts[ $top_slug ]['name'],
+		'kicker'      => 'Kategoria',
+		'description' => '<p>Wszystko, co dzieje się w tej części życia parafii – relacje, zaproszenia i zdjęcia.</p>',
+		'cats'        => $cat_list,
+		'all_url'     => '#aktualnosci',
+		'all_active'  => false,
+		'page'        => 1,
+		'pages'       => 1,
+		'total'       => count( $cat_posts ),
+		'pager'       => [],
+		'search'      => [ 'action' => 'https://parafiapio.pl/', 'value' => '', 'cat' => 0 ],
+		'term'        => [
+			'type'   => 'Kategoria',
+			'name'   => $cat_counts[ $top_slug ]['name'],
+			'color'  => $cat_counts[ $top_slug ]['color'],
+			'count'  => count( $cat_posts ),
+			'since'  => $oldest ? piodesign_months()[ (int) ( new DateTimeImmutable( $oldest['iso'] ) )->format( 'n' ) ] . ' ' . ( new DateTimeImmutable( $oldest['iso'] ) )->format( 'Y' ) : '',
+			'latest' => $cat_posts ? piodesign_date( new DateTimeImmutable( $cat_posts[0]['iso'] ), true ) : '',
+			'back'   => '#aktualnosci',
+		],
+	]
+);
+
 /* ------------------------------------------------------------ page */
 
 $shell = file_get_contents( __DIR__ . '/shell.html' );
@@ -413,6 +447,7 @@ $html  = strtr(
 		'{{TODAY}}'    => esc_html( $today ),
 		'{{NPOSTS}}'   => 15,
 		'{{ARCHIVE_NEWS}}' => $news_archive,
+		'{{CATEGORY}}'     => $category_view,
 		'{{SINGLE_POST}}'  => $single_post,
 		'{{NEVENTS}}'  => count( $home_ev ),
 	]

@@ -127,11 +127,19 @@ function piodesign_single_post_html( $post_id ) {
 
 	$tags = get_the_tags( $post->ID );
 
+	// Hero: a landscape photo that the text doesn't open with; if the only
+	// good one does, it moves to the top and leaves the text.
+	$hero    = piodesign_pick_image( $post, true );
+	$content = apply_filters( 'the_content', $post->post_content );
+	if ( $hero['strip'] ) {
+		$content = piodesign_strip_image( $content, $hero['id'] );
+	}
+
 	return piodesign_render(
 		'single-post',
 		[
 			'p'        => $p,
-			'content'  => apply_filters( 'the_content', $post->post_content ),
+			'content'  => $content,
 			'lede'     => has_excerpt( $post ) ? html_entity_decode( get_the_excerpt( $post ), ENT_QUOTES, 'UTF-8' ) : '',
 			'cat_url'  => $cat_obj ? get_category_link( $cat_obj ) : '',
 			'prev'     => piodesign_post_link( get_previous_post() ),
@@ -140,7 +148,7 @@ function piodesign_single_post_html( $post_id ) {
 			'tags'     => $tags && ! is_wp_error( $tags ) ? array_map( static fn( $t ) => [ 'name' => $t->name, 'url' => get_tag_link( $t ) ], $tags ) : [],
 			'back_url' => piodesign_archive_url(),
 			'share'    => (bool) piodesign_option( 'single_share' ),
-			'image'    => piodesign_wp_image( get_post_thumbnail_id( $post ), 'full' ),
+			'image'    => piodesign_wp_image( $hero['id'], 'full' ),
 		]
 	);
 }

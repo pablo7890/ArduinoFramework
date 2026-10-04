@@ -65,6 +65,12 @@ Category colours: posts – fixed map per slug (filter
   the image on top.
 - Cards: 16:9 frames (`.pio-frame`, `object-fit` chosen by aspect ratio:
   `contain` with blurred backdrop for odd ratios), a photo-count badge.
+- Photos: always prefer landscape (≥ 1.2:1) – choose among the featured image
+  and the post's gallery (`piodesign_pick_image()`); the hero must not repeat
+  the photo the text opens with (move it up and strip it from the text).
+- Term views (category/tag): crumbs back to the archive, huge name, outlined
+  count in the term colour, date span, description, chips with the active one
+  first and filled in the term colour, a colour ribbon under the header.
 - Balance: when a side column is optional, put the extras under the title
   (chips) and let the remaining side card stretch to the main column height.
 

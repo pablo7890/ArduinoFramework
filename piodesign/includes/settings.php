@@ -38,7 +38,8 @@ function piodesign_settings_schema() {
 			'title'  => 'Archiwum i wpis',
 			'intro'  => 'Strona „Aktualności”, kategorie, tagi, miesiące i pojedynczy wpis. Shortcode <code>[pio_archiwum]</code>.',
 			'fields' => [
-				[ 'news_archive', 'checkbox', 'Nowy wygląd archiwum', 1, 'Strona „Aktualności”, kategorie, tagi, archiwa miesięczne i wyszukiwanie we wpisach.' ],
+				[ 'news_archive', 'checkbox', 'Strona „Aktualności” w nowym wyglądzie', 1, 'Wtyczka pokazuje archiwum zamiast treści strony wybranej niżej (i strony wpisów z Ustawienia → Czytanie). Wyłącz, jeśli budujesz tę stronę w Avadzie z shortcode’em [pio_archiwum].' ],
+				[ 'news_terms', 'checkbox', 'Kategorie, tagi i archiwa w nowym wyglądzie', 1, 'Widoki /category/…, /tag/…, archiwa miesięczne, autorzy i wyszukiwanie we wpisach – tu prowadzą zakładki kategorii, także z [pio_archiwum].' ],
 				[ 'archive_page', 'page', 'Strona „Aktualności”', 0, 'Na tej stronie wtyczka pokaże archiwum zamiast treści zbudowanej w Avadzie.', [ 'auto' => 'aktualnosci' ] ],
 				[ 'archive_per_page', 'number', 'Wpisów na stronę', 18, 'Najlepiej wielokrotność 3.', [ 6, 48 ] ],
 				[ 'archive_excerpt', 'number', 'Zajawka w archiwum (znaki)', 150, '', [ 0, 400 ] ],

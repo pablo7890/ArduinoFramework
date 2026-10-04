@@ -19,6 +19,7 @@
 				<a href="#kalendarz" role="tab" id="tab-kalendarz" aria-controls="kalendarz" aria-selected="false">Kalendarz</a>
 				<a href="#miesiac" role="tab" id="tab-miesiac" aria-controls="miesiac" aria-selected="false">Miesiąc</a>
 				<a href="#aktualnosci" role="tab" id="tab-aktualnosci" aria-controls="aktualnosci" aria-selected="false">Archiwum aktualności</a>
+				<a href="#kategoria" role="tab" id="tab-kategoria" aria-controls="kategoria" aria-selected="false">Kategoria</a>
 				<a href="#wpis" role="tab" id="tab-wpis" aria-controls="wpis" aria-selected="false">Wpis</a>
 			</nav>
 		</div>
@@ -53,6 +54,10 @@
 			{{ARCHIVE_NEWS}}
 		</section>
 
+		<section class="pv-view" id="kategoria" role="tabpanel" aria-labelledby="tab-kategoria" hidden>
+			{{CATEGORY}}
+		</section>
+
 		<section class="pv-view" id="wpis" role="tabpanel" aria-labelledby="tab-wpis" hidden>
 			{{SINGLE_POST}}
 		</section>
@@ -84,7 +89,7 @@
 		});
 	});
 
-	var views = ['home', 'wydarzenie', 'kalendarz', 'miesiac', 'aktualnosci', 'wpis'];
+	var views = ['home', 'wydarzenie', 'kalendarz', 'miesiac', 'aktualnosci', 'kategoria', 'wpis'];
 	function show(id, scroll) {
 		if (views.indexOf(id) < 0) { id = 'home'; }
 		views.forEach(function (v) {

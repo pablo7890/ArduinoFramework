@@ -1,6 +1,6 @@
 # Parafia: PioDesign
 
-Wersja 1.3 · autor: cruzLabs
+Wersja 1.4 · autor: cruzLabs
 
 Wtyczka WordPress dla parafiapio.pl (Avada + The Events Calendar, wersja
 darmowa): nowy układ strony głównej, archiwum aktualności, widoki wydarzeń,
@@ -270,12 +270,25 @@ Obejmuje:
   Avadzie; wtyczka pokazuje na niej archiwum zamiast jej treści, a kolejne
   strony mają adresy `/aktualnosci/page/2/`),
 - stronę wpisów z *Ustawienia → Czytanie*, jeśli jest ustawiona,
-- kategorie, tagi, archiwa miesięczne i roczne,
+- kategorie, tagi, archiwa miesięczne, dzienne i roczne, autorów,
 - wyszukiwanie ograniczone do wpisów (formularz w archiwum dodaje
   `post_type=post`).
 
-Archiwum możesz też wstawić w dowolne miejsce shortcode'em
-`[pio_archiwum]` (parametry `title`, `kicker`, `category`).
+Dwa osobne przełączniki w *Ustawienia → PioDesign → Archiwum i wpis*:
+„Strona »Aktualności« w nowym wyglądzie” (przejmuje stronę i stronę wpisów)
+oraz „Kategorie, tagi i archiwa w nowym wyglądzie”. Jeśli „Aktualności” to
+strona zbudowana w Avadzie z shortcode'em `[pio_archiwum]` (parametry
+`title`, `kicker`, `category`), wyłącz pierwszy, a drugi zostaw włączony –
+zakładki kategorii prowadzą wtedy do widoków `/category/…/` w tym samym
+stylu, a „Wszystko” wraca na Twoją stronę.
+
+**Widok kategorii (i tagu):** okruszki „← Aktualności / Kategoria”, ogromna
+nazwa kategorii, obok liczba wpisów obrysowana kolorem kategorii („od marca
+2024”, „ostatni 21 września 2026”), opis kategorii (*Wpisy → Kategorie →
+Opis*), zakładki z aktywną kategorią na początku i w jej kolorze,
+wyszukiwarka zawężona do kategorii i wstęga w kolorze kategorii pod
+nagłówkiem. Akcenty kart przejmują kolor kategorii. Ogólna kategoria
+„Aktualności” wygląda jak całe archiwum.
 
 - Nagłówek jak na stronie głównej, w uchu: liczba wpisów, numer strony i
   wyszukiwarka. Pod nim kategorie jako zakładki (z liczbą wpisów).
@@ -289,6 +302,18 @@ Archiwum możesz też wstawić w dowolne miejsce shortcode'em
   wyłączyć w opcjach archiwów, bo archiwum ma własny tytuł.
 
 ## Pojedynczy wpis
+
+**Zdjęcie nad wpisem** wtyczka dobiera sama:
+
+1. poziome zdjęcie (szersze niż 1,2 : 1) spośród obrazka wyróżniającego i
+   zdjęć z galerii wpisu, którego nie ma w treści – pionowy plakat ustawiony
+   jako wyróżniający ustępuje poziomemu zdjęciu z galerii;
+2. jeśli jedyne dobre poziome zdjęcie otwiera treść wpisu, idzie na górę, a
+   z treści znika (żeby się nie dublowało);
+3. dopiero potem zdjęcie pionowe (pokazane w całości na rozmytym tle).
+
+Karty na stronie głównej i w archiwum też wolą poziome zdjęcie z galerii od
+pionowego obrazka wyróżniającego.
 
 Wpisy (post) dostają widok w stylu wydarzenia: okruszki, kategoria i data,
 duży tytuł z zajawką, zdjęcie 16:9, obok treści przyklejony pasek (kafelek
@@ -388,6 +413,15 @@ piodesign/
 ```
 
 ## Zmiany
+
+**1.4**
+
+- Widok kategorii i tagu z prawdziwego zdarzenia (nagłówek w kolorze
+  kategorii, licznik, zakres dat, opis, wyszukiwarka w kategorii).
+- Osobny przełącznik dla kategorii/tagów/archiwów – działają także, gdy
+  „Aktualności” są stroną Avady z `[pio_archiwum]`.
+- Zdjęcie nad wpisem: poziome, bez dublowania pierwszego zdjęcia z treści.
+- Karty wolą poziome zdjęcia z galerii.
 
 **1.3**
 
