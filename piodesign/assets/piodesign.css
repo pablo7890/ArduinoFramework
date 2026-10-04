@@ -2733,7 +2733,8 @@ a.pio-cal__num:hover { background: var(--pio-ink); color: #fff !important; }
 .pio-cal__ev.pio-cal__ev:focus-visible .pio-cal__pop,
 .pio-cal__bar.pio-cal__bar:hover .pio-cal__pop,
 .pio-cal__bar.pio-cal__bar:focus-visible .pio-cal__pop { opacity: 1; visibility: visible; transform: none; }
-.pio-cal__pop-img.pio-cal__pop-img { aspect-ratio: 16 / 9; margin-bottom: 5px; border-radius: 6px; background: var(--pio-night-2) center / cover no-repeat; }
+.pio-cal__pop-img.pio-cal__pop-img { display: block; overflow: hidden; aspect-ratio: 16 / 9; margin-bottom: 5px; border-radius: 6px; background: var(--pio-night-2); }
+.pio-cal__pop-img.pio-cal__pop-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .pio-cal__pop-cat.pio-cal__pop-cat { color: var(--pio-gold); font: 750 10.5px/1.2 var(--pio-display); letter-spacing: .12em; text-transform: uppercase; }
 .pio-cal__pop-t.pio-cal__pop-t { font: 750 15px/1.25 var(--pio-display); }
 .pio-cal__pop-when.pio-cal__pop-when,

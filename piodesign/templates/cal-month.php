@@ -27,7 +27,7 @@ $pop = static function ( array $e, $right ) {
 	?>
 	<span class="pio-cal__pop<?php echo $right ? ' is-right' : ''; ?>" aria-hidden="true">
 		<?php if ( ! empty( $e['image']['src'] ) ) : ?>
-			<span class="pio-cal__pop-img" style="background-image: url('<?php echo esc_url( $e['image']['src'] ); ?>');"></span>
+			<span class="pio-cal__pop-img"><img src="<?php echo esc_url( $e['image']['src'] ); ?>" alt="" loading="lazy" decoding="async"></span>
 		<?php endif; ?>
 		<?php if ( ! empty( $e['category']['name'] ) ) : ?><span class="pio-cal__pop-cat"><?php echo esc_html( $e['category']['name'] ); ?></span><?php endif; ?>
 		<span class="pio-cal__pop-t"><?php echo esc_html( $e['title'] ); ?></span>
