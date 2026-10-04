@@ -57,7 +57,11 @@ function piodesign_settings_schema() {
 				[ 'events_mobile', 'number', 'Wydarzeń na telefonie', 5, '', [ 1, 30 ] ],
 				[ 'events_weeks', 'number', 'Długość osi (tygodnie)', 5, '', [ 2, 8 ] ],
 				[ 'events_excerpt', 'number', 'Zajawka na liście wydarzeń (znaki)', 170, '', [ 0, 400 ] ],
-				[ 'tec_subscribe', 'checkbox', 'Przycisk „Zasubskrybuj kalendarz” pod listą', 0 ],
+				[ 'tec_subscribe', 'checkbox', 'Przycisk „Subskrybuj” w kalendarzu', 0, 'Google, iPhone / Outlook i plik .ics – w pasku nad kalendarzem.' ],
+				[ 'cal_per_page', 'number', 'Kalendarz – wydarzeń na stronie listy', 12, '', [ 4, 60 ] ],
+				[ 'cal_month_max', 'number', 'Kalendarz – wydarzeń w kratce miesiąca', 3, 'Reszta pod „+2 więcej” (prowadzi do widoku dnia).', [ 1, 8 ] ],
+				[ 'cal_lit', 'checkbox', 'Kalendarz – kolor liturgiczny i święta w kratkach miesiąca', 1, 'Z wtyczki „Parafia: Kalendarz liturgiczny”.' ],
+				[ 'single_width', 'select', 'Pojedyncze wydarzenie i wpis – szerokość', 'site', 'Jeśli dla wydarzeń lub wpisów masz układ w Avada → Layouts, wtyczka go nie zastępuje: wstaw w sekcji treści element Code Block z <code>[pio_wydarzenie]</code> lub <code>[pio_wpis]</code>.', [ 'site' => 'Szerokość strony (Site Width z Avady)', 'full' => 'Cała szerokość obszaru treści' ] ],
 			],
 		],
 		'liturgy'  => [

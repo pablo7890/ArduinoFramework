@@ -11,12 +11,64 @@ function piodesign_is_single_post() {
 	return ! is_admin() && is_singular( 'post' ) && piodesign_option( 'single_post' ) && apply_filters( 'piodesign_single_post', true );
 }
 
+/**
+ * True when an Avada Layout (Avada → Layouts) replaces the content of this
+ * page. Then the layout wins and the [pio_wpis] / [pio_wydarzenie]
+ * shortcodes put our view inside it.
+ */
+function piodesign_avada_layout() {
+	if ( ! class_exists( 'Fusion_Template_Builder' ) || ! method_exists( 'Fusion_Template_Builder', 'get_instance' ) ) {
+		return false;
+	}
+	$builder = Fusion_Template_Builder::get_instance();
+	return method_exists( $builder, 'get_override' ) && (bool) $builder->get_override( 'content' );
+}
+
 add_filter(
 	'template_include',
 	static function ( $template ) {
-		return piodesign_is_single_post() ? PIODESIGN_DIR . 'wp/single-post.php' : $template;
+		return piodesign_is_single_post() && ! piodesign_avada_layout() ? PIODESIGN_DIR . 'wp/single-post.php' : $template;
 	},
 	99
+);
+
+/*
+ * [pio_wpis] and [pio_wydarzenie]: the single post / single event view for
+ * an Avada Layout section (Code Block element). Without `id` they show the
+ * post or event being viewed.
+ */
+add_shortcode(
+	'pio_wpis',
+	static function ( $atts ) {
+		static $busy = false;
+		$atts = shortcode_atts( [ 'id' => 0 ], $atts, 'pio_wpis' );
+		$id   = (int) $atts['id'] ?: ( is_singular( 'post' ) ? get_queried_object_id() : 0 );
+		if ( $busy || ! $id || 'post' !== get_post_type( $id ) ) {
+			return '';
+		}
+		$busy = true;
+		piodesign_enqueue_late();
+		$html = piodesign_single_post_html( $id );
+		$busy = false;
+		return $html;
+	}
+);
+
+add_shortcode(
+	'pio_wydarzenie',
+	static function ( $atts ) {
+		static $busy = false;
+		$atts = shortcode_atts( [ 'id' => 0 ], $atts, 'pio_wydarzenie' );
+		$id   = (int) $atts['id'] ?: ( is_singular( 'tribe_events' ) ? get_queried_object_id() : 0 );
+		if ( $busy || ! $id || 'tribe_events' !== get_post_type( $id ) || ! function_exists( 'piodesign_single_event_html' ) ) {
+			return '';
+		}
+		$busy = true;
+		piodesign_enqueue_late();
+		$html = piodesign_single_event_html( $id );
+		$busy = false;
+		return $html;
+	}
 );
 
 add_filter(

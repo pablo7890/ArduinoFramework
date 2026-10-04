@@ -20,6 +20,7 @@ $cache_dir = getenv( 'PIO_CACHE' ) ?: __DIR__ . '/.cache';
 @mkdir( $cache_dir, 0777, true );
 
 define( 'PIODESIGN_DIR', $root . '/piodesign/' );
+define( 'ABSPATH', __DIR__ . '/' ); // calendar.php checks it
 
 /* ------------------------------------------------------------ WordPress shims */
 
@@ -83,8 +84,25 @@ function apply_filters( $hook, $value, ...$args ) {
 	return $value;
 }
 
+function add_filter() {}
+function add_action() {}
+function has_filter( $hook ) { return 'kalendarz_liturgiczny_day' === $hook; }
+function get_option( $name, $default = false ) { return 'start_of_week' === $name ? 1 : $default; }
+function add_query_arg( $k, $v, $url ) { return $url; }
+function trailingslashit( $s ) { return rtrim( $s, '/' ) . '/'; }
+function piodesign_option( $key ) {
+	$o = [ 'single_width' => 'site', 'cal_month_max' => 3, 'cal_lit' => 1, 'cal_per_page' => 12, 'tec_subscribe' => 0, 'events_weeks' => 5 ];
+	return $o[ $key ] ?? '';
+}
+// The calendar's links: views switch tabs in the preview, the rest stays put.
+class Tribe__Events__Main {
+	public static function instance() { return new self(); }
+	public function getLink( $type, $date = false, $term = null ) { return 'month' === $type ? '#miesiac' : ( 'list' === $type ? '#kalendarz' : '#miesiac' ); }
+}
+
 require PIODESIGN_DIR . 'includes/core.php';
 require PIODESIGN_DIR . 'includes/sections-core.php';
+require PIODESIGN_DIR . 'includes/calendar.php';
 function piodesign_now() { return $GLOBALS['now']; }
 // Fresh assets/piodesign.css from assets/src/piodesign.css.
 passthru( escapeshellarg( PHP_BINARY ) . ' ' . escapeshellarg( PIODESIGN_DIR . 'tools/build-css.php' ) . ' >&2' );
@@ -276,30 +294,49 @@ $single    = piodesign_render(
 	]
 );
 
-// Archive: TEC list view = hero (our hook) + TEC events bar + our rows.
-$archive_rows = '';
-$last_month   = '';
-foreach ( array_slice( $upcoming, 0, 12 ) as $k => $e ) {
-	$sep = max( $e['ymd'], $now->format( 'Y-m-d' ) );
-	$m   = substr( $sep, 0, 7 );
-	if ( $m !== $last_month ) {
-		$d             = new DateTimeImmutable( $sep, $tz );
-		$archive_rows .= piodesign_render( 'partials/month-head', [ 'month' => piodesign_months( 'nom' )[ (int) $d->format( 'n' ) ], 'year' => $d->format( 'Y' ) ] );
-		$last_month    = $m;
-	}
-	$archive_rows .= piodesign_render( 'partials/event-row', [ 'e' => $e, 'context' => 'archive', 'i' => $k ] );
+// Calendar pages: the same frame and views as on the site (list and month).
+$cal_state = [ 'view' => 'list', 'past' => false, 'term' => null, 'keyword' => '', 'page' => 1, 'day' => null, 'now' => $now ];
+$groups    = [];
+foreach ( array_slice( $upcoming, 0, 12 ) as $e ) {
+	$sep = new DateTimeImmutable( max( $e['ymd'], $now->format( 'Y-m-d' ) ), $tz );
+	$key = $sep->format( 'Y-m' );
+	$groups[ $key ] = $groups[ $key ] ?? [ 'month' => piodesign_months( 'nom' )[ (int) $sep->format( 'n' ) ], 'year' => $sep->format( 'Y' ), 'events' => [] ];
+	$groups[ $key ]['events'][] = $e;
 }
-$archive = piodesign_render(
-	'archive-hero',
-	[
-		'day'      => $day,
-		'timeline' => piodesign_timeline( $events, $now ),
-		'search'   => [ 'action' => '#kalendarz', 'value' => '', 'month_url' => 'https://parafiapio.pl/wydarzenia/miesiac/' ],
-	]
+$cal_cats = [];
+foreach ( $events as $e ) {
+	if ( ! empty( $e['category']['slug'] ) ) {
+		$cal_cats[ $e['category']['slug'] ] = [ 'name' => $e['category']['name'], 'url' => '#kalendarz', 'color' => piodesign_event_cat_color( $e['category']['slug'] ), 'active' => false ];
+	}
+}
+$cal_frame = static function ( array $st, $body, $title, $timeline ) use ( $day, $cal_cats ) {
+	return piodesign_render(
+		'calendar',
+		[
+			's'         => $st,
+			'body'      => $body,
+			'title'     => $title,
+			'kicker'    => 'Kalendarz',
+			'desc'      => '',
+			'day'       => $day,
+			'timeline'  => $timeline,
+			'cats'      => array_values( $cal_cats ),
+			'all_url'   => '#' . ( 'month' === $st['view'] ? 'miesiac' : 'kalendarz' ),
+			'views'     => [ 'list' => '#kalendarz', 'month' => '#miesiac' ],
+			'search'    => [ 'action' => '#kalendarz', 'value' => '', 'clear' => '#kalendarz' ],
+			'count'     => null,
+			'subscribe' => [],
+		]
+	);
+};
+$archive = $cal_frame(
+	$cal_state,
+	piodesign_render( 'cal-list', [ 's' => $cal_state, 'groups' => $groups, 'total' => count( $upcoming ), 'pager' => [], 'past_url' => '#kalendarz', 'list_url' => '#kalendarz', 'month_url' => '#miesiac', 'from' => null ] ),
+	'Nadchodzące wydarzenia',
+	piodesign_timeline( $events, $now )
 );
-// TEC's list container and its own prev / next links, as TEC renders them.
-$archive .= '<div class="tribe-events-view tribe-events-view--list"><div class="tribe-events-calendar-list">' . $archive_rows . '</div>'
-	. '<nav class="tribe-events-c-nav"><ul class="tribe-events-c-nav__list"><li><button class="tribe-events-c-nav__prev" disabled>‹ Poprzednie wydarzenia</button></li><li><a class="tribe-events-c-nav__next" href="#kalendarz">Następne wydarzenia ›</a></li></ul></nav></div>';
+$month_state = [ 'view' => 'month' ] + $cal_state;
+$month_html  = $cal_frame( $month_state, piodesign_cal_month_render( $month_state, $events, static fn() => null ), 'Nadchodzące wydarzenia', null );
 
 // Single news post: the second story, with its FooGallery shown as a plain grid.
 $sp      = $data['single_post'];
@@ -372,6 +409,7 @@ $html  = strtr(
 		'{{HOME}}'     => $home,
 		'{{SINGLE}}'   => $single,
 		'{{ARCHIVE}}'  => $archive,
+		'{{MONTH}}'    => $month_html,
 		'{{TODAY}}'    => esc_html( $today ),
 		'{{NPOSTS}}'   => 15,
 		'{{ARCHIVE_NEWS}}' => $news_archive,

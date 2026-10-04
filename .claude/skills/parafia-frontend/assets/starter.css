@@ -1,0 +1,129 @@
+/*
+ * Starter stylesheet for a cruzLabs parish plugin (from Parafia: PioDesign).
+ *
+ * 1. Copy to <plugin>/assets/src/<plugin>.css.
+ * 2. Replace the prefix: sed -i 's/\bpio-/xx-/g; s/\.pio\b/.xx/g' (keep the
+ *    --pio-* token names if you want PioDesign's Custom CSS overrides to apply
+ *    to both plugins; otherwise rename them too).
+ * 3. Build: php build-css.php assets/src/<plugin>.css assets/<plugin>.css
+ *
+ * Tokens, the theme-neutralising resets and the icon baseline follow.
+ */
+
+.pio {
+	--pio-ink: #1c1d21;
+	--pio-paper: #ffffff;
+	--pio-mist: #f4f3f1;
+	--pio-night: #14161b;
+	--pio-night-2: #1d2027;
+	--pio-rust: #c14e00;
+	--pio-gold: #dba562;
+	--pio-muted: #62656d;
+	--pio-line: #e4e3e0;
+	--lit: #3f7a4f;
+
+	/*
+	 * Typefaces come from Avada (Global Options → Typography): headings use
+	 * the H1 face, running text the body face. Sizes, weights and widths
+	 * below are tuned to work with a grotesque (Bricolage Grotesque, whose
+	 * width axis gives the condensed titles) and with a serif (Iowan Old
+	 * Style), where font-stretch simply has no effect.
+	 */
+	--pio-display: var(--h1_typography-font-family, var(--awb-typography1-font-family, system-ui, sans-serif));
+	--pio-text: var(--body_typography-font-family, var(--awb-typography4-font-family, Georgia, serif));
+	--pio-track-xl: -.022em; /* very large titles */
+	--pio-track-l: -.015em;  /* large titles, big numbers */
+
+	--pio-radius: 4px;
+	--pio-ease: cubic-bezier(.2, .7, .1, 1);
+	--pio-page-bg: var(--pio-paper);
+
+	/* Component colours (light context) */
+	--c-fg: var(--pio-ink);
+	--c-muted: var(--pio-muted);
+	--c-line: var(--pio-line);
+	--c-hover: rgba(28, 29, 33, .035);
+	--c-accent: var(--pio-rust);
+	--c-chip: rgba(193, 78, 0, .1);
+}
+
+/* ---------------------------------------------------------------- base */
+
+.pio {
+	color: var(--c-fg);
+	font-family: var(--pio-text);
+	font-size: 17px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+.pio *,
+.pio *::before,
+.pio *::after { box-sizing: border-box; }
+
+/*
+ * Neutralise the theme. Avada styles bare elements (`h2`, `.post-content h4`,
+ * `p`, `a`) with its own fonts, colours and margins. :where() keeps these
+ * resets at the specificity of `.pio` alone, so every component rule below
+ * still overrides them.
+ */
+.pio :where(p, ul, ol, li, dl, dd, dt, figure, blockquote) { margin: 0; padding: 0; }
+.pio :where(p, span, a, time, small, b, strong, em, i, li, dd, dt, button, label, input, figcaption) {
+	font-family: inherit;
+	letter-spacing: inherit;
+	text-transform: inherit;
+}
+.pio :where(a) { color: inherit; text-decoration: none; box-shadow: none; }
+.pio :where(a, button, [tabindex]):focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; border-radius: 2px; }
+.pio :where(h1, h2, h3, h4, h5, h6) {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	color: inherit;
+	font-family: var(--pio-display);
+	font-size: inherit;
+	font-weight: 700;
+	line-height: 1.12;
+	letter-spacing: -.01em;
+	text-transform: none;
+	text-wrap: balance;
+}
+.pio :where(h1, h2, h3, h4, h5, h6)::before,
+.pio :where(h1, h2, h3, h4, h5, h6)::after { content: none; }
+.pio :where(img) { max-width: 100%; }
+.pio :where(abbr[title]) { text-decoration: none; border: 0; }
+.pio :where(blockquote, q, address, figure) {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	box-shadow: none;
+	color: inherit;
+	font-style: normal;
+	quotes: none;
+}
+.pio :where(blockquote)::before,
+.pio :where(blockquote)::after { content: none; }
+.pio :where(button) { text-transform: none; letter-spacing: inherit; box-shadow: none; text-shadow: none; }
+.pio :where(dl) { margin: 0; }
+/* Avada's text block may add a <br> between two shortcodes. */
+.pio + br { display: none; }
+.pio [hidden],
+.pio[hidden] { display: none !important; }
+.pio .screen-reader-text {
+	position: absolute !important;
+	width: 1px; height: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+	white-space: nowrap;
+}
+.pio-i { flex: none; vertical-align: -3px; }
+
+/* Sticky parts clear the theme's sticky header (JS sets --pio-top on <html>). */
+.pio-sticky { position: sticky; top: calc(var(--pio-top, 0px) + 24px); }
+
+/* Never wider than Avada's site width. */
+.pio-w-site { width: 100%; max-width: var(--pio-max, var(--site_width, 1200px)); margin-inline: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+	.pio *, .pio *::before, .pio *::after { animation: none !important; transition: none !important; }
+}

@@ -12,7 +12,7 @@
 
 $year = $e['year'];
 ?>
-<article class="pio pio-single" id="pio-ev-<?php echo (int) $e['id']; ?>">
+<article class="pio pio-single<?php echo 'site' === piodesign_option( 'single_width' ) ? ' pio-w-site' : ''; ?>" id="pio-ev-<?php echo (int) $e['id']; ?>">
 	<nav class="pio-crumbs" aria-label="Okruszki">
 		<a href="<?php echo esc_url( $calendar_url ); ?>"><?php echo piodesign_icon( 'arrow-l' ); // phpcs:ignore ?> Kalendarz parafii</a>
 		<span aria-hidden="true">/</span>
@@ -23,7 +23,14 @@ $year = $e['year'];
 		<p class="pio-ev__rel">
 			<span class="pio-rel pio-rel--<?php echo esc_attr( $e['status'] ); ?>"><?php echo esc_html( $e['relative'] ); ?></span>
 			<?php if ( $e['featured'] ) : ?><span class="pio-flag">Polecamy</span><?php endif; ?>
-			<?php if ( ! empty( $e['category']['name'] ) ) : ?><span class="pio-ev__cat"><?php echo esc_html( $e['category']['name'] ); ?></span><?php endif; ?>
+			<?php if ( ! empty( $e['category']['name'] ) ) : ?>
+				<?php $cat_link = get_term_link( $e['category']['slug'], 'tribe_events_cat' ); ?>
+				<?php if ( is_string( $cat_link ) ) : ?>
+					<a class="pio-ev__cat" href="<?php echo esc_url( $cat_link ); ?>"><?php echo esc_html( $e['category']['name'] ); ?></a>
+				<?php else : ?>
+					<span class="pio-ev__cat"><?php echo esc_html( $e['category']['name'] ); ?></span>
+				<?php endif; ?>
+			<?php endif; ?>
 		</p>
 		<h1 class="pio-single__title"><?php echo esc_html( $e['title'] ); ?></h1>
 		<p class="pio-single__sub"><?php echo esc_html( piodesign_ucfirst( $e['when'] ) ); ?> · <?php echo esc_html( $e['time'] ); ?><?php echo $e['venue']['name'] ? ' · ' . esc_html( $e['venue']['name'] ) : ''; ?></p>

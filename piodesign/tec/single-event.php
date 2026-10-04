@@ -11,9 +11,7 @@ defined( 'ABSPATH' ) || exit;
 wp_enqueue_style( 'piodesign' );
 wp_enqueue_script( 'piodesign' );
 
-if ( function_exists( 'tribe_the_notices' ) ) {
-	tribe_the_notices();
-}
+// TEC's notices ("This event has passed") are not printed: the ticket shows the status.
 
 while ( have_posts() ) {
 	the_post();

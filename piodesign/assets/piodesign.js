@@ -592,6 +592,71 @@
 		});
 	}
 
+	/* ------------------------------------------------------------ sticky header offset */
+
+	/*
+	 * Sticky parts (event ticket, post rail) and anchor jumps must clear the
+	 * theme's sticky header and the admin bar, whose height changes as Avada
+	 * shrinks the header on scroll. We look at what sits at the very top of
+	 * the viewport, find fixed / sticky boxes there and publish their bottom
+	 * edge as --pio-top on <html>.
+	 */
+	function initStickyTop() {
+		if (!document.querySelector('.pio-ticket, .pio-post__rail, .pio-cal, .pio-single, .pio-post')) { return; }
+		var root = document.documentElement;
+		var last = -1;
+		var queued = false;
+
+		function pinned(el) {
+			for (var n = el; n && n !== document.body && n !== root; n = n.parentElement) {
+				if (n.closest && n.closest('.pio')) { return null; }
+				var pos = getComputedStyle(n).position;
+				if (pos === 'fixed' || pos === 'sticky') { return n; }
+			}
+			return null;
+		}
+		function measure() {
+			queued = false;
+			var bottom = 0;
+			var xs = [Math.round(innerWidth / 2), 24, innerWidth - 24];
+			// Bars can be stacked (admin bar, then the header): probe just below each one.
+			for (var step = 0; step < 4 && document.elementsFromPoint; step++) {
+				var y = bottom + 1;
+				var next = bottom;
+				for (var i = 0; i < xs.length; i++) {
+					var stack = document.elementsFromPoint(xs[i], y);
+					for (var k = 0; k < stack.length; k++) {
+						var box = pinned(stack[k]);
+						if (!box) { continue; }
+						var r = box.getBoundingClientRect();
+						if (r.top <= y && r.bottom > y && r.height < innerHeight * 0.45) {
+							next = Math.max(next, Math.round(r.bottom));
+						}
+					}
+				}
+				if (next === bottom) { break; }
+				bottom = next;
+			}
+			if (bottom !== last) {
+				last = bottom;
+				root.style.setProperty('--pio-top', bottom + 'px');
+			}
+			// A sticky box taller than the room under the header would never
+			// show its bottom part: let it scroll with the page instead.
+			Array.prototype.forEach.call(document.querySelectorAll('.pio-ticket, .pio-post__rail'), function (el) {
+				el.classList.toggle('is-unstuck', el.offsetHeight > innerHeight - bottom - 48);
+			});
+		}
+		function queue() {
+			if (!queued) { queued = true; window.requestAnimationFrame(measure); }
+		}
+		measure();
+		window.addEventListener('scroll', queue, { passive: true });
+		window.addEventListener('resize', queue);
+		// Avada animates the header shrink; measure again when it settles.
+		document.addEventListener('transitionend', queue, true);
+	}
+
 	/* ------------------------------------------------------------ boot */
 
 	function boot() {
@@ -604,6 +669,7 @@
 		initCarousels(document);
 		initInfo(document);
 		initLiturgy(document);
+		initStickyTop();
 
 		// TEC list view swaps its markup over AJAX (search, next page).
 		if (window.jQuery) {

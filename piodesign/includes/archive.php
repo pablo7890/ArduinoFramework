@@ -21,7 +21,10 @@ function piodesign_is_news_archive() {
 	if ( $page && is_page( $page ) ) {
 		return true;
 	}
-	return ( is_home() && ! is_front_page() ) || is_category() || is_tag() || ( is_date() && ! is_day() );
+	if ( function_exists( 'tribe_is_event_query' ) && tribe_is_event_query() ) {
+		return false;
+	}
+	return ( is_home() && ! is_front_page() ) || is_category() || is_tag() || is_date() || is_author();
 }
 
 /** Current page number on archives and on a static page (/aktualnosci/page/2/). */
@@ -36,7 +39,7 @@ add_action(
 			return;
 		}
 		$is_search = $q->is_search() && 'post' === $q->get( 'post_type' );
-		if ( ( $q->is_home() && ! $q->is_front_page() ) || $q->is_category() || $q->is_tag() || ( $q->is_date() && ! $q->is_day() ) || $is_search ) {
+		if ( 'tribe_events' !== $q->get( 'post_type' ) && ( ( $q->is_home() && ! $q->is_front_page() ) || $q->is_category() || $q->is_tag() || $q->is_date() || $q->is_author() || $is_search ) ) {
 			$q->set( 'posts_per_page', (int) piodesign_option( 'archive_per_page' ) );
 		}
 	}
@@ -103,6 +106,12 @@ function piodesign_news_archive_html( array $args = [] ) {
 	} elseif ( is_month() && ! $on_page ) {
 		$kicker = 'Archiwum';
 		$title  = piodesign_months( 'nom' )[ (int) get_query_var( 'monthnum' ) ] . ' ' . get_query_var( 'year' );
+	} elseif ( is_day() && ! $on_page ) {
+		$kicker = 'Archiwum';
+		$title  = (int) get_query_var( 'day' ) . ' ' . piodesign_months()[ (int) get_query_var( 'monthnum' ) ] . ' ' . get_query_var( 'year' );
+	} elseif ( is_author() && ! $on_page ) {
+		$kicker = 'Autor';
+		$title  = get_the_author_meta( 'display_name', (int) get_query_var( 'author' ) );
 	} elseif ( is_year() && ! $on_page ) {
 		$kicker = 'Archiwum';
 		$title  = 'Rok ' . get_query_var( 'year' );

@@ -36,7 +36,6 @@
 
 	--pio-radius: 4px;
 	--pio-ease: cubic-bezier(.2, .7, .1, 1);
-	--pio-sticky-top: 110px; /* Avada sticky header height */
 	--pio-page-bg: var(--pio-paper);
 
 	/* Component colours (light context) */
@@ -1129,6 +1128,8 @@ a.pio-pager__step:hover { border-color: var(--c-fg); background: var(--c-fg); co
 .pio-archive-hero.pio-archive-hero {
 	--pio-page-bg: var(--pio-paper);
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	min-width: 0;
 	gap: 18px;
 	margin-bottom: clamp(24px, 3vw, 40px);
 	padding-bottom: 28px;
@@ -1246,7 +1247,8 @@ body.pio-tec-single #content {
 /* ticket */
 .pio-ticket.pio-ticket {
 	position: sticky;
-	top: var(--pio-sticky-top);
+	top: calc(var(--pio-top, 0px) + 24px);
+	transition: top .3s var(--pio-ease);
 	display: grid;
 	/* No filter: drop-shadow here. A filtered element is repainted whenever
 	   anything inside changes, so the shadow flickered with every second of
@@ -2306,8 +2308,14 @@ body.pio-tec-single #content {
 	transition: background-color .25s, color .25s;
 }
 .pio-calbar__views.pio-calbar__views a .pio-i { width: 16px; height: 16px; }
-.pio-calbar__views.pio-calbar__views a:hover { color: var(--c-fg); }
-.pio-calbar__views.pio-calbar__views a.is-active { background: var(--c-fg); color: var(--pio-paper); }
+/* !important: Avada colours visited links on TEC pages (.fusion-body .tribe-common a:visited). */
+.pio-calbar__views.pio-calbar__views a,
+.pio-calbar__views.pio-calbar__views a:visited { color: var(--c-muted) !important; }
+.pio-calbar__views.pio-calbar__views a:hover { background: var(--pio-mist); color: var(--pio-ink) !important; }
+.pio-calbar__views.pio-calbar__views a.is-active,
+.pio-calbar__views.pio-calbar__views a.is-active:visited,
+.pio-calbar__views.pio-calbar__views a.is-active:hover,
+.pio-calbar__views.pio-calbar__views a.is-active:focus { background: var(--pio-ink); color: #fff !important; }
 .pio-calbar__result.pio-calbar__result { flex-basis: 100%; color: var(--c-muted); font: 500 14.5px/1.4 var(--pio-display); }
 .pio-calbar__result.pio-calbar__result a { color: var(--pio-rust); text-decoration: underline; }
 
@@ -2371,7 +2379,8 @@ body.pio-tec-single #content {
 }
 .pio-post__rail.pio-post__rail {
 	position: sticky;
-	top: var(--pio-sticky-top);
+	top: calc(var(--pio-top, 0px) + 24px);
+	transition: top .3s var(--pio-ease);
 	display: grid;
 	gap: 18px;
 	padding-top: 6px;
@@ -2493,3 +2502,343 @@ body.pio-tec-single #content {
 	}
 	.pio-frame.pio-frame > img { transform: none !important; }
 }
+
+/* ---------------------------------------------------------------- calendar pages (list, month, day) */
+
+.pio-cal-page.pio-cal-page { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(22px, 3vw, 36px); min-width: 0; }
+.pio-cal-page.pio-cal-page .pio-archive-hero { margin-bottom: 0; }
+.pio-cal-page.pio-cal-page .pio-calbar__cats { margin-top: -4px; }
+.pio-cal-page.pio-cal-page a:visited { color: inherit; }
+@media (max-width: 700px) {
+	/* Phones: no day box, straight to the calendar (as on the homepage). */
+	.pio-cal-page.pio-cal-page .pio-mast__day { display: none; }
+	.pio-cal-page.pio-cal-page .pio-mast__top { padding-bottom: 0; border-bottom: 0; }
+}
+
+.pio-calbar__sub.pio-calbar__sub { position: relative; }
+.pio-calbar__sub.pio-calbar__sub summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 10px 16px;
+	border: 1px solid var(--c-line);
+	border-radius: 999px;
+	color: var(--c-fg);
+	font: 650 14px/1 var(--pio-display);
+	list-style: none;
+	cursor: pointer;
+}
+.pio-calbar__sub.pio-calbar__sub summary::-webkit-details-marker { display: none; }
+.pio-calbar__sub.pio-calbar__sub summary .pio-i { width: 16px; height: 16px; }
+.pio-calbar__sub.pio-calbar__sub[open] summary { border-color: var(--pio-ink); }
+.pio-calbar__sub.pio-calbar__sub ul {
+	position: absolute;
+	top: calc(100% + 6px);
+	right: 0;
+	z-index: 30;
+	min-width: 230px;
+	padding: 6px;
+	border: 1px solid var(--c-line);
+	border-radius: 10px;
+	background: var(--pio-paper);
+	box-shadow: 0 18px 40px -18px rgba(20, 22, 27, .35);
+	list-style: none;
+}
+.pio-calbar__sub.pio-calbar__sub a { display: block; padding: 10px 12px; border-radius: 6px; font: 600 14px/1.2 var(--pio-display); }
+.pio-calbar__sub.pio-calbar__sub a:hover { background: var(--pio-mist); color: var(--pio-rust); }
+
+/* heading shared by month and day */
+.pio-cal__head.pio-cal__head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 24px; min-width: 0; }
+.pio-cal__title.pio-cal__title {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0 .28em;
+	margin: 0 !important;
+	font: 800 clamp(2.3rem, 5.4vw, 4.2rem)/.92 var(--pio-display) !important;
+	font-stretch: 75% !important;
+	letter-spacing: var(--pio-track-xl) !important;
+}
+.pio-cal__wd.pio-cal__wd { flex-basis: 100%; margin-bottom: 10px; color: var(--pio-rust); font: 800 13px/1 var(--pio-display); font-stretch: 100%; letter-spacing: .14em; text-transform: uppercase; }
+.pio-cal__sum.pio-cal__sum { padding-bottom: .35em; color: var(--c-muted); font: 650 14px/1 var(--pio-display); letter-spacing: .02em; }
+.pio-cal__nav.pio-cal__nav { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.pio-cal__step.pio-cal__step {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 10px 16px;
+	border: 1px solid var(--c-line);
+	border-radius: 999px;
+	background: var(--pio-paper);
+	color: var(--c-fg) !important;
+	font: 650 14px/1 var(--pio-display);
+	transition: background-color .25s, border-color .25s, color .25s;
+}
+.pio-cal__step.pio-cal__step .pio-i { width: 16px; height: 16px; }
+.pio-cal__step.pio-cal__step:hover { border-color: var(--pio-ink); background: var(--pio-ink); color: #fff !important; }
+.pio-cal__step.pio-cal__step.is-today { border-color: transparent; background: var(--c-chip); color: var(--pio-rust) !important; }
+.pio-cal__step.pio-cal__step.is-today:hover { background: var(--pio-rust); color: #fff !important; }
+
+/* month grid */
+.pio-cal.pio-cal {
+	--pio-cal-bar: 25px;
+	--pio-cal-min: 70px;
+	container: cal / inline-size;
+	display: grid;
+	gap: 18px;
+	min-width: 0;
+}
+.pio-cal__grid.pio-cal__grid { position: relative; min-width: 0; border: 1px solid var(--c-line); border-radius: 12px; background: var(--pio-paper); }
+.pio-cal__wds.pio-cal__wds {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	border-bottom: 1px solid var(--c-line);
+	border-radius: 12px 12px 0 0;
+	background: var(--pio-mist);
+}
+.pio-cal__wds.pio-cal__wds span { padding: 11px 12px; color: var(--c-muted); font: 750 11.5px/1 var(--pio-display); letter-spacing: .12em; text-transform: uppercase; }
+.pio-cal__wds.pio-cal__wds span.is-sunday { color: var(--pio-rust); }
+.pio-cal__wds.pio-cal__wds abbr { border: 0; text-decoration: none; cursor: default; }
+.pio-cal__week.pio-cal__week {
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	row-gap: 3px;
+	padding-bottom: 8px;
+}
+.pio-cal__week.pio-cal__week + .pio-cal__week { border-top: 1px solid var(--c-line); }
+.pio-cal__week.pio-cal__week:hover,
+.pio-cal__week.pio-cal__week:focus-within { z-index: 5; }
+.pio-cal__cell.pio-cal__cell { grid-row: 1 / -1; margin-bottom: -8px; border-left: 1px solid var(--c-line); transition: background-color .25s; }
+.pio-cal__cell.pio-cal__cell.is-c1 { border-left: 0; }
+.pio-cal__cell.pio-cal__cell.is-sunday { background: rgba(193, 78, 0, .025); }
+.pio-cal__cell.pio-cal__cell.is-out { background: repeating-linear-gradient(135deg, transparent 0 7px, rgba(28, 29, 33, .025) 7px 8px); }
+.pio-cal__cell.pio-cal__cell.is-today { background: rgba(193, 78, 0, .06); box-shadow: inset 0 3px 0 var(--pio-rust); }
+.pio-cal__week.pio-cal__week:last-child .pio-cal__cell.is-c1 { border-bottom-left-radius: 12px; }
+.pio-cal__week.pio-cal__week:last-child .pio-cal__cell.is-c7 { border-bottom-right-radius: 12px; }
+.pio-cal__dhead.pio-cal__dhead {
+	position: relative;
+	z-index: 1;
+	grid-row: 1;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	min-width: 0;
+	padding: 8px 10px 4px 8px;
+}
+.pio-cal__num.pio-cal__num {
+	display: inline-grid;
+	flex: none;
+	place-items: center;
+	min-width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	color: var(--c-fg) !important;
+	font: 750 15px/1 var(--pio-display);
+	font-variant-numeric: tabular-nums;
+	transition: background-color .2s, color .2s;
+}
+a.pio-cal__num:hover { background: var(--pio-ink); color: #fff !important; }
+.pio-cal__dhead.pio-cal__dhead.is-sunday .pio-cal__num { color: var(--pio-rust) !important; }
+.pio-cal__dhead.pio-cal__dhead.is-out .pio-cal__num { color: var(--c-muted) !important; opacity: .55; }
+.pio-cal__dhead.pio-cal__dhead.is-today .pio-cal__num { background: var(--pio-rust); color: #fff !important; }
+.pio-cal__lit.pio-cal__lit { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18); }
+.pio-cal__feast.pio-cal__feast { min-width: 0; overflow: hidden; color: var(--c-muted); font: 600 11.5px/1.2 var(--pio-display); text-overflow: ellipsis; white-space: nowrap; }
+.pio-cal__dots.pio-cal__dots,
+.pio-cal__tap.pio-cal__tap { display: none; }
+.pio-cal__items.pio-cal__items {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	align-content: start;
+	gap: 3px;
+	min-width: 0;
+	margin: 0 !important;
+	padding: 0 6px !important;
+	list-style: none !important;
+}
+.pio-cal__items.pio-cal__items li { margin: 0; padding: 0; min-width: 0; }
+.pio-cal__items.pio-cal__items li::before { content: none !important; }
+.pio-cal__ev.pio-cal__ev {
+	position: relative;
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	min-width: 0;
+	padding: 5px 7px;
+	border-left: 3px solid var(--cat);
+	border-radius: 4px 6px 6px 4px;
+	background: color-mix(in srgb, var(--cat) 9%, var(--pio-paper));
+	color: var(--c-fg) !important;
+	font: 600 12.5px/1.25 var(--pio-display);
+	transition: background-color .2s;
+}
+.pio-cal__ev.pio-cal__ev:hover,
+.pio-cal__ev.pio-cal__ev:focus-visible { background: color-mix(in srgb, var(--cat) 18%, var(--pio-paper)); }
+.pio-cal__ev.pio-cal__ev time { flex: none; color: var(--cat); font-weight: 800; font-variant-numeric: tabular-nums; }
+.pio-cal__ev.pio-cal__ev.is-allday { border-left-width: 6px; }
+.pio-cal.pio-cal .pio-cal__t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pio-cal.pio-cal .is-past { opacity: .5; }
+.pio-cal__more.pio-cal__more { display: inline-block; padding: 2px 7px; color: var(--pio-rust) !important; font: 750 12px/1.4 var(--pio-display); }
+.pio-cal__more.pio-cal__more:hover { text-decoration: underline; }
+.pio-cal__bar.pio-cal__bar {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	min-width: 0;
+	height: calc(var(--pio-cal-bar) - 3px);
+	margin: 0 5px;
+	padding: 0 10px;
+	border-radius: 6px;
+	background: var(--cat);
+	color: #fff !important;
+	font: 700 12px/1 var(--pio-display);
+	box-shadow: 0 6px 14px -10px var(--cat);
+	transition: filter .2s, transform .2s var(--pio-ease);
+}
+.pio-cal__bar.pio-cal__bar:hover,
+.pio-cal__bar.pio-cal__bar:focus-visible { filter: brightness(1.1); }
+.pio-cal__bar.pio-cal__bar.is-left { margin-left: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.pio-cal__bar.pio-cal__bar.is-right { margin-right: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.pio-cal__bar.pio-cal__bar.is-left::before { content: "←"; margin-right: 6px; opacity: .7; }
+.pio-cal__bar.pio-cal__bar.is-right::after { content: "→"; margin-left: auto; padding-left: 6px; opacity: .7; }
+
+/* hover card */
+.pio-cal__pop.pio-cal__pop {
+	position: absolute;
+	top: calc(100% + 8px);
+	left: 0;
+	z-index: 40;
+	display: grid;
+	gap: 5px;
+	width: 270px;
+	padding: 12px;
+	border-radius: 10px;
+	background: var(--pio-night);
+	color: #f4f1ea;
+	font-family: var(--pio-display);
+	text-align: left;
+	white-space: normal;
+	box-shadow: 0 22px 44px -18px rgba(20, 22, 27, .6);
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-4px);
+	transition: opacity .18s, transform .18s var(--pio-ease), visibility .18s;
+	pointer-events: none;
+}
+.pio-cal__pop.pio-cal__pop.is-right { right: 0; left: auto; }
+.pio-cal__ev.pio-cal__ev:hover .pio-cal__pop,
+.pio-cal__ev.pio-cal__ev:focus-visible .pio-cal__pop,
+.pio-cal__bar.pio-cal__bar:hover .pio-cal__pop,
+.pio-cal__bar.pio-cal__bar:focus-visible .pio-cal__pop { opacity: 1; visibility: visible; transform: none; }
+.pio-cal__pop-img.pio-cal__pop-img { aspect-ratio: 16 / 9; margin-bottom: 5px; border-radius: 6px; background: var(--pio-night-2) center / cover no-repeat; }
+.pio-cal__pop-cat.pio-cal__pop-cat { color: var(--pio-gold); font: 750 10.5px/1.2 var(--pio-display); letter-spacing: .12em; text-transform: uppercase; }
+.pio-cal__pop-t.pio-cal__pop-t { font: 750 15px/1.25 var(--pio-display); }
+.pio-cal__pop-when.pio-cal__pop-when,
+.pio-cal__pop-where.pio-cal__pop-where { color: rgba(244, 241, 234, .72); font: 550 13px/1.35 var(--pio-display); }
+@media (hover: none) { .pio-cal__pop.pio-cal__pop { display: none; } }
+
+.pio-cal__agenda.pio-cal__agenda { display: none; }
+
+/* narrow: compact month + agenda */
+@container cal (max-width: 719px) {
+	.pio-cal__items.pio-cal__items,
+	.pio-cal__bar.pio-cal__bar,
+	.pio-cal__feast.pio-cal__feast { display: none; }
+	.pio-cal__week.pio-cal__week { grid-template-rows: auto !important; padding-bottom: 0; }
+	.pio-cal__cell.pio-cal__cell { margin-bottom: 0; }
+	.pio-cal__dhead.pio-cal__dhead { flex-direction: column; gap: 5px; min-height: 58px; padding: 7px 2px 8px; }
+	.pio-cal__num.pio-cal__num { min-width: 30px; height: 30px; font-size: 14px; }
+	.pio-cal__lit.pio-cal__lit { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; }
+	.pio-cal__dots.pio-cal__dots { display: flex; gap: 3px; }
+	.pio-cal__dots.pio-cal__dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--cat); }
+	.pio-cal__tap.pio-cal__tap { position: absolute; inset: 0; z-index: 2; display: block; }
+	.pio-cal__wds.pio-cal__wds span { padding: 9px 2px; font-size: 10.5px; letter-spacing: .06em; text-align: center; }
+	.pio-cal__nav.pio-cal__nav { width: 100%; margin-left: 0; }
+	.pio-cal__step.pio-cal__step { flex: 1 1 auto; }
+	.pio-cal__agenda.pio-cal__agenda { display: grid; gap: 16px; }
+}
+.pio-cal__aday.pio-cal__aday {
+	display: grid;
+	grid-template-columns: 52px minmax(0, 1fr);
+	gap: 12px;
+	padding-top: 14px;
+	border-top: 1px solid var(--c-line);
+	scroll-margin-top: calc(var(--pio-top, 0px) + 16px);
+}
+.pio-cal__aday.pio-cal__aday:target .pio-cal__adate b { color: var(--pio-rust); }
+.pio-cal__adate.pio-cal__adate { display: grid; align-content: start; gap: 4px; font-family: var(--pio-display); }
+.pio-cal__adate.pio-cal__adate b { font-size: 2rem; font-weight: 800; font-stretch: 80%; line-height: 1; transition: color .3s; }
+.pio-cal__adate.pio-cal__adate span { color: var(--c-muted); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pio-cal__adate.pio-cal__adate.is-sunday b { color: var(--pio-rust); }
+.pio-cal__aday.pio-cal__aday ul { display: grid; gap: 6px; margin: 0 !important; padding: 0 !important; list-style: none !important; }
+.pio-cal__aday.pio-cal__aday li { margin: 0; padding: 0; }
+.pio-cal__aday.pio-cal__aday li::before { content: none !important; }
+.pio-cal__arow.pio-cal__arow {
+	display: grid;
+	gap: 3px;
+	padding: 10px 12px;
+	border-left: 3px solid var(--cat);
+	border-radius: 4px 8px 8px 4px;
+	background: color-mix(in srgb, var(--cat) 8%, var(--pio-paper));
+	color: var(--c-fg) !important;
+	font-family: var(--pio-display);
+}
+.pio-cal__atime.pio-cal__atime { color: var(--cat); font-size: 12px; font-weight: 800; letter-spacing: .02em; }
+.pio-cal__arow.pio-cal__arow .pio-cal__t { overflow: visible; font-size: 15.5px; font-weight: 700; line-height: 1.3; white-space: normal; }
+.pio-cal__arow.pio-cal__arow small { color: var(--c-muted); font-size: 12.5px; }
+
+/* list & day */
+.pio-cal-list.pio-cal-list,
+.pio-cal-day.pio-cal-day { display: grid; gap: 14px; min-width: 0; }
+.pio-cal-list.pio-cal-list .pio-month { margin-bottom: 0 !important; }
+.pio-cal-list__rows.pio-cal-list__rows { display: grid; min-width: 0; }
+.pio-cal-note.pio-cal-note { color: var(--c-muted); font: 550 15px/1.4 var(--pio-display); }
+.pio-cal-note.pio-cal-note a,
+.pio-cal-empty__text.pio-cal-empty__text a { color: var(--pio-rust) !important; text-decoration: underline; text-underline-offset: 3px; }
+.pio-cal-lit.pio-cal-lit {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	justify-self: start;
+	padding: 8px 16px 8px 10px;
+	border-radius: 999px;
+	background: var(--pio-mist);
+	font: 600 14px/1.3 var(--pio-display);
+}
+.pio-cal-lit.pio-cal-lit i { flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18); }
+.pio-cal-empty.pio-cal-empty {
+	display: grid;
+	justify-items: center;
+	gap: 8px;
+	padding: clamp(28px, 5vw, 56px) 20px;
+	border: 1px dashed var(--c-line);
+	border-radius: 12px;
+	background: var(--pio-mist);
+	text-align: center;
+}
+.pio-cal-empty--inline.pio-cal-empty--inline {
+	grid-template-columns: auto minmax(0, 1fr);
+	justify-items: start;
+	align-items: center;
+	gap: 2px 16px;
+	padding: 16px 20px;
+	text-align: left;
+}
+.pio-cal-empty--inline.pio-cal-empty--inline .pio-cal-empty__icon { grid-row: span 2; }
+.pio-cal-empty__icon.pio-cal-empty__icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--pio-paper); color: var(--pio-rust); }
+.pio-cal-empty__icon.pio-cal-empty__icon .pio-i { width: 22px; height: 22px; }
+.pio-cal-empty__title.pio-cal-empty__title { font: 750 1.2rem/1.3 var(--pio-display); }
+.pio-cal-empty__text.pio-cal-empty__text { color: var(--c-muted); font: 500 15px/1.5 var(--pio-display); }
+.pio-cal-more.pio-cal-more { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding-top: 8px; }
+
+/* ---------------------------------------------------------------- single views: width */
+
+/* "Site Width" option: never wider than Avada's site width, even inside a 100% width container or layout. */
+.pio-w-site.pio-w-site { width: 100%; max-width: var(--pio-max, var(--site_width, 1200px)); margin-inline: auto; }
+.pio-ticket.pio-ticket.is-unstuck,
+.pio-post__rail.pio-post__rail.is-unstuck { position: relative; top: auto; }
+.pio-single.pio-single,
+.pio-post.pio-post { scroll-margin-top: calc(var(--pio-top, 0px) + 16px); }

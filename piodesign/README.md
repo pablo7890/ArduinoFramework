@@ -1,6 +1,6 @@
 # Parafia: PioDesign
 
-Wersja 1.2 · autor: cruzLabs
+Wersja 1.3 · autor: cruzLabs
 
 Wtyczka WordPress dla parafiapio.pl (Avada + The Events Calendar, wersja
 darmowa): nowy układ strony głównej, archiwum aktualności, widoki wydarzeń,
@@ -14,9 +14,9 @@ Co jest w środku:
 |---|---|
 | **Aktualności** (12–15 wpisów, układ „gazetowy”) | shortcode `[pio_aktualnosci]` |
 | **Nadchodzące wydarzenia** (oś 5 tygodni + 8–10 wydarzeń) | shortcode `[pio_wydarzenia]` |
-| **Pojedyncze wydarzenie** (bilet z odliczaniem, dodaj do kalendarza) | automatycznie, podmienia szablon TEC |
-| **Lista wydarzeń** (archiwum TEC, widok „Lista”) | automatycznie, podmienia wiersze listy TEC |
-| **Pojedynczy wpis** (nagłówek, zdjęcie 16:9, boczny pasek z datą i udostępnianiem, „Czytaj także”) | automatycznie, podmienia szablon wpisu |
+| **Pojedyncze wydarzenie** (bilet z odliczaniem, dodaj do kalendarza) | automatycznie, podmienia szablon TEC; w Avada Layouts shortcode `[pio_wydarzenie]` |
+| **Kalendarz parafii**: lista, miesiąc, dzień, minione, kategorie, wyszukiwanie | automatycznie, wtyczka rysuje całe widoki TEC |
+| **Pojedynczy wpis** (nagłówek, zdjęcie 16:9, boczny pasek z datą i udostępnianiem, „Czytaj także”) | automatycznie, podmienia szablon wpisu; w Avada Layouts shortcode `[pio_wpis]` |
 | **Archiwum aktualności** (strona „Aktualności”, kategorie, tagi, miesiące, wyszukiwanie we wpisach) | automatycznie, albo shortcode `[pio_archiwum]` |
 | **Sakramenty** (animowane slajdy) | shortcode `[pio_sakramenty]` |
 | **Cytaty św. Ojca Pio** (animowane slajdy) | shortcode `[pio_cytaty]` |
@@ -209,23 +209,50 @@ add_filter( 'piodesign_category_color', function ( $color, $slug ) {
 
 ## The Events Calendar – szczegóły
 
-- **Lista wydarzeń:** wtyczka podmienia dwa szablony TEC
-  (`v2/list/event.php` i `v2/list/month-separator.php`) przez filtr
-  `tribe_template_file`. Nad listą jest nagłówek „Kalendarz / Nadchodzące
-  wydarzenia” z uchem dnia, osią tygodni, własną wyszukiwarką i przełącznikiem
-  Lista / Miesiąc. Pasek wyszukiwania TEC i „Zasubskrybuj kalendarz” są
-  ukryte (subskrypcję można przywrócić w zakładce *Wydarzenia*). Paginacja i
-  AJAX zostają z TEC.
+- **Kalendarz (lista, miesiąc, dzień):** wtyczka rysuje całe widoki TEC sama
+  (filtr `tribe_events_views_v2_bootstrap_pre_get_view_html`), więc nie
+  pojawia się nic z domyślnego wyglądu – ani pasek wyszukiwania, ani siatka
+  miesiąca, ani komunikaty TEC. Adresy, kategorie i ustawienia TEC zostają:
+  - `/wydarzenia/` i `/wydarzenia/lista/` – nadchodzące, po 12 na stronie
+    (*Ustawienia → PioDesign → Wydarzenia*), pogrupowane po miesiącach, z osią
+    tygodni na pierwszej stronie;
+  - `/wydarzenia/lista/?eventDisplay=past` – minione, od najnowszych;
+  - `/wydarzenia/miesiac/` i `/wydarzenia/2026-11/` – siatka miesiąca:
+    wydarzenia wielodniowe jako paski przez cały tydzień, pozostałe w dniach
+    (najwyżej 3, dalej „+2 więcej” → widok dnia), kolor liturgiczny i nazwa
+    święta w kratce (z wtyczki „Parafia: Kalendarz liturgiczny”), karta z
+    opisem po najechaniu; na telefonie mała siatka z kropkami i lista dni pod
+    nią (dotknięcie dnia przewija do niego);
+  - `/wydarzenia/2026-10-05/`, `/wydarzenia/dzisiaj/` – jeden dzień z
+    przejściem do poprzedniego / następnego;
+  - `/wydarzenia/kategoria/…/` – każdy z tych widoków dla jednej kategorii
+    (kategorie jako zakładki nad kalendarzem);
+  - `?tribe-bar-search=…` – wyszukiwarka w nagłówku, w liście i w miesiącu.
+
+  Miesiące i dni bez wydarzeń (także daleko w przyszłości) otwierają się
+  normalnie z informacją o najbliższym wydarzeniu – TEC od wersji 6.16 dawał
+  tam błąd 404; wtyczka wysyła zamiast tego `noindex`. Przycisk
+  „Subskrybuj” (Google, iPhone/Outlook, plik .ics) włączysz w zakładce
+  *Wydarzenia*. Wyłączenie: `add_filter( 'piodesign_tec_views', '__return_false' );`
+  (wtedy lista TEC wraca z naszymi wierszami).
 - **Pojedyncze wydarzenie:** filtr `tribe_events_template` podmienia
-  `single-event.php`. Widok zajmuje całą szerokość: boczny panel Avady
+  `single-event.php`. Widok ma szerokość strony (Site Width z Avady; w
+  *Ustawienia → PioDesign → Wydarzenia* można wybrać całą szerokość obszaru
+  treści). Bilet z datą jest przypięty przy przewijaniu tuż pod przyklejonym
+  menu Avady (wtyczka mierzy jego wysokość, także gdy menu się zmniejsza i
+  gdy widać pasek administratora). Boczny panel Avady
   „Szczegóły” (opcja *Avada → Options → The Events Calendar → Event Meta
   Layout: Sidebar*) jest wyłączany na tej stronie, bo bilet pokazuje te same
   dane. Możesz też ustawić tę opcję na *Disabled* na stałe.
 - Działa dla wydarzeń w klasycznym edytorze (tak jak teraz). Jeżeli w
   *Wydarzenia → Ustawienia* włączysz edytor blokowy dla wydarzeń, TEC użyje
   innego szablonu.
-- **Avada Layouts:** jeżeli w *Avada → Layouts* jest przypisany układ dla
-  pojedynczych wydarzeń albo archiwów, ma on pierwszeństwo – trzeba go odpiąć.
+- **Avada Layouts:** jeżeli w *Avada → Layouts* przypiszesz układ do
+  pojedynczych wydarzeń (albo wpisów), wtyczka go nie zastępuje. W sekcji
+  treści (Content Layout Section) wstaw kontener **Site Width** z elementem
+  **Code Block** i shortcode `[pio_wydarzenie]` (dla wpisów `[pio_wpis]`) –
+  bez parametrów pokazuje aktualnie oglądane wydarzenie / wpis; `id="123"`
+  pokazuje konkretne. Nad i pod nim możesz układać własne sekcje Avady.
 - Wyłączenie którejkolwiek części:
 
   ```php
@@ -319,7 +346,8 @@ Options → Custom CSS*:
 | `piodesign_category_color` | Kolor kategorii. |
 | `piodesign_template` | Ścieżka szablonu (możesz podmienić dowolny plik z `templates/`). |
 | `piodesign_archive_query` | Argumenty `WP_Query` archiwum na stronie „Aktualności” i w `[pio_archiwum]`. |
-| `piodesign_cache_ttl`, `piodesign_tec_list`, `piodesign_tec_single`, `piodesign_news_archive` | Opisane wyżej. |
+| `piodesign_event_category_color` | Kolor kategorii wydarzeń (domyślnie stały kolor z palety dla sluga). |
+| `piodesign_cache_ttl`, `piodesign_tec_views`, `piodesign_tec_list`, `piodesign_tec_single`, `piodesign_news_archive` | Opisane wyżej. |
 
 ## Style i Avada
 
@@ -343,7 +371,9 @@ piodesign/
 ├── piodesign.php              shortcode'y, zasoby, cache
 ├── includes/core.php          daty po polsku, rok liturgiczny, logika wydarzeń, kadrowanie, paginacja
 ├── includes/wp-data.php       zapytania WP/TEC → dane dla szablonów
-├── includes/tec.php           integracja z The Events Calendar
+├── includes/tec.php           integracja z The Events Calendar (pojedyncze wydarzenie, wiersze listy)
+├── includes/calendar.php      kalendarz: lista, miesiąc, dzień, kategorie, wyszukiwanie
+├── includes/single.php        pojedynczy wpis, [pio_wpis], [pio_wydarzenie]
 ├── includes/archive.php       archiwum aktualności
 ├── includes/settings.php      Ustawienia → PioDesign
 ├── includes/sections.php      [pio_sakramenty] [pio_cytaty] [pio_informacje] [pio_liturgia]
@@ -358,6 +388,21 @@ piodesign/
 ```
 
 ## Zmiany
+
+**1.3**
+
+- Własne widoki kalendarza: lista, **miesiąc** (paski wydarzeń
+  wielodniowych, kolor liturgiczny, karty po najechaniu, wersja na telefon z
+  listą dni), dzień, minione, kategorie jako zakładki, wyszukiwanie w każdym
+  widoku. Nic z domyślnego wyglądu TEC się nie ładuje.
+- Przełącznik Lista / Miesiąc: napis był niewidoczny po odwiedzeniu strony
+  (Avada koloruje odwiedzone linki w TEC) – poprawione.
+- Pojedyncze wydarzenie i wpis: opcja szerokości (domyślnie Site Width),
+  shortcode'y `[pio_wydarzenie]` i `[pio_wpis]` do Avada Layouts; przypięty
+  bilet / pasek nie chowa się pod przyklejonym menu.
+- Archiwum aktualności obejmuje też archiwa dzienne i autorów; kategoria
+  wydarzenia na bilecie prowadzi do kalendarza tej kategorii.
+- Brak błędów 404 dla miesięcy i dni bez wydarzeń.
 
 **1.2**
 

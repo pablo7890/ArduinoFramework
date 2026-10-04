@@ -20,7 +20,7 @@ $date = new DateTimeImmutable( $p['iso'] );
 $url  = $p['url'];
 $hero = $image ? piodesign_frame( $image, 'post' ) : null;
 ?>
-<article class="pio pio-post" style="--cat: <?php echo esc_attr( $p['category']['color'] ); ?>;">
+<article class="pio pio-post<?php echo 'site' === piodesign_option( 'single_width' ) ? ' pio-w-site' : ''; ?>" style="--cat: <?php echo esc_attr( $p['category']['color'] ); ?>;">
 	<nav class="pio-crumbs" aria-label="Okruszki">
 		<a href="<?php echo esc_url( $back_url ); ?>"><?php echo piodesign_icon( 'arrow-l' ); // phpcs:ignore ?> Aktualności</a>
 		<?php if ( $cat_url ) : ?>

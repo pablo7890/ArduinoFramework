@@ -17,6 +17,7 @@
 				<a href="#home" role="tab" id="tab-home" aria-controls="home" aria-selected="true">Strona główna</a>
 				<a href="#wydarzenie" role="tab" id="tab-wydarzenie" aria-controls="wydarzenie" aria-selected="false">Wydarzenie</a>
 				<a href="#kalendarz" role="tab" id="tab-kalendarz" aria-controls="kalendarz" aria-selected="false">Kalendarz</a>
+				<a href="#miesiac" role="tab" id="tab-miesiac" aria-controls="miesiac" aria-selected="false">Miesiąc</a>
 				<a href="#aktualnosci" role="tab" id="tab-aktualnosci" aria-controls="aktualnosci" aria-selected="false">Archiwum aktualności</a>
 				<a href="#wpis" role="tab" id="tab-wpis" aria-controls="wpis" aria-selected="false">Wpis</a>
 			</nav>
@@ -44,6 +45,10 @@
 			{{ARCHIVE}}
 		</section>
 
+		<section class="pv-view pio-tec" id="miesiac" role="tabpanel" aria-labelledby="tab-miesiac" hidden>
+			{{MONTH}}
+		</section>
+
 		<section class="pv-view" id="aktualnosci" role="tabpanel" aria-labelledby="tab-aktualnosci" hidden>
 			{{ARCHIVE_NEWS}}
 		</section>
@@ -54,7 +59,7 @@
 	</main>
 
 	<footer class="pv-foot">
-		<p>Podgląd zbudowany z szablonów wtyczki na treściach z parafiapio.pl ({{NPOSTS}} wpisów, {{NEVENTS}} wydarzeń), stan na {{TODAY}}. Kategorie wpisów w podglądzie to propozycja – dziś prawie wszystkie wpisy mają kategorię „Aktualności”. Dzień liturgiczny, czytania i święta parafialne to przykładowe dane; na stronie pochodzą z wtyczki „Parafia: Kalendarz liturgiczny”. Godziny Mszy, kancelaria i kontakt pochodzą z parafiapio.pl i można je zmienić w Ustawienia → PioDesign. Na telefonie widać 5 aktualności i 5 wydarzeń. „Najbliższa Msza” liczy z intencji mszalnych parafiapio.pl. Odtwarzacz Spotify działa na stronie; w podglądzie zastępuje go przycisk. Archiwum pokazuje pierwszą stronę z 18 wpisami; numery stron prowadzą na parafiapio.pl.</p>
+		<p>Podgląd zbudowany z szablonów wtyczki na treściach z parafiapio.pl ({{NPOSTS}} wpisów, {{NEVENTS}} wydarzeń), stan na {{TODAY}}. Kategorie wpisów w podglądzie to propozycja – dziś prawie wszystkie wpisy mają kategorię „Aktualności”. Dzień liturgiczny, czytania i święta parafialne to przykładowe dane; na stronie pochodzą z wtyczki „Parafia: Kalendarz liturgiczny”. Godziny Mszy, kancelaria i kontakt pochodzą z parafiapio.pl i można je zmienić w Ustawienia → PioDesign. Na telefonie widać 5 aktualności i 5 wydarzeń. „Najbliższa Msza” liczy z intencji mszalnych parafiapio.pl. Odtwarzacz Spotify działa na stronie; w podglądzie zastępuje go przycisk. Archiwum pokazuje pierwszą stronę z 18 wpisami; numery stron prowadzą na parafiapio.pl. W kalendarzu i widoku miesiąca działają przełącznik Lista / Miesiąc i karty po najechaniu na wydarzenie; strzałki miesięcy, kategorie i wyszukiwarka działają na stronie.</p>
 	</footer>
 </div>
 
@@ -79,7 +84,7 @@
 		});
 	});
 
-	var views = ['home', 'wydarzenie', 'kalendarz', 'aktualnosci', 'wpis'];
+	var views = ['home', 'wydarzenie', 'kalendarz', 'miesiac', 'aktualnosci', 'wpis'];
 	function show(id, scroll) {
 		if (views.indexOf(id) < 0) { id = 'home'; }
 		views.forEach(function (v) {
@@ -92,7 +97,7 @@
 		var a = e.target.closest && e.target.closest('a[href]');
 		if (!a) { return; }
 		var href = a.getAttribute('href');
-		if (href === '#home' || href === '#wydarzenie' || href === '#kalendarz' || href === '#aktualnosci' || href === '#wpis') {
+		if (views.indexOf(href.slice(1)) > -1) {
 			e.preventDefault();
 			history.replaceState(null, '', href);
 			show(href.slice(1), true);
