@@ -70,6 +70,9 @@
     padding-bottom: 3px;
   }
   .top a:hover { border-color: var(--krem); }
+  .fb { width: 1.25em; height: 1.25em; flex: none; }
+  .top a, .stopka nav a { display: inline-flex; align-items: center; gap: .45rem; }
+  .btn--jasny .fb { width: 22px; height: 22px; color: #0866FF; }
 
   .hero__main {
     display: grid; grid-template-columns: 1fr auto; gap: 3rem; align-items: center;
@@ -103,7 +106,7 @@
     border-radius: 6px;
     transition: background-color .15s;
   }
-  .btn--jasny { background: var(--krem); color: var(--bordo-ciemne); }
+  .btn--jasny { background: var(--krem); color: var(--bordo-ciemne); display: inline-flex; align-items: center; gap: .6rem; }
   .btn--jasny:hover { background: var(--bialy); }
   .btn--bordo { background: var(--bordo); color: var(--krem); }
   .btn--bordo:hover { background: var(--bordo-ciemne); }
@@ -165,6 +168,7 @@
     .brand img { width: 46px; height: 46px; }
     .brand p { font-size: .7rem; }
     .btn { display: block; text-align: center; }
+    .btn--jasny { display: flex; justify-content: center; }
   }
 </style>
 </head>
@@ -177,7 +181,7 @@
         <img src="logo.png" alt="Logo Służby Liturgicznej Archidiecezji Gdańskiej" width="56" height="56">
         <p>Służba Liturgiczna<br>Archidiecezji Gdańskiej</p>
       </div>
-      <a href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener"><svg class="fb" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>Facebook</a>
     </div>
 
     <div class="hero__main">
@@ -185,7 +189,7 @@
         <p class="motto">Adsumus, Domine! <span>Oto jesteśmy, Panie.</span></p>
         <h1>Nowa strona duszpasterstwa jest w&nbsp;przygotowaniu</h1>
         <p class="hero__lead">Pracujemy nad nową stroną Służby Liturgicznej Archidiecezji Gdańskiej. Do czasu jej uruchomienia aktualności, zapowiedzi wydarzeń i relacje publikujemy na Facebooku.</p>
-        <a class="btn btn--jasny" href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener">Odwiedź nasz Facebook</a>
+        <a class="btn btn--jasny" href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener"><svg class="fb" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>Odwiedź nasz Facebook</a>
       </div>
       <img class="hero__logo" src="logo.png" alt="" width="280" height="280">
     </div>
@@ -252,7 +256,7 @@
   <div class="wrap">
     <p>© 2026 Służba Liturgiczna Archidiecezji Gdańskiej</p>
     <nav aria-label="Linki">
-      <a href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener"><svg class="fb" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>Facebook</a>
       <a href="https://zrzutka.pl/jtex6y" target="_blank" rel="noopener">Zrzutka</a>
     </nav>
   </div>
