@@ -3,429 +3,234 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Służba Liturgiczna Archidiecezji Gdańskiej – nowa strona w budowie</title>
-<meta name="description" content="Budujemy nową stronę duszpasterstwa Służby Liturgicznej Archidiecezji Gdańskiej – Centrum (In)formacyjne dla ministrantów, lektorów i ceremoniarzy.">
-<meta name="theme-color" content="#2D0408">
-<meta property="og:title" content="Budujemy Centrum (In)formacyjne Służby Liturgicznej">
-<meta property="og:description" content="Nowa strona duszpasterstwa jest w budowie. Dołóż swoją cegiełkę!">
+<title>Służba Liturgiczna Archidiecezji Gdańskiej | Nowa strona w przygotowaniu</title>
+<meta name="description" content="Przygotowujemy nową stronę Duszpasterstwa Służby Liturgicznej Archidiecezji Gdańskiej. Aktualności publikujemy na Facebooku.">
+<meta name="theme-color" content="#5A0812">
+<meta property="og:title" content="Służba Liturgiczna Archidiecezji Gdańskiej">
+<meta property="og:description" content="Nowa strona duszpasterstwa jest w przygotowaniu. Aktualności znajdziesz na Facebooku.">
 <meta property="og:locale" content="pl_PL">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Lato:wght@400;700&family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bordo: #8B1020;
-    --bordo-2: #5A0812;
-    --bordo-3: #2D0408;
+    --bordo-ciemne: #5A0812;
+    --bordo-najciemniejsze: #2D0408;
     --zloto: #D4AF37;
     --krem: #F8F5F0;
-    --krem-2: #EFE8DC;
     --bialy: #FFFFFF;
     --tekst: #1A1A1A;
     --szary: #6B6B6B;
-    --radius: 18px;
-    --head: "Montserrat", system-ui, sans-serif;
-    --body: "Lato", system-ui, sans-serif;
-    --serif: "Cormorant Garamond", Georgia, serif;
+    --linia: #E6DFD3;
+    --naglowki: "Montserrat", Arial, sans-serif;
+    --tresc: "Lato", Arial, sans-serif;
   }
-  *, *::before, *::after { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  * { box-sizing: border-box; }
   body {
     margin: 0;
     background: var(--krem);
     color: var(--tekst);
-    font: 400 1.0625rem/1.65 var(--body);
-    -webkit-font-smoothing: antialiased;
+    font: 400 1.0625rem/1.65 var(--tresc);
   }
-  a { color: inherit; }
-  .wrap { width: min(1120px, 100% - 2.5rem); margin-inline: auto; }
+  .wrap { width: min(1080px, 100% - 2.5rem); margin-inline: auto; }
+  h1, h2, h3 { font-family: var(--naglowki); color: var(--bordo-najciemniejsze); margin: 0; }
 
-  /* ---------- HERO ---------- */
-  .hero {
-    position: relative;
-    overflow: hidden;
-    color: var(--krem);
-    background:
-      radial-gradient(1200px 600px at 85% -10%, rgba(139,16,32,.65), transparent 60%),
-      radial-gradient(900px 500px at -10% 110%, rgba(90,8,18,.9), transparent 60%),
-      linear-gradient(160deg, var(--bordo-3) 0%, var(--bordo-2) 100%);
-    padding: clamp(2rem, 5vw, 3.5rem) 0 clamp(4rem, 9vw, 7rem);
-  }
-  /* subtelny wzór krzyży */
-  .hero::before {
-    content: "";
-    position: absolute; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M26 18h4v8h8v4h-8v12h-4V30h-8v-4h8z' fill='%23F8F5F0' fill-opacity='.035'/%3E%3C/svg%3E");
-    pointer-events: none;
-  }
-  /* wielki znak w tle */
-  .hero__seal {
-    position: absolute;
-    right: -60px; top: 54%;
-    width: 600px; aspect-ratio: 1;
-    transform: translateY(-50%);
-    border-radius: 50%;
-    border: 1px solid rgba(212,175,55,.18);
-    box-shadow: inset 0 0 0 26px rgba(248,245,240,.025), inset 0 0 0 27px rgba(212,175,55,.12);
-    pointer-events: none;
-  }
-  .hero__seal img {
-    position: absolute; inset: 120px;
-    width: calc(100% - 240px); height: auto;
-    border-radius: 50%;
-    background: var(--krem);
-    padding: 14px;
-    box-shadow: 0 0 0 6px rgba(212,175,55,.35), 0 30px 80px rgba(0,0,0,.45);
-    transform: rotate(-6deg);
-  }
-  .hero__seal::after {
-    content: ""; position: absolute; inset: 70px;
-    border-radius: 50%;
-    border: 1px dashed rgba(212,175,55,.14);
-    animation: spin 120s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
+  /* Hero */
+  .hero { background: var(--bordo-ciemne); color: var(--krem); }
   .top {
-    position: relative;
     display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(248,245,240,.15);
   }
-  .brand { display: flex; align-items: center; gap: .9rem; text-decoration: none; }
-  .brand__logo {
-    width: 64px; height: 64px; flex: none;
-    border-radius: 50%;
-    background: var(--krem);
-    padding: 4px;
-    box-shadow: 0 0 0 3px rgba(212,175,55,.55), 0 8px 24px rgba(0,0,0,.35);
+  .brand { display: flex; align-items: center; gap: .85rem; }
+  .brand img {
+    width: 56px; height: 56px; flex: none;
+    border-radius: 50%; background: var(--krem); padding: 3px;
   }
-  .brand__logo img { width: 100%; height: 100%; display: block; }
-  .brand__name {
-    font: 700 .78rem/1.35 var(--head);
-    letter-spacing: .14em; text-transform: uppercase;
+  .brand p {
+    margin: 0;
+    font: 700 .8rem/1.35 var(--naglowki);
+    letter-spacing: .08em; text-transform: uppercase;
   }
-  .brand__name span { display: block; color: var(--zloto); font-weight: 600; }
-  .top__fb {
-    font: 600 .8rem/1 var(--head); letter-spacing: .06em;
-    text-decoration: none; color: var(--krem);
-    display: inline-flex; align-items: center; gap: .5rem;
-    padding: .6rem .95rem; border-radius: 999px;
-    border: 1px solid rgba(248,245,240,.25);
-    transition: background .2s, border-color .2s;
+  .top a {
+    color: var(--krem);
+    font: 600 .875rem/1 var(--naglowki);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(248,245,240,.4);
+    padding-bottom: 3px;
   }
-  .top__fb:hover { background: rgba(248,245,240,.08); border-color: rgba(248,245,240,.5); }
+  .top a:hover { border-color: var(--krem); }
 
-  .hero__body { position: relative; max-width: 760px; margin-top: clamp(3rem, 9vw, 6.5rem); }
+  .hero__main {
+    display: grid; grid-template-columns: 1fr auto; gap: 3rem; align-items: center;
+    padding: clamp(3rem, 8vw, 5.5rem) 0;
+  }
   .motto {
-    display: inline-flex; align-items: center; gap: 1rem;
-    font: italic 600 clamp(1.15rem, 2.4vw, 1.45rem)/1 var(--serif);
-    color: var(--zloto); letter-spacing: .03em;
-    margin: 0 0 1.4rem;
+    margin: 0 0 1.25rem;
+    font: 700 .85rem/1.4 var(--naglowki);
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--zloto);
   }
-  .motto::before, .motto::after {
-    content: ""; width: 42px; height: 1px; background: currentColor; opacity: .7;
+  .motto span { color: rgba(248,245,240,.65); font-weight: 600; }
+  .hero h1 {
+    color: var(--krem);
+    font-weight: 800;
+    font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+    line-height: 1.08;
+    letter-spacing: -.015em;
+    margin-bottom: 1.25rem;
   }
-  .motto small {
-    font: 500 .72rem/1 var(--head); font-style: normal;
-    letter-spacing: .14em; text-transform: uppercase;
-    color: rgba(248,245,240,.6);
-  }
-  h1 {
-    font: 800 clamp(2.4rem, 7vw, 4.6rem)/1.02 var(--head);
-    letter-spacing: -.025em;
-    margin: 0 0 1.5rem;
-  }
-  h1 em {
-    font-style: italic; font-weight: 700;
-    color: transparent;
-    background: linear-gradient(90deg, #F3DFA0, var(--zloto));
-    -webkit-background-clip: text; background-clip: text;
-  }
-  .lead {
-    font-size: clamp(1.05rem, 1.8vw, 1.2rem);
-    color: rgba(248,245,240,.82);
-    max-width: 580px; margin: 0 0 2.2rem;
+  .hero__lead { max-width: 560px; margin: 0 0 2rem; color: rgba(248,245,240,.85); font-size: 1.125rem; }
+  .hero__logo {
+    width: 280px; height: 280px;
+    border-radius: 50%; background: var(--krem); padding: 10px;
   }
 
   .btn {
-    display: inline-flex; align-items: center; gap: .65rem;
-    font: 700 .95rem/1 var(--head); letter-spacing: .02em;
-    text-decoration: none;
-    padding: 1.05rem 1.6rem; border-radius: 999px;
-    transition: transform .2s ease, box-shadow .2s ease, background .2s;
-  }
-  .btn svg { width: 20px; height: 20px; flex: none; }
-  .btn .arrow { transition: transform .2s ease; }
-  .btn:hover { transform: translateY(-2px); }
-  .btn:hover .arrow { transform: translateX(4px); }
-  .btn:focus-visible, .top__fb:focus-visible, .footer a:focus-visible {
-    outline: 3px solid var(--zloto); outline-offset: 3px;
-  }
-  .btn--light { background: var(--krem); color: var(--bordo-3); box-shadow: 0 10px 30px rgba(0,0,0,.3); }
-  .btn--light:hover { box-shadow: 0 14px 36px rgba(0,0,0,.4); }
-  .btn--bordo { background: var(--bordo); color: var(--krem); box-shadow: 0 10px 26px rgba(139,16,32,.35); }
-  .btn--bordo:hover { background: #A0142A; box-shadow: 0 14px 32px rgba(139,16,32,.45); }
-
-  .actions { display: flex; flex-wrap: wrap; gap: .9rem 1.4rem; align-items: center; }
-  .status {
-    display: inline-flex; align-items: center; gap: .7rem;
-    font: 600 .78rem/1 var(--head); letter-spacing: .12em; text-transform: uppercase;
-    color: rgba(248,245,240,.7);
-  }
-  .status__bar {
-    position: relative; width: 120px; height: 6px; border-radius: 6px;
-    background: rgba(248,245,240,.14); overflow: hidden;
-  }
-  .status__bar::before {
-    content: ""; position: absolute; inset: 0 32% 0 0; border-radius: inherit;
-    background: linear-gradient(90deg, var(--bordo), var(--zloto));
-  }
-  .status__bar::after {
-    content: ""; position: absolute; top: 0; bottom: 0; width: 40%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
-    animation: shine 2.4s ease-in-out infinite;
-  }
-  @keyframes shine { from { left: -40%; } to { left: 70%; } }
-
-  /* łuk przejścia hero → krem */
-  .hero__arch {
-    position: absolute; left: 0; right: 0; bottom: -1px; height: 60px;
-    background: var(--krem);
-    clip-path: ellipse(75% 100% at 50% 100%);
-  }
-
-  /* ---------- CENTRUM ---------- */
-  .centrum { padding: clamp(3rem, 7vw, 5.5rem) 0 clamp(3rem, 6vw, 4.5rem); }
-  .eyebrow {
     display: inline-block;
-    font: 700 .74rem/1 var(--head); letter-spacing: .18em; text-transform: uppercase;
-    color: var(--bordo);
-    padding: .5rem .85rem; border-radius: 999px;
-    background: rgba(139,16,32,.08);
-    margin-bottom: 1.1rem;
+    font: 700 1rem/1 var(--naglowki);
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    transition: background-color .15s;
   }
-  h2 {
-    font: 800 clamp(2rem, 5vw, 3.3rem)/1.06 var(--head);
-    letter-spacing: -.02em; margin: 0 0 1.2rem;
-    color: var(--bordo-3);
-  }
-  h2 .in { color: var(--bordo); font-style: italic; font-weight: 700; }
-  h2 .sub { display: block; font-weight: 600; font-size: .55em; letter-spacing: -.01em; color: var(--szary); margin-top: .5rem; }
-  .intro { max-width: 680px; color: #3d3d3d; margin: 0; }
-  .intro strong { color: var(--bordo-3); }
+  .btn--jasny { background: var(--krem); color: var(--bordo-ciemne); }
+  .btn--jasny:hover { background: var(--bialy); }
+  .btn--bordo { background: var(--bordo); color: var(--krem); }
+  .btn--bordo:hover { background: var(--bordo-ciemne); }
+  a:focus-visible { outline: 3px solid var(--zloto); outline-offset: 3px; }
 
-  .cards {
-    list-style: none; padding: 0;
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem;
-    margin: clamp(2.2rem, 5vw, 3.2rem) 0 0;
+  /* Centrum */
+  .centrum { padding: clamp(3rem, 7vw, 5rem) 0; }
+  .centrum h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.15; letter-spacing: -.01em; }
+  .centrum h2 + p { margin: .4rem 0 1.25rem; font: 600 1.125rem/1.4 var(--naglowki); color: var(--szary); }
+  .intro { max-width: 680px; margin: 0; }
+
+  .karty {
+    list-style: none; padding: 0; margin: 2.5rem 0 0;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
   }
-  .card {
-    position: relative;
+  .karta {
     background: var(--bialy);
-    border-radius: var(--radius);
-    padding: 2rem 1.7rem 1.8rem;
-    box-shadow: 0 1px 2px rgba(45,4,8,.05), 0 12px 32px -14px rgba(45,4,8,.18);
-    transition: transform .25s ease, box-shadow .25s ease;
-    overflow: hidden;
+    border: 1px solid var(--linia);
+    border-radius: 8px;
+    padding: 1.75rem 1.5rem;
   }
-  .card::before {
-    content: ""; position: absolute; left: 1.7rem; right: 1.7rem; top: 0; height: 3px;
-    background: linear-gradient(90deg, var(--zloto), rgba(212,175,55,0));
-    border-radius: 0 0 3px 3px;
-  }
-  .card:hover { transform: translateY(-6px); box-shadow: 0 1px 2px rgba(45,4,8,.05), 0 22px 44px -16px rgba(45,4,8,.28); }
-  .card__icon {
-    width: 52px; height: 52px; border-radius: 14px;
-    display: grid; place-items: center;
-    background: linear-gradient(150deg, var(--bordo), var(--bordo-2));
-    color: var(--krem); margin-bottom: 1.2rem;
-  }
-  .card__icon svg { width: 26px; height: 26px; }
-  .card h3 { font: 800 1.3rem/1.2 var(--head); margin: 0 0 .25rem; color: var(--bordo-3); }
-  .card__tag { font: italic 600 1.05rem/1.2 var(--serif); color: var(--bordo); margin: 0 0 .9rem; }
-  .card ul { margin: 0; padding: 0; list-style: none; color: #4a4a4a; font-size: .97rem; }
-  .card li { position: relative; padding-left: 1.1rem; margin-top: .4rem; }
-  .card li::before { content: ""; position: absolute; left: 0; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--zloto); }
+  .karta h3 { font-size: 1.2rem; margin-bottom: .75rem; color: var(--bordo); }
+  .karta ul { margin: 0; padding-left: 1.1rem; color: #3d3d3d; font-size: .975rem; }
+  .karta li + li { margin-top: .35rem; }
+  .karta li::marker { color: var(--bordo); }
 
-  /* ---------- CEGIEŁKA ---------- */
-  .wsparcie { padding: 0 0 clamp(3.5rem, 8vw, 6rem); }
-  .cegla {
-    position: relative; overflow: hidden;
-    display: grid; grid-template-columns: 1.35fr 1fr; gap: 2rem; align-items: center;
+  /* Cegiełka */
+  .wsparcie { padding: 0 0 clamp(3rem, 7vw, 5rem); }
+  .cegielka {
     background: var(--bialy);
-    border: 2px solid var(--bordo);
-    border-radius: calc(var(--radius) + 6px);
-    padding: clamp(1.8rem, 4.5vw, 3.2rem);
-    box-shadow: 0 24px 60px -28px rgba(45,4,8,.35);
+    border: 1px solid var(--linia);
+    border-top: 4px solid var(--bordo);
+    border-radius: 8px;
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem 3rem;
   }
-  .cegla h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: .9rem; }
-  .cegla p { margin: 0 0 1.5rem; color: #3d3d3d; max-width: 520px; }
+  .cegielka h2 { font-size: clamp(1.5rem, 3vw, 1.9rem); line-height: 1.2; margin-bottom: .6rem; }
+  .cegielka p { margin: 0; max-width: 560px; color: #3d3d3d; }
 
-  /* mur z cegieł (mijanka) – wzór SVG */
-  .mur {
-    position: relative; align-self: stretch; min-height: 220px;
-    border-radius: var(--radius);
-    background: var(--krem) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='68'%3E%3Cg fill='%23EDE4D6'%3E%3Crect x='2' y='2' width='72' height='30' rx='3'/%3E%3Crect x='-36' y='36' width='72' height='30' rx='3'/%3E%3Crect x='40' y='36' width='72' height='30' rx='3'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 76px 68px;
-    -webkit-mask-image: linear-gradient(to top, #000 55%, transparent 100%);
-            mask-image: linear-gradient(to top, #000 55%, transparent 100%);
-  }
-  .mur__new {
-    position: absolute; left: 50%; top: 38%;
-    width: 72px; height: 30px; border-radius: 4px;
-    background: linear-gradient(160deg, #A0142A, var(--bordo-2));
-    box-shadow: 0 10px 22px rgba(90,8,18,.4);
-    transform: translateX(-50%);
-    animation: drop 3.2s cubic-bezier(.3,.7,.2,1) infinite;
-  }
-  .mur__new::after {
-    content: "Ty"; position: absolute; inset: 0; display: grid; place-items: center;
-    font: 800 .78rem/1 var(--head); letter-spacing: .08em; color: var(--krem);
-  }
-  @keyframes drop {
-    0%, 15% { transform: translate(-50%, -40px); opacity: 0; }
-    45%, 85% { transform: translate(-50%, 0); opacity: 1; }
-    100% { transform: translate(-50%, 0); opacity: 0; }
-  }
+  /* Stopka */
+  .stopka { background: var(--bordo-najciemniejsze); color: rgba(248,245,240,.75); font-size: .9rem; padding: 1.75rem 0; }
+  .stopka .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem 1.5rem; }
+  .stopka p { margin: 0; }
+  .stopka a { color: var(--krem); }
+  .stopka nav { display: flex; gap: 1.25rem; }
 
-  /* ---------- STOPKA ---------- */
-  .footer {
-    background: var(--bordo-3); color: rgba(248,245,240,.7);
-    padding: 2rem 0; font-size: .9rem;
+  @media (max-width: 860px) {
+    .hero__main { grid-template-columns: 1fr; }
+    .hero__logo { display: none; }
+    .karty { grid-template-columns: 1fr; }
   }
-  .footer .wrap { display: flex; flex-wrap: wrap; gap: .8rem 1.5rem; align-items: center; justify-content: space-between; }
-  .footer p { margin: 0; }
-  .footer em { font: italic 600 1.05rem/1 var(--serif); color: var(--zloto); }
-  .footer nav { display: flex; gap: 1.3rem; }
-  .footer a { color: var(--krem); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,.5); padding-bottom: 2px; }
-  .footer a:hover { border-color: var(--zloto); }
-
-  /* ---------- RESPONSYWNOŚĆ ---------- */
-  @media (max-width: 1180px) and (min-width: 901px) {
-    .hero__seal { right: -260px; opacity: .55; }
-  }
-  @media (max-width: 900px) {
-    .cards { grid-template-columns: 1fr; }
-    .cegla { grid-template-columns: 1fr; }
-    .mur { min-height: 150px; order: -1; }
-    .hero__seal { display: none; }
-  }
-  @media (max-width: 560px) {
-    .brand__logo { width: 52px; height: 52px; }
-    .brand__name { font-size: .68rem; }
-    .top__fb span { display: none; }
-    .top__fb { padding: .6rem; }
-    .btn { width: 100%; justify-content: center; }
-    .motto { flex-wrap: wrap; gap: .35rem .8rem; }
-    .motto::before, .motto::after { display: none; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-    .mur__new { opacity: 1; }
+  @media (max-width: 480px) {
+    .brand img { width: 46px; height: 46px; }
+    .brand p { font-size: .7rem; }
+    .btn { display: block; text-align: center; }
   }
 </style>
 </head>
 <body>
 
 <header class="hero">
-  <div class="hero__seal" aria-hidden="true"><img src="logo.png" alt="" width="360" height="360"></div>
   <div class="wrap">
     <div class="top">
-      <a class="brand" href="#" aria-label="Służba Liturgiczna Archidiecezji Gdańskiej">
-        <span class="brand__logo"><img src="logo.png" alt="" width="64" height="64"></span>
-        <span class="brand__name">Służba Liturgiczna<span>Archidiecezji Gdańskiej</span></span>
-      </a>
-      <a class="top__fb" href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener" aria-label="Facebook Służby Liturgicznej">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H7.9v3h2.6V21h3z"/></svg>
-        <span>Facebook</span>
-      </a>
+      <div class="brand">
+        <img src="logo.png" alt="Logo Służby Liturgicznej Archidiecezji Gdańskiej" width="56" height="56">
+        <p>Służba Liturgiczna<br>Archidiecezji Gdańskiej</p>
+      </div>
+      <a href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener">Facebook</a>
     </div>
 
-    <div class="hero__body">
-      <p class="motto">Adsumus, Domine! <small>Oto jesteśmy, Panie</small></p>
-      <h1>Budujemy nową <em>stronę</em> duszpasterstwa.</h1>
-      <p class="lead">Na razie przygotowujemy wszystko w zakrystii, a wkrótce wyjdziemy do ołtarza. Do tego czasu bądź z nami na Facebooku. Tam znajdziesz aktualności, wydarzenia i relacje.</p>
-      <div class="actions">
-        <a class="btn btn--light" href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H7.9v3h2.6V21h3z"/></svg>
-          Odwiedź nasz Facebook
-          <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-        <span class="status" role="status"><span class="status__bar" aria-hidden="true"></span>Strona w budowie</span>
+    <div class="hero__main">
+      <div>
+        <p class="motto">Adsumus, Domine! <span>Oto jesteśmy, Panie</span></p>
+        <h1>Nowa strona duszpasterstwa jest w&nbsp;przygotowaniu</h1>
+        <p class="hero__lead">Pracujemy nad nową stroną Służby Liturgicznej Archidiecezji Gdańskiej. Do czasu jej uruchomienia aktualności, zapowiedzi wydarzeń i relacje publikujemy na Facebooku.</p>
+        <a class="btn btn--jasny" href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener">Odwiedź nasz Facebook</a>
       </div>
+      <img class="hero__logo" src="logo.png" alt="" width="280" height="280">
     </div>
   </div>
-  <div class="hero__arch" aria-hidden="true"></div>
 </header>
 
 <main>
   <section class="centrum" aria-labelledby="centrum-h">
     <div class="wrap">
-      <span class="eyebrow">Nowy projekt</span>
-      <h2 id="centrum-h">Centrum <span class="in">(In)</span>formacyjne <span class="sub">dla Służby Liturgicznej Archidiecezji Gdańskiej</span></h2>
-      <p class="intro">Nowa strona będzie czymś więcej niż tablicą ogłoszeń. Ma być <strong>praktycznym narzędziem organizacji, komunikacji i formacji</strong> ministrantów, lektorów i ceremoniarzy. Chcemy, żeby była czytelna, nowoczesna, bezpieczna i wygodna na telefonie, bo ma pomagać <strong>lepiej służyć tym, którzy służą przy ołtarzu</strong>.</p>
+      <h2 id="centrum-h">Budujemy Centrum (In)formacyjne</h2>
+      <p>dla Służby Liturgicznej Archidiecezji Gdańskiej</p>
+      <p class="intro">Nowa strona zbierze w jednym miejscu to, czego potrzebują ministranci, lektorzy, ceremoniarze, animatorzy i duszpasterze: aktualności, kalendarz wydarzeń, zapisy oraz materiały formacyjne. Będzie wygodna w obsłudze także na telefonie.</p>
 
-      <ul class="cards">
-        <li class="card">
-          <div class="card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M7.5 13.5h3M7.5 16.5h6"/></svg>
-          </div>
+      <ul class="karty">
+        <li class="karta">
           <h3>Informacja</h3>
-          <p class="card__tag">wszystko w jednym miejscu</p>
           <ul>
             <li>aktualności z życia Służby Liturgicznej</li>
             <li>kalendarz wydarzeń diecezjalnych</li>
             <li>zapisy na kursy, turnieje i dni skupienia</li>
           </ul>
         </li>
-        <li class="card">
-          <div class="card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 3.5 4.8v13.7C7 18.2 10 18.7 12 20.2c2-1.5 5-2 8.5-1.7V4.8C17 4.5 14 5 12 6.5z"/><path d="M12 6.5v13.7"/></svg>
-          </div>
+        <li class="karta">
           <h3>Formacja</h3>
-          <p class="card__tag">bliżej Słowa i liturgii</p>
           <ul>
             <li>codzienne przygotowanie lektorów do czytań</li>
-            <li>biblioteka materiałów formacyjnych</li>
-            <li>dokumenty, regulaminy i pomoce liturgiczne</li>
+            <li>materiały formacyjne i pomoce liturgiczne</li>
+            <li>dokumenty i regulaminy</li>
           </ul>
         </li>
-        <li class="card">
-          <div class="card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.6c2.6-.3 4.6 1.3 5 4.4"/></svg>
-          </div>
+        <li class="karta">
           <h3>Wspólnota</h3>
-          <p class="card__tag">wiara to gra zespołowa</p>
           <ul>
             <li>turnieje, pielgrzymki i spotkania</li>
             <li>galeria i relacje z wydarzeń</li>
-            <li>strefa dla rodziców, animatorów i duszpasterzy</li>
+            <li>informacje dla rodziców i duszpasterzy</li>
           </ul>
         </li>
       </ul>
     </div>
   </section>
 
-  <section class="wsparcie" aria-labelledby="cegla-h">
+  <section class="wsparcie" aria-labelledby="cegielka-h">
     <div class="wrap">
-      <div class="cegla">
+      <div class="cegielka">
         <div>
-          <span class="eyebrow">Dobrowolne wsparcie</span>
-          <h2 id="cegla-h">Dołóż swoją cegiełkę</h2>
-          <p>Jeśli chcesz, możesz dołożyć małą cegiełkę na wsparcie Duszpasterstwa Służby Liturgicznej. Każdy gest dobroci jest dla nas cenny, a najcenniejsza jest Twoja modlitwa.</p>
-          <a class="btn btn--bordo" href="https://zrzutka.pl/jtex6y" target="_blank" rel="noopener">
-            Dołóż cegiełkę
-            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+          <h2 id="cegielka-h">Cegiełka na wsparcie Duszpasterstwa</h2>
+          <p>Budowę nowej strony można wesprzeć dobrowolną cegiełką na rzecz Duszpasterstwa Służby Liturgicznej. Dziękujemy za każdą pomoc.</p>
         </div>
-        <div class="mur" aria-hidden="true"><span class="mur__new"></span></div>
+        <a class="btn btn--bordo" href="https://zrzutka.pl/jtex6y" target="_blank" rel="noopener">Wesprzyj przez Zrzutkę</a>
       </div>
     </div>
   </section>
 </main>
 
-<footer class="footer">
+<footer class="stopka">
   <div class="wrap">
-    <p>© 2026 Służba Liturgiczna Archidiecezji Gdańskiej · <em>Króluj nam, Chryste!</em></p>
+    <p>© 2026 Służba Liturgiczna Archidiecezji Gdańskiej</p>
     <nav aria-label="Linki">
       <a href="https://www.facebook.com/sluzbaliturgicznaAG" target="_blank" rel="noopener">Facebook</a>
       <a href="https://zrzutka.pl/jtex6y" target="_blank" rel="noopener">Zrzutka</a>
